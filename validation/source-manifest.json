@@ -19,6 +19,7 @@
     "src/hyperoptimization/data/golden_family_live.json": "d90e2115a7c590d708b445b4d7a35fbd91bafdcafa0ae6f9571f0b1da132e6ff",
     "src/hyperoptimization/data/golden_gl_loops.json": "daf48d9627da7fcc9e74e16f1dbfb9f8c71d61d754ecbea0497dd97ae1ddf5b9",
     "src/hyperoptimization/data/golden_l2_gate_bits.json": "e7de61703756f064371ff7bdf238bd7631c45468407519173d9a7db88c6c55f9",
+    "src/hyperoptimization/deals.py": "208b562f8912803dc5a69e680ee6ac3843d6b6373b9be9acb8c5000437e479b7",
     "src/hyperoptimization/decisions.py": "f96beb59261a4dbb8deb6ed806f7c722c468d234b8b0a46366b72819d67c233e",
     "src/hyperoptimization/entrenchment.py": "09e7fae4d9ffb78e77774a658be89f3cce66e633d56a706df3afb32d7491daa6",
     "src/hyperoptimization/family.py": "041fa2e4a0aebbcf81ef7e2b2b150f26608d752fb31013d83ba480e463d203c9",
@@ -36,6 +37,7 @@
     "tests/randomgames.py": "d61667866692a952c75829dffafaaf5f01de9be623292b2714e62783d5d641e9",
     "tests/test_clauses.py": "bc4a968ec8c27cc0507811ac6df73d33c624fb6d7c41da11f888ebb39ce9caf4",
     "tests/test_comprehension.py": "cd526c78290ab9e1f8062bd11bab10834c24392a89db61cdbe4133f164f6017d",
+    "tests/test_deals.py": "92dac334d5813c372c64bd1efb80bcff1f634b7df936d26a101bbbe0c0f7e3ad",
     "tests/test_decisions.py": "538428e6b3ebdaae4c6b668f5e48a416286a55c6a369e8cbaf38c023056292b1",
     "tests/test_documents.py": "9c27864e00563b7a2d34e864b7a98ec13e1775945aff6f118d842139d452bc9a",
     "tests/test_entrenchment.py": "d820d7b7915ece97da31c4b697753745fbc6b3ee51f945a3b82c23c973318d3d",
@@ -55,5 +57,5 @@
     "tests/test_surprisal.py": "4c5f7419b853920ec72a34b6666471830844a8847a4b0a8c62a6cc184346a3ef",
     "tests/test_viability.py": "38b75b4c29a26bba6a23e19742a53d787fa9d7341b2a6305cfa55510866e8f31"
   },
-  "manifest_sha256": "640cb24f81ca5b2184b2a6314177c9ccd8fd729314d15e35f8cd700a46dcd527"
+  "manifest_sha256": "76208ebdadc03993b853d536651f3bb40bebf635164876f8c311a85edbfa371e"
 }
