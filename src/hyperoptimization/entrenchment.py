@@ -230,6 +230,15 @@ def _reached(graph: Mapping[str, frozenset[str]]) -> dict[str, set[str]]:
     return reached
 
 
+def reliance_closure(depends_on: Mapping[str, Iterable[str]]) -> dict[str, frozenset[str]]:
+    """For each node, everything it relies on, directly or through others (one step or more).
+
+    A node is in its own closure exactly when it lies on a cycle. What relies on a node is read off the
+    same table: m relies on n iff n is in m's closure.
+    """
+    return {name: frozenset(found) for name, found in _reached(_dependencies(depends_on)).items()}
+
+
 def incomparable_pairs(depends_on: Mapping[str, Iterable[str]]) -> list[tuple[str, str]]:
     """The pairs of nodes that neither relies on, directly or through others, sorted.
 
@@ -246,4 +255,4 @@ def incomparable_pairs(depends_on: Mapping[str, Iterable[str]]) -> list[tuple[st
 
 
 __all__ = ["Rule", "apex", "authority_height", "cores", "cycles", "incomparable_pairs", "phases", "protection",
-           "weakest_link"]
+           "reliance_closure", "weakest_link"]
