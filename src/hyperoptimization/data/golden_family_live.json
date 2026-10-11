@@ -1,0 +1,1718 @@
+{
+ "command": "PYTHONPATH=<hyperstratum>/src python scripts/regenerate_golden_live.py <hyperstratum>",
+ "edges": [
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "grounded-hypercalculi",
+   "target": "grounded-hyperset-theory"
+  },
+  {
+   "count": 5,
+   "kind": "name",
+   "source": "grounded-hypercalculi",
+   "target": "hypermath"
+  },
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "grounded-hypercalculi",
+   "target": "ordinatics"
+  },
+  {
+   "count": 18,
+   "kind": "name",
+   "source": "grounded-hypercalculi",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "grounded-hyperset-theory",
+   "target": "grounded-hypercalculi"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "grounded-hyperset-theory",
+   "target": "hypermath"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "grounded-hyperset-theory",
+   "target": "hypermath"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "grounded-hyperset-theory",
+   "target": "ordinatics"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "grounded-hyperset-theory",
+   "target": "ordinatics"
+  },
+  {
+   "count": 9,
+   "kind": "name",
+   "source": "grounded-hyperset-theory",
+   "target": "verifier"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "hyperchemistry",
+   "target": "hyperbiology"
+  },
+  {
+   "count": 16,
+   "kind": "name",
+   "source": "hyperchemistry",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 4,
+   "kind": "url",
+   "source": "hyperchemistry",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hyperchemistry",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hyperethics",
+   "target": "hypergrammar"
+  },
+  {
+   "count": 8,
+   "kind": "name",
+   "source": "hyperethics",
+   "target": "hypermath"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hyperethics",
+   "target": "hypermath"
+  },
+  {
+   "count": 16,
+   "kind": "name",
+   "source": "hyperethics",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hyperethics",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 15,
+   "kind": "name",
+   "source": "hyperethics",
+   "target": "metamathethicology"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hyperethics",
+   "target": "metamathethicology"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "hyperethics",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hypergrammar",
+   "target": "grounded-hypercalculi"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hypergrammar",
+   "target": "grounded-hyperset-theory"
+  },
+  {
+   "count": 50,
+   "kind": "name",
+   "source": "hypergrammar",
+   "target": "hypermath"
+  },
+  {
+   "count": 15,
+   "kind": "name",
+   "source": "hypergrammar",
+   "target": "hyperorder"
+  },
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "hypergrammar",
+   "target": "ordinatics"
+  },
+  {
+   "count": 6,
+   "kind": "name",
+   "source": "hypergrammar",
+   "target": "verifier"
+  },
+  {
+   "count": 5,
+   "kind": "name",
+   "source": "hyperlogic",
+   "target": "grounded-hypercalculi"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "hyperlogic",
+   "target": "grounded-hyperset-theory"
+  },
+  {
+   "count": 18,
+   "kind": "name",
+   "source": "hyperlogic",
+   "target": "hyperethics"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hyperlogic",
+   "target": "hyperethics"
+  },
+  {
+   "count": 97,
+   "kind": "name",
+   "source": "hyperlogic",
+   "target": "hypermath"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "hyperlogic",
+   "target": "hypermath"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "hyperlogic",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hyperlogic",
+   "target": "hyperreality"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "hyperlogic",
+   "target": "metamathethicology"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "hyperlogic",
+   "target": "ordinatics"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "hyperlogic",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hypermath",
+   "target": "grounded-hypercalculi"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hypermath",
+   "target": "grounded-hyperset-theory"
+  },
+  {
+   "count": 13,
+   "kind": "name",
+   "source": "hypermath",
+   "target": "hypergrammar"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hypermath",
+   "target": "hyperlogic"
+  },
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "hypermath",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 74,
+   "kind": "name",
+   "source": "hypermath",
+   "target": "ordinatics"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hypermath",
+   "target": "ordinatics"
+  },
+  {
+   "count": 39,
+   "kind": "name",
+   "source": "hypermath",
+   "target": "verifier"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "hypermath",
+   "target": "verifier"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "hyperobjectivity",
+   "target": "hyperemergence"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hyperobjectivity",
+   "target": "hyperethics"
+  },
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "hyperobjectivity",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "hyperobjectivity",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "hyperobjectivity",
+   "target": "hypersubjectivity"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hyperobjectivity",
+   "target": "hypersubjectivity"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hyperobjectivity",
+   "target": "verifier"
+  },
+  {
+   "count": 9,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "hyperbiology"
+  },
+  {
+   "count": 6,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "hyperchemistry"
+  },
+  {
+   "count": 16,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "hyperethics"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "hypergrammar"
+  },
+  {
+   "count": 6,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "hyperlogic"
+  },
+  {
+   "count": 7,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "hypermath"
+  },
+  {
+   "count": 7,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "hyperreality"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "metamathethicology"
+  },
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "ordinatics"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "hyperphysics",
+   "target": "verifier"
+  },
+  {
+   "count": 20,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hyperethics"
+  },
+  {
+   "count": 3,
+   "kind": "url",
+   "source": "hyperreality",
+   "target": "hyperethics"
+  },
+  {
+   "count": 5,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hyperlogic"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hypermath"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hyperobjectivity"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hyperreality",
+   "target": "hyperobjectivity"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hyperorder"
+  },
+  {
+   "count": 15,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hyperprobability"
+  },
+  {
+   "count": 9,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hyperspace"
+  },
+  {
+   "count": 3,
+   "kind": "url",
+   "source": "hyperreality",
+   "target": "hyperspace"
+  },
+  {
+   "count": 18,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 3,
+   "kind": "url",
+   "source": "hyperreality",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hypersubjectivity"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hyperreality",
+   "target": "hypersubjectivity"
+  },
+  {
+   "count": 5,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "hypertime"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "hyperreality",
+   "target": "hypertime"
+  },
+  {
+   "count": 8,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "metamathethicology"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "hyperreality",
+   "target": "metamathethicology"
+  },
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "hyperreality",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hyperspace",
+   "target": "hyperethics"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hyperspace",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "hyperspace",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "hyperspace",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 12,
+   "kind": "name",
+   "source": "hyperspace",
+   "target": "hypertime"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hyperspace",
+   "target": "hypertime"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "hyperspace",
+   "target": "verifier"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "hypersubjectivity",
+   "target": "hyperemergence"
+  },
+  {
+   "count": 7,
+   "kind": "name",
+   "source": "hypersubjectivity",
+   "target": "hyperethics"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hypersubjectivity",
+   "target": "hyperethics"
+  },
+  {
+   "count": 8,
+   "kind": "name",
+   "source": "hypersubjectivity",
+   "target": "hyperobjectivity"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hypersubjectivity",
+   "target": "hyperobjectivity"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "hypersubjectivity",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hypersubjectivity",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hypersubjectivity",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hypertime",
+   "target": "hyperethics"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hypertime",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "hypertime",
+   "target": "hyperreality"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "hypertime",
+   "target": "hyperreality"
+  },
+  {
+   "count": 10,
+   "kind": "name",
+   "source": "hypertime",
+   "target": "hyperspace"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "hypertime",
+   "target": "hyperspace"
+  },
+  {
+   "count": 5,
+   "kind": "name",
+   "source": "hypertime",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "hypertime",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "hypertime",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "meta-morphoscripted-origination",
+   "target": "hypergrammar"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "meta-morphoscripted-origination",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "metamathethicology",
+   "target": "grounded-hypercalculi"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "metamathethicology",
+   "target": "grounded-hypercalculi"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "metamathethicology",
+   "target": "grounded-hyperset-theory"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "metamathethicology",
+   "target": "grounded-hyperset-theory"
+  },
+  {
+   "count": 48,
+   "kind": "name",
+   "source": "metamathethicology",
+   "target": "hyperethics"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "metamathethicology",
+   "target": "hyperethics"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "metamathethicology",
+   "target": "hypergrammar"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "metamathethicology",
+   "target": "hyperlogic"
+  },
+  {
+   "count": 5,
+   "kind": "name",
+   "source": "metamathethicology",
+   "target": "hypermath"
+  },
+  {
+   "count": 54,
+   "kind": "name",
+   "source": "metamathethicology",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "metamathethicology",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 9,
+   "kind": "name",
+   "source": "metamathethicology",
+   "target": "ordinatics"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "metamathethicology",
+   "target": "ordinatics"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "metamathethicology",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "ordinatics",
+   "target": "grounded-hypercalculi"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "ordinatics",
+   "target": "grounded-hypercalculi"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "ordinatics",
+   "target": "grounded-hyperset-theory"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "ordinatics",
+   "target": "grounded-hyperset-theory"
+  },
+  {
+   "count": 4,
+   "kind": "name",
+   "source": "ordinatics",
+   "target": "hypermath"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "ordinatics",
+   "target": "hypermath"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "ordinatics",
+   "target": "hyperphysics"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "ordinatics",
+   "target": "hyperstratum"
+  },
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "ordinatics",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "ordinatics",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "speedrunning-social-development",
+   "target": "hypergrammar"
+  },
+  {
+   "count": 8,
+   "kind": "name",
+   "source": "speedrunning-social-development",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "url",
+   "source": "speedrunning-social-development",
+   "target": "verifier"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "taxonomy-of-deception",
+   "target": "verifier"
+  },
+  {
+   "count": 5,
+   "kind": "url",
+   "source": "taxonomy-of-deception",
+   "target": "verifier"
+  },
+  {
+   "count": 1,
+   "kind": "name",
+   "source": "throwaway-papers",
+   "target": "hypergrammar"
+  },
+  {
+   "count": 5,
+   "kind": "name",
+   "source": "throwaway-papers",
+   "target": "verifier"
+  },
+  {
+   "count": 2,
+   "kind": "name",
+   "source": "verifier",
+   "target": "grounded-hypercalculi"
+  },
+  {
+   "count": 3,
+   "kind": "name",
+   "source": "verifier",
+   "target": "grounded-hyperset-theory"
+  },
+  {
+   "count": 16,
+   "kind": "name",
+   "source": "verifier",
+   "target": "hypermath"
+  },
+  {
+   "count": 4,
+   "kind": "url",
+   "source": "verifier",
+   "target": "hypermath"
+  },
+  {
+   "count": 6,
+   "kind": "name",
+   "source": "verifier",
+   "target": "ordinatics"
+  },
+  {
+   "count": 2,
+   "kind": "url",
+   "source": "verifier",
+   "target": "ordinatics"
+  }
+ ],
+ "fields": {
+  "grounded-hypercalculi": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "1284bee154d409ed8b90ed4dfb837174b2437e61",
+   "tags": {}
+  },
+  "grounded-hyperset-theory": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "5fb2a8bf9b5cc8a57baacc424c552c1eeeb84c9e",
+   "tags": {}
+  },
+  "hyperchaos": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "cead99a681f46a5cdf6fba752af96fd59b3c70e8",
+   "tags": {}
+  },
+  "hyperchemistry": {
+   "hm_open": [],
+   "open_items": [
+    [
+     "COMPOSITION_CONTRACT.md",
+     6,
+     "the native ground. `[OPEN]` denotes an unsupplied field interface or proof"
+    ],
+    [
+     "COMPOSITION_CONTRACT.md",
+     131,
+     "**[OPEN] Typed source-to-model handoff.** Identify an exact source version and"
+    ],
+    [
+     "COMPOSITION_CONTRACT.md",
+     140,
+     "**[OPEN] Hyperphysics ground.** GC-5's separate question is whether"
+    ],
+    [
+     "COMPOSITION_CONTRACT.md",
+     146,
+     "**[OPEN] Preservation.** For each proposed source-operation-to-relation map,"
+    ],
+    [
+     "COMPOSITION_CONTRACT.md",
+     152,
+     "**[OPEN] Physical application.** Supply a measurement/units map, constitutive"
+    ],
+    [
+     "COMPOSITION_CONTRACT.md",
+     157,
+     "**[OPEN] Hyperbiology handoff.** A composite relation is not a comprehended"
+    ],
+    [
+     "COMPOSITION_CONTRACT.md",
+     163,
+     "**[OPEN] Verifier Standard (VSTD) claims.** A test result about this finite"
+    ]
+   ],
+   "pin": "ed32f5ee1026306bdf04894da200539fd4abc266",
+   "tags": {
+    "FORM": 1,
+    "FRAME": 3,
+    "HYPER": 1,
+    "OPEN": 7
+   }
+  },
+  "hyperemergence": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "a19d2927ce80bd82a2b68e66600a237b0f967e76",
+   "tags": {}
+  },
+  "hyperethics": {
+   "hm_open": [
+    [
+     "L0_creation.hm",
+     291,
+     "nd-consistency-self-maintenance",
+     "NAMED OPEN OBLIGATION, NOT DISCHARGED. Universal Consistency Self-Maintenance Paradox (Tyler Roost's phrase, preserved exactly): a realm's self-maintenance of consistency appears to presuppose the very consistency relation being maintained. Under ax-immanence this is sharpened rather than solved: the archetype maintaining its realm's consistency is ITSELF inside that realm and so is subject to the consistency it maintains. The four axioms neither establish that such maintenance is possible nor that it is impossible. This is the principal open problem of hyperethics. It is recorded here as an o"
+    ],
+    [
+     "L2_governance.hm",
+     419,
+     "nd-adequacy-of-the-capture-model",
+     "NAMED OPEN OBLIGATION, NOT DISCHARGED. That parties with prices, powers with stakes, blocks and command, and an attacker who buys, describe any actual institution is not established. The numbers are inputs. The qualitative results, the clauses, no-apex and the closure under enactment, do not depend on them; the outlays do."
+    ],
+    [
+     "L2_governance.hm",
+     426,
+     "nd-implicit-control",
+     "NAMED OPEN OBLIGATION, NOT DISCHARGED. Two readings of \"implicit control\" are implemented and both are reported: command running outward in secret (Route.IMPLICIT), and a structure that pays for its own capture (self-funding-capture). Which one is meant has not been said, and they are different findings."
+    ]
+   ],
+   "open_items": [],
+   "pin": "a13770716f570934812503e785da98652af91160",
+   "tags": {}
+  },
+  "hypergrammar": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "f2af6c7a07e1257266c43340e05260a0cc534029",
+   "tags": {
+    "FRAME": 1
+   }
+  },
+  "hyperlogic": {
+   "hm_open": [
+    [
+     "L0_triangle.hm",
+     343,
+     "nd-the-gate",
+     "NOTHING MOVES OUT OF HYPERMATH UNTIL GC-1 AND GC-4 ARE BOTH DISCHARGED. GC-1 is discharged. GC-4 is not. Until then hypermath Section VIII and L1_relations.hm Section IV stay exactly where they are, unmodified, and this package is written beside them rather than carved out of them. A foundation that removed another foundation's metalanguage before it could supply a replacement would break the base field of the family to make a point about layering. The gate is stated as an open obligation, not as a comment, so that a later reader can see it was a decision and not an oversight."
+    ]
+   ],
+   "open_items": [],
+   "pin": "09231650d41919708824dd734a082ac9259d2f16",
+   "tags": {}
+  },
+  "hypermath": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "a34017995372329c8b9d62fbdda9217aa5b5078b",
+   "tags": {}
+  },
+  "hyperobjectivity": {
+   "hm_open": [],
+   "open_items": [
+    [
+     "FIELD_SPEC.md",
+     3,
+     "Status: **[FRAME] finite research contract**. Here `[FORM]` would mean a proposition closed by a stated derivation in its named formal scope; `[FRAME]` is an explicit construction with unresolved obligations; `[OPEN]` is an unresolved quest"
+    ],
+    [
+     "FIELD_SPEC.md",
+     31,
+     "Hyperethics currently names `areality` (abstract artificial reality), `surreality` (dream reality), `preality` (possibility reality), and `base-reality` (universal base reality) as distinct, unranked kinds. This is a source taxonomy, not a "
+    ],
+    [
+     "FIELD_SPEC.md",
+     39,
+     "**[OPEN]** A native instantiation rule must define how an object comes from a hyperform without equating a representation with the object. A native closure criterion must establish when the source hyperstructure is a hyperform; a reference "
+    ]
+   ],
+   "pin": "ed75d14f5ce8b59b1b72983a58a207ea9fc73bfc",
+   "tags": {
+    "FORM": 2,
+    "FRAME": 6,
+    "HYPER": 1,
+    "OPEN": 3
+   }
+  },
+  "hyperorder": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "3b9932ce80546b3c5ad1b4616a08d1b72a0b3a03",
+   "tags": {}
+  },
+  "hyperphysics": {
+   "hm_open": [],
+   "open_items": [
+    [
+     "README.md",
+     159,
+     "`docs/research/TIME_BUBBLE_SHEET.md` carry that discussion and its `[OPEN]` items), and the gap says nothing"
+    ],
+    [
+     "docs/research/END_OF_BASE_REALITY.md",
+     3,
+     "Owner's statement (USER-STATED, 2026-10-06), recorded verbatim in hyperreality `PROVENANCE.md`: \"possibility events act as bootstrap tenet points across physical laws, so as realities evolve their physical laws can be modified from inside o"
+    ],
+    [
+     "docs/research/END_OF_BASE_REALITY.md",
+     14,
+     "The state of the evidence on dark energy: DESI has completed its planned map of more than 47 million galaxies and quasars; its first-three-years data hinted that dark energy may evolve, and combined with other probes there is \"increasing ev"
+    ],
+    [
+     "docs/research/END_OF_BASE_REALITY.md",
+     28,
+     "* **Steps are not free even if conservation fails.** Each modification has to supply a new gradient, and to prevent the freeze for good it must do so without end: an unbounded sequence of modifications with finite resources each, for exampl"
+    ],
+    [
+     "docs/research/END_OF_BASE_REALITY.md",
+     33,
+     "Read as: a possibility event is a point where the reason of a later collapse sits at an earlier one (the two-boundary description in `docs/research/POSSIBILITIES_AND_SUPERPOSITIONS.md`), and the laws modified there are the laws that made th"
+    ],
+    [
+     "docs/research/END_OF_BASE_REALITY.md",
+     37,
+     "* `[OPEN]` Whether the dark-energy evidence settles toward constant (Big Freeze), weakening (possibly a Crunch), or strengthening (a Rip); a prediction of the end should be stated as conditional on that."
+    ],
+    [
+     "docs/research/END_OF_BASE_REALITY.md",
+     38,
+     "* `[OPEN]` Whether law modification can supply gradients without end, or only a finite number, in which case it postpones the freeze."
+    ],
+    [
+     "docs/research/END_OF_BASE_REALITY.md",
+     39,
+     "* `[OPEN]` Whether \"from inside\" respects causality in the two-boundary sense or is an additional mechanism."
+    ],
+    [
+     "docs/research/LAW_RANKING.md",
+     3,
+     "Owner's statements (USER-STATED, 2026-10-06), recorded in hyperreality `PROVENANCE.md`: conservation is a law, but where does it go on a ranking of laws; we assume all laws are absolute but some take priority in resolution, one dominant mod"
+    ],
+    [
+     "docs/research/LAW_RANKING.md",
+     35,
+     "The owner's \"whole-forms above them that represent them all orderly\" has a literal reading here: the **symmetry group** (Poincar\u00e9 times the gauge group) organizes the conserved quantities, whose charges form a representation of its Lie alge"
+    ],
+    [
+     "docs/research/LAW_RANKING.md",
+     39,
+     "* `[OPEN]` Whether the meta-law the owner posits is Tier 0 (a consistency requirement, as in anomaly cancellation) or a rule above all tiers."
+    ],
+    [
+     "docs/research/LAW_RANKING.md",
+     40,
+     "* `[OPEN]` Whether \"priority in resolution\" is dependence order (this table) or a different ordering."
+    ],
+    [
+     "docs/research/LAW_RANKING.md",
+     41,
+     "* `[OPEN]` Whether the whole-form is the symmetry group or something the table does not contain."
+    ],
+    [
+     "docs/research/POSSIBILITIES_AND_SUPERPOSITIONS.md",
+     3,
+     "Owner's statements (USER-STATED, 2026-10-06), recorded verbatim in hyperreality `PROVENANCE.md`: preality has an atemporal version, the same laws with nulltime, which \"flows both way acausally\" like the film *Tenet*, with events on both she"
+    ],
+    [
+     "docs/research/POSSIBILITIES_AND_SUPERPOSITIONS.md",
+     13,
+     "This formalism is not retrocausal in the sense of signalling: it re-describes the same statistics, and whether a physical retrocausal mechanism exists is not shown. The earlier objection on retrocausality, stated once (the Leifer\u2013Pusey and "
+    ],
+    [
+     "docs/research/POSSIBILITIES_AND_SUPERPOSITIONS.md",
+     30,
+     "The state space of a set of mutually exclusive possibilities with no interference is a **simplex** of probability vectors (a segment for two laws). A Bloch ball is the state space of a qubit and needs coherence between its two basis states."
+    ],
+    [
+     "docs/research/POSSIBILITIES_AND_SUPERPOSITIONS.md",
+     43,
+     "* `[OPEN]` **Literal entanglement or sectors.** Is \"sempiternal entanglement\" a coherent law register (possibilities are then superpositions of laws), or a superselected correlation between laws and within-law superpositions (no entanglemen"
+    ],
+    [
+     "docs/research/POSSIBILITIES_AND_SUPERPOSITIONS.md",
+     44,
+     "* `[OPEN]` Simplex or Bloch ball for the shape of preality (section 3)."
+    ],
+    [
+     "docs/research/POSSIBILITIES_AND_SUPERPOSITIONS.md",
+     45,
+     "* `[OPEN]` Whether \"nulltime flows both ways acausally\" means this re-description of statistics or an additional physical retrocausal mechanism."
+    ],
+    [
+     "docs/research/POSSIBILITIES_AND_SUPERPOSITIONS.md",
+     46,
+     "* `[OPEN]` Whether \"encompasses\" is a property of preality alone or of every atemporal counterpart."
+    ],
+    [
+     "docs/research/QUANTUM_GRAVITY_CANDIDATES.md",
+     3,
+     "Record of the owner's questions of 2026-10-03/04 (USER-STATED) and what was found. Tags: `[FORM]` checked fact, `[FRAME]` holds within a stated frame, `[HYPER]` owner's hypothesis, `[OPEN]` unresolved. Items marked *recalled* were not retri"
+    ],
+    [
+     "docs/research/QUANTUM_GRAVITY_CANDIDATES.md",
+     30,
+     "| Transfinite time | \u2014 | \u2014 | \u2014 | no theory exists `[OPEN]` |"
+    ],
+    [
+     "docs/research/QUANTUM_GRAVITY_CANDIDATES.md",
+     32,
+     "Options for a transfinite time axis: hyperreal time (transfer keeps ODEs; *recalled*), ordinal time (limit points but no smooth structure, so differential equations become transfinite recursion) `[OPEN]`. Extra time dimensions threaten pred"
+    ],
+    [
+     "docs/research/QUANTUM_GRAVITY_CANDIDATES.md",
+     39,
+     "* **Objection, stated once:** nothing found connects imaginary time to transfinite or fractal structure; in Hartle\u2013Hawking it removes a singularity, opposite to nesting singularities. \"Requires imaginary time\" stays `[OPEN]` until a mapping"
+    ],
+    [
+     "docs/research/QUANTUM_GRAVITY_CANDIDATES.md",
+     46,
+     "* \"Eight real\" is two different spaces: twistor space `C\u2074` (projective `CP\u00b3`, 6 real) and complexified Minkowski `C\u2074`. In the LQG\u2013twistor literature twistors sit on graph links as phase-space data, reduced afterwards by constraints. Which s"
+    ],
+    [
+     "docs/research/QUANTUM_GRAVITY_CANDIDATES.md",
+     47,
+     "* Dynamically LQG is not closed: non-unique Hamiltonian constraint, semiclassical limit the main open problem ([review](https://pure.mpg.de/rest/items/item_150130/component/file_150128/content), [EPRL limit](https://arxiv.org/pdf/1010.4886)"
+    ],
+    [
+     "docs/research/QUANTUM_GRAVITY_CANDIDATES.md",
+     60,
+     "* `[OPEN]` Which of the two 8-real spaces; whether any mapping from imaginary time to nesting exists; whether a transfinite-time physics can be stated."
+    ],
+    [
+     "docs/research/QUANTUM_GRAVITY_CANDIDATES.md",
+     61,
+     "* `[OPEN]` Whether the LQG two-limit instance of `limit labels` (large spin then refinement) can be run on a computable model beyond the 3D toy."
+    ],
+    [
+     "docs/research/SELF_CONSISTENT_CORRECTION.md",
+     3,
+     "Owner's statement (USER-STATED, 2026-10-06), recorded verbatim in hyperreality `PROVENANCE.md`: sempiternal meta/hyper laws dictate the self-consistency of base-reality and the possibility-dynamics of preality; possibilities are continuous "
+    ],
+    [
+     "docs/research/SELF_CONSISTENT_CORRECTION.md",
+     20,
+     "* The cost function is an assumption, and a norm constraint on intermediate states (physical states are normalized) raises the minimum: this was checked only for unconstrained intermediate states. `[OPEN]`"
+    ],
+    [
+     "docs/research/SELF_CONSISTENT_CORRECTION.md",
+     21,
+     "* \"Self-consistency forces creation or erasure of matter\" is the same as asserting the target boundary is forced and the lower laws are soft. A different choice, soft boundary and hard laws, gives the standard answer: no violation, and an i"
+    ],
+    [
+     "docs/research/SELF_CONSISTENT_CORRECTION.md",
+     25,
+     "* `[OPEN]` Hard laws with soft boundaries (standard consistency, no violation) or hard boundaries with soft laws (correction); and the cost function."
+    ],
+    [
+     "docs/research/SELF_CONSISTENT_CORRECTION.md",
+     26,
+     "* `[OPEN]` Whether the discrete junctions are concave-cost minima or something else."
+    ],
+    [
+     "docs/research/SELF_CONSISTENT_CORRECTION.md",
+     27,
+     "* `[OPEN]` Whether the dilution with chain length gives an experimentally distinguishable signature or is unobservable by construction."
+    ],
+    [
+     "docs/research/SELF_CONSISTENT_CORRECTION.md",
+     34,
+     "* **The cost.** The same fact makes the claim untestable until such a device exists, which is the unfalsifiability pattern the owner has named for other claims (hyperlogic's derivation-status layer). A claim that can only be tested with tec"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     14,
+     "So the infinite-time-computer reading and the \"return right after\" reading use different resources (MH limit stage versus CTC fixed point). `[FORM]` on each model's stated result; which one the sheet is `[OPEN]`."
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     28,
+     "Oreality as the order-type closure of the nesting: `T(0)` base, `T(k+1)` the interior time of a sheet inside `T(k)`, limit stages at suprema. Prealities hold areality simulations; each is an infinite-time finite space; the transfinite dimen"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     32,
+     "* `[OPEN]` MH or CTC or a bounce for the return; stability of MH structure."
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     33,
+     "* `[OPEN]` Which limit rule an interior uses at its limit stage."
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     34,
+     "* `[OPEN]` Whether an infinite-volume interior behind a finite-area sheet is consistent with holographic bounds."
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     42,
+     "* **R3, deciding recurrent computations.** For an interior with unbounded memory, deciding what recurs is what the infinite-time machine already does, classically. Finite-precision quantum computation is simulable by a classical machine wit"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     56,
+     "`[OPEN]` Whether the sheet is a coupling (then the interior is not isolated and R1 for the interior fails) or a pure entangler (then nothing crosses without a classical hand-off)."
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     66,
+     "* **What does not map.** A wormhole's interior is a second asymptotic region of the same theory, not a nested bubble inside a finite exterior volume; the infinite-time property (state recurrence in a finite space) belongs to the boundary th"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     67,
+     "* **Return.** A traversable wormhole connecting the interior to the outside would let an occupant return without a closed timelike curve, at the cost of the coupling and the negative energy. Whether the return lands \"right after we left\" in"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     73,
+     "* **Geometry, in GR terms.** A throat closing around a region is baby-universe pinch-off (a collapsing shell with an inflating interior, Frolov\u2013Markov\u2013Mukhanov, *recalled*): the exterior sees a collapsed object, and the region becomes a dis"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     80,
+     "`[OPEN]` Whether salience is the stationary-sector weight (the proposal here) or something else; whether the interior is the bridge (bounded, recurring) or an open bubble (unbounded memory)."
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     89,
+     "* **\"Constant density in zero volume\" does not hold as written.** `M = \u03c1V`, so `V \u2192 0` at fixed `\u03c1` sends `M \u2192 0`, and fixed `M` sends `\u03c1 \u2192 \u221e`. The consistent reading is the long-throat geometry: the exterior-visible size (the mouth area) s"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     92,
+     "* **Tension with frozen time.** A demon operates, so it needs state changes. In the two-sided toy the frozen combination is `H_R - H_L`; the exterior's clock runs `t_R`, and keeping the state unchanged against it requires something to suppl"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     93,
+     "* **Thermodynamics, the generalized second law.** If matter and its entropy vanish from the exterior, the exterior's entropy count drops unless the mouths carry area-law entropy `A/4` to compensate; a large-entropy interior behind a small m"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     99,
+     "* **Two different devices.** \"Appear right after you left\" (earlier statements) is a bounded hold with reentry at exterior time `t0 + \u03b4`. \"Hold indefinitely, the outside jumps to the end of expansion\" is an unbounded hold whose reentry, if "
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     111,
+     "* **Maintenance, and where \"incorrigible\" is real.** The history state is a zero mode only as long as `H` is the designed `H`; the gap above it is small for long computations (about `1/T\u00b2`, *recalled*, Kitaev\u2013Shen\u2013Vyalyi), so a generic pert"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     119,
+     "* **What it does not give: speed.** The time is not removed; it moves to the exterior. (1) Preparing the history state means reaching the ground (zero) state of the propagation Hamiltonian; its gap is exactly `2 \u2212 2cos(\u03c0/(T+1)) \u2248 \u03c0\u00b2/(T+1)\u00b2`"
+    ],
+    [
+     "docs/research/TIME_BUBBLE_SHEET.md",
+     130,
+     "* **What is not established.** Hyperlogic's own L0 states that it \"is not a logic\": no connective, quantifier, inference rule or proof object. The bridge above shows the interior's rules have the shape of a derivation structure; it does not"
+    ],
+    [
+     "docs/research/TIME_COMB_LIMITS.md",
+     3,
+     "Owner's question (USER-STATED, 2026-10-06): \"what are the theoretical physical limits of timecombs? Does parallel timecomb syncronized timecombs yield higher order timematrices that allow planck specificity, I dont think humans have this ye"
+    ],
+    [
+     "docs/research/TIME_COMB_LIMITS.md",
+     7,
+     "*Timecomb*: an optical frequency comb, a pulse train whose spectrum is a ladder of equally spaced lines, used to count optical cycles against a microwave reference (Hall and H\u00e4nsch, 2005 Nobel, *recalled*). *Parallel synchronized timecombs*"
+    ],
+    [
+     "docs/research/TIME_COMB_LIMITS.md",
+     24,
+     "* **A real open range.** Between `~10\u207b\u00b9\u2079` (today) and `~10\u207b\u00b2\u2079` (estimate) lies about ten orders of magnitude where the bounds above do not forbid progress, though the systematics of point 2 need to be solved first. `[OPEN]`"
+    ]
+   ],
+   "pin": "daded1f7a3697c1d4bd1e9764264731024fdde04",
+   "tags": {
+    "FORM": 37,
+    "FRAME": 41,
+    "HYPER": 41,
+    "OPEN": 56
+   }
+  },
+  "hyperprobability": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "c09bfbd9a3dc5e2563cc02c3d52250becfe607f7",
+   "tags": {}
+  },
+  "hyperreality": {
+   "hm_open": [],
+   "open_items": [
+    [
+     "FIELD_SPEC.md",
+     11,
+     "Tyler's proposal, [FRAME] the finite executable reading, [OPEN] unresolved,"
+    ],
+    [
+     "FIELD_SPEC.md",
+     55,
+     "[OPEN] Two local drafts elsewhere in the family disagree on that last point."
+    ],
+    [
+     "FIELD_SPEC.md",
+     90,
+     "[OPEN] Q2 below asks which reading Tyler intends, or whether both hold at"
+    ],
+    [
+     "FIELD_SPEC.md",
+     100,
+     "- [OPEN] Whether the mapping is classification only, with no inclusion between kinds, or whether the \"no order, no nesting\" rule needs revisiting (HR-017)."
+    ],
+    [
+     "FIELD_SPEC.md",
+     114,
+     "[OPEN] Whether the family intends the transitive closure in the first clause. [HYPOTHETICAL] as a reading of universempiternity."
+    ],
+    [
+     "FIELD_SPEC.md",
+     118,
+     "[HYPER] Tyler stated on 2026-10-05 that sempiternity is unbounded in time. Wording elsewhere in the family that calls sempiternity atemporal (this field's 2026-09-26 record, and Hypertime's field specification) can therefore describe, at mo"
+    ],
+    [
+     "FIELD_SPEC.md",
+     131,
+     "[HYPER] On 2026-10-06 the owner said atemporal versions of the kinds all exist and can be made to exist from all base-realities, and that this is one of the laws the possibility space of preality must abide by. [FORM] Encoded 2026-10-06: `C"
+    ],
+    [
+     "FIELD_SPEC.md",
+     137,
+     "[FORM] Encoded: `SIMULABLE_IN_AREALITY` is every kind below sempiternity in `CONTROL_ORDER`, areality included; `areality_can_simulate(\"sempiternity\")` and of universempiternity are false; `OBTAINABLE_FROM_PREALITY = (base-reality, surreali"
+    ],
+    [
+     "FIELD_SPEC.md",
+     143,
+     "[OPEN] Read with his 2026-10-04 hierarchy (prealities run inside the sempiternity; surreality inherits from them through an imagination-reachable filter; base-reality is beneath and holds access to the higher ones), the answer gives two rel"
+    ],
+    [
+     "FIELD_SPEC.md",
+     159,
+     "[OPEN] Naming. Tyler's statement calls the anchored enclosure \"the sempiternality\" and what is accessed inside it \"sempiternity\". That differs from the convention above. One reading fits both, the enclosure against its interior; it is the a"
+    ],
+    [
+     "FIELD_SPEC.md",
+     166,
+     "[OPEN] Q1 asks what Tyler intends. His 09-21 words, quoted in hyperethics"
+    ],
+    [
+     "PROVENANCE.md",
+     47,
+     "[OPEN] The gloss of areality differs between the two statements:"
+    ],
+    [
+     "PROVENANCE.md",
+     101,
+     "Effect here: where this repository describes the object that contains realities, it now writes **sempiternity** and **universempiternity**; the property or class is **sempiternality**, which is also the `class_name` a `Whole` carries (`Whol"
+    ],
+    [
+     "PROVENANCE.md",
+     153,
+     "[OPEN] \"maybe the unobservable physical laws are more aptly called natural laws\" is tentative naming by Tyler and is not adopted here."
+    ],
+    [
+     "PROVENANCE.md",
+     161,
+     "[OPEN] Here \"the sempiternality\" names the anchored thing that exists in or outside a base-reality, and \"sempiternity\" what is accessed inside it. That differs from the convention above (object sempiternity, property sempiternality). One re"
+    ],
+    [
+     "PROVENANCE.md",
+     177,
+     "`[OPEN]` \"Compute is physically free outside of base-reality\" is a hypothesis: the claim conflicts with the finite-state bound recorded in `wiki/hypersphere-and-preality.md` unless the interior time has order type above \u03c9 or the departure i"
+    ],
+    [
+     "PROVENANCE.md",
+     187,
+     "Terms used here under the 2026-10-05 naming (object sempiternity, property sempiternality): in this passage \"sempiternality\" is the owner's pre-rename word for the object. `[OPEN]` \"indistinguishibly disprovable\" is quoted as typed; \"indist"
+    ],
+    [
+     "PROVENANCE.md",
+     201,
+     "(Numbers added; the owner's list was unnumbered.) These are recorded unanalysed. `[OPEN]` Whether they belong in hyperethics, where they would be a basis, or here. The hyperethics repository was not touched."
+    ],
+    [
+     "PROVENANCE.md",
+     209,
+     "Encoded: `CONTROL_ORDER` in `hyperreality.py`. Not encoded: \"around or within\" for oreality (`[OPEN]`); the company named for dream headbands is the owner's recollection, not checked here, and the prediction about dream technology is his; t"
+    ],
+    [
+     "PROVENANCE.md",
+     217,
+     "Analysis lives in hyperphysics `docs/research/TIME_BUBBLE_SHEET.md`, not here. `[OPEN]` Reentry read as the continuation guarantee for the object's presence in base-reality, which is how the preality definition above (\"existence continuatio"
+    ],
+    [
+     "PROVENANCE.md",
+     227,
+     "Analysis lives in hyperphysics `docs/research/TIME_BUBBLE_SHEET.md`. `[OPEN]` \"Constant density in zero volume\" is not consistent as written (`M = \u03c1V`); see the analysis for the reading that is."
+    ],
+    [
+     "PROVENANCE.md",
+     235,
+     "Analysis, including what \"provably indefinite\" can and cannot mean, is in hyperphysics `docs/research/TIME_BUBBLE_SHEET.md`. `[OPEN]` This connects to the owner's 2026-10-04 statement that a preality device is one \"you can build a device to"
+    ],
+    [
+     "PROVENANCE.md",
+     243,
+     "Analysis in hyperphysics `docs/research/TIME_BUBBLE_SHEET.md`. `[OPEN]` \"Null time\" read as the interior's frozen sector; the owner to confirm."
+    ],
+    [
+     "PROVENANCE.md",
+     251,
+     "Formal reading, checked in hyperlogic `tests/test_unknown_unknowns.py` (4 tests): an unknown unknown for a theory `T` is a sentence that is not known and not known to be not known. `Con(T)` is one for any consistent theory the provability l"
+    ],
+    [
+     "PROVENANCE.md",
+     259,
+     "Analysis in hyperphysics `docs/research/TIME_BUBBLE_SHEET.md`: interior time is zero, exterior time is not. `[OPEN]`"
+    ],
+    [
+     "PROVENANCE.md",
+     267,
+     "Analysis in hyperphysics `docs/research/TIME_BUBBLE_SHEET.md`: the interior's step-by-step structure has the shape of a derivation chain (energy equals total violation of derivation steps), which is hyperlogic's and hypermath's subject. `[O"
+    ],
+    [
+     "PROVENANCE.md",
+     275,
+     "Encoded in `hyperreality.py` (`Counterpart`, `KINDS_WITH_ATEMPORAL_COUNTERPART`, `SIMULABLE_IN_AREALITY`, `OBTAINABLE_FROM_PREALITY`, `areality_can_simulate`, `counterpart_law_violations`) and tested in `tests/test_counterparts_and_simulati"
+    ],
+    [
+     "PROVENANCE.md",
+     293,
+     "Analysis in hyperphysics `docs/research/END_OF_BASE_REALITY.md`: the Big Freeze is the default expectation and not contradicted by anything retrieved, with the 2026 dark-energy data the live empirical question; law modification from inside "
+    ],
+    [
+     "PROVENANCE.md",
+     301,
+     "Analysis, and the claim's testable form, in this record's neighbours: hyperphysics `docs/research/POSSIBILITIES_AND_SUPERPOSITIONS.md` (two-boundary description: statistics, not a loop) and hyperlogic `src/hyperlogic/ledger.py` (commit-befo"
+    ],
+    [
+     "PROVENANCE.md",
+     309,
+     "Reading: the loop lives in the correspondence between two observers' experiences; in the physical record it appears one-way (the earlier artifact, the later hearing); acausal events are inside it. A fixed recorded artifact makes the reply c"
+    ],
+    [
+     "PROVENANCE.md",
+     317,
+     "Analysis in hyperphysics `docs/research/SELF_CONSISTENT_CORRECTION.md`: a model in which the correction is exact (least-violation chains), continuous spread and discrete junctions as two cost functions, and what is and is not supported. `[O"
+    ],
+    [
+     "PROVENANCE.md",
+     325,
+     "Analysis in hyperphysics `docs/research/SELF_CONSISTENT_CORRECTION.md`: the point is fair for a correction that occurs only under inconsistent boundary conditions, which also makes the claim untestable until a device exists; post-selected c"
+    ],
+    [
+     "PROVENANCE.md",
+     333,
+     "Analysis in hyperphysics `docs/research/LAW_RANKING.md`: a ranking by dependence (consistency, symmetry, conservation, dynamics, statistical laws), precedents where conservation yields to a higher structure, an exact anomaly-cancellation ch"
+    ],
+    [
+     "tests/test_sempiternity_bisim.py",
+     12,
+     "[OPEN] whether the family intends the transitive closure for u_real.\"\"\""
+    ]
+   ],
+   "pin": "9e217aef1c39228bb1042c9ebc10b59cacefafc4",
+   "tags": {
+    "FORM": 18,
+    "FRAME": 7,
+    "HYPER": 11,
+    "OPEN": 34
+   }
+  },
+  "hyperspace": {
+   "hm_open": [],
+   "open_items": [
+    [
+     "FIELD_SPEC.md",
+     11,
+     "[OPEN] \u201cObservable\u201d could mean already observed by some observer, available"
+    ],
+    [
+     "FIELD_SPEC.md",
+     31,
+     "definition. [OPEN] The relation is unresolved: a situated slice without an"
+    ],
+    [
+     "FIELD_SPEC.md",
+     52,
+     "The user term **hyperphere** is retained literally. [OPEN] It might denote"
+    ],
+    [
+     "FIELD_SPEC.md",
+     67,
+     "[OPEN] Show who can observe which presentation, with what channel, evidence,"
+    ],
+    [
+     "GRID_SEAM.md",
+     25,
+     "[OPEN] Supply stable identity across rows, observational equivalence,"
+    ],
+    [
+     "README.md",
+     30,
+     "[OPEN]. The [provenance record](PROVENANCE.md), [technical debt](TECHNICAL_DEBT.md),"
+    ]
+   ],
+   "pin": "bfcf5e7d8d1ea6b30672c32285810178514d61d4",
+   "tags": {
+    "FORM": 1,
+    "FRAME": 5,
+    "HYPER": 4,
+    "OPEN": 6
+   }
+  },
+  "hypersubjectivity": {
+   "hm_open": [],
+   "open_items": [
+    [
+     "FIELD_SPEC.md",
+     3,
+     "Status: **[FRAME] finite research contract**. `[FORM]` would require a proposition closed by a stated derivation in its own formal scope; `[FRAME]` is an explicit construction with unresolved obligations; `[OPEN]` marks an unresolved questi"
+    ],
+    [
+     "FIELD_SPEC.md",
+     36,
+     "**[OPEN]** Supply a typed Hyperobjectivity receipt binding each presented object to source forms and a hyperform, and a sound transport for any cross-presentation identity claim. Supply a Hyperethics-compatible bridge from an actual first-p"
+    ]
+   ],
+   "pin": "1f7f8a75daa569563d1fa607000a655beb21158c",
+   "tags": {
+    "FORM": 3,
+    "FRAME": 5,
+    "HYPER": 3,
+    "OPEN": 2
+   }
+  },
+  "hypertime": {
+   "hm_open": [],
+   "open_items": [
+    [
+     "FIELD_SPEC.md",
+     41,
+     "[OPEN]. [OPEN] Whether"
+    ],
+    [
+     "FIELD_SPEC.md",
+     64,
+     "its relation to the new criterion [OPEN]."
+    ],
+    [
+     "FIELD_SPEC.md",
+     77,
+     "[OPEN] Give an observer-relative test for advance, a bridge preserving"
+    ],
+    [
+     "PROVENANCE.md",
+     25,
+     "USER-STATED, in a session with the assistant: the object is spelled **universempiternity** (and **sempiternity**), the property it holds **universempiternality** / **sempiternality**. Prose in this repository about the object now uses the o"
+    ],
+    [
+     "PROVENANCE.md",
+     27,
+     "[SUPERSEDED 2026-10-05, in scope: the [OPEN] sentence above (\"records both and decides neither\") was answered by Tyler for sempiternity; see the next section. It is kept as written.]"
+    ],
+    [
+     "PROVENANCE.md",
+     35,
+     "Source: Hyperstratum `wiki/hypermath-program.md` at commit `076c951af32315d2acf9f79d6b2aeef88f36561d`, on branch `claude/optimistic-einstein-3zorpo` (file SHA-256 `cfaf1ef557a3ae9d4f441c2325fcc44765edbe527da94c61addbfdd65c23f4cc`). That pag"
+    ]
+   ],
+   "pin": "cb980b5f2377013444e8b41f8ba0577271ba82cf",
+   "tags": {
+    "FORM": 1,
+    "FRAME": 3,
+    "HYPER": 2,
+    "OPEN": 7
+   }
+  },
+  "meta-morphoscripted-origination": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "b3445b65c6843ee30aaadff6c26cace21357f0dd",
+   "tags": {}
+  },
+  "metamathethicology": {
+   "hm_open": [
+    [
+     "will_electrophysics.hm",
+     166,
+     "nd-charge-constant-law",
+     "WHICH function relates constant will to invariant will is NOT fixed. The declaration says constant will IS the invariant's constant of charge. It does not say by what map, and no argument here determines one. Every result in this file is stated for an arbitrary law functional in the invariant. binding_is_functional checks a candidate on a sample and, as always, agreement on a sample establishes nothing."
+    ],
+    [
+     "will_electrophysics.hm",
+     311,
+     "nd-stage-semantics",
+     "The stages omega, omega+1 and omega+2 here order AVAILABILITY: a formed term is available only after the law and component it was formed from. They are dimensionless language ranks. They are not time, not energy, not utility, and not a measure of how far the transport has been justified. No argument is offered that omega is the right starting stage for a transport rather than a convention inherited from this package's core."
+    ]
+   ],
+   "open_items": [],
+   "pin": "7ce47ad777d6b3c867c28f5f640846160ee6931a",
+   "tags": {}
+  },
+  "ordinatics": {
+   "hm_open": [],
+   "open_items": [
+    [
+     "docs/complex_rotation_and_limit_rules.md",
+     13,
+     "1. `[FORM]` **No value without a limit rule.** `i\u207f` cycles `1, i, \u22121, \u2212i` and does not converge. Ordinal remainder: `\u03c9 = 4\u00b7\u03c9`, identity. Ces\u00e0ro mean: `0`. limsup per coordinate (infinite-time machine): all four phases at once. Hyperreal: on"
+    ],
+    [
+     "docs/complex_rotation_and_limit_rules.md",
+     20,
+     "* Climbing needs a non-contractive inductive operator, whose closure ordinal can be large (the \u03b5\u2080 route). A strange-loop attractor with a ladder needs nesting that is inductive and carries a metric: a design choice. `[OPEN]`"
+    ]
+   ],
+   "pin": "50655e9ee7f77a86594998d32015463ddba21a18",
+   "tags": {
+    "FORM": 7,
+    "HYPER": 1,
+    "OPEN": 2
+   }
+  },
+  "speedrunning-social-development": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "287e96dadc5bcba36b7a75d9f4568c982ce44439",
+   "tags": {}
+  },
+  "taxonomy-of-deception": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "102e02e767c5b9c839be0a7ef3bce4f884555a6a",
+   "tags": {}
+  },
+  "throwaway-papers": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "e289f9109562c7157baf41003b8e0ee385717d88",
+   "tags": {}
+  },
+  "verifier": {
+   "hm_open": [],
+   "open_items": [],
+   "pin": "f06414feec801c8b44a662d583ddff817ce22a1b",
+   "tags": {}
+  }
+ },
+ "hyperstratum_commit": "87aadc390fea2197b8525e13489d3c839e7ab545",
+ "source": "hyperstratum.scan.scan_field (no terms) and build_edges over the pinned fields, plus the open declarations of their .hm files",
+ "unscanned": [
+  "hyperbiology"
+ ]
+}

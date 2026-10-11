@@ -33,6 +33,7 @@ import pytest
 from hyperoptimization import decisions as D
 from hyperoptimization import (
     entrenchment,
+    family,
     loop,
     ordinal,
     quorum,
@@ -147,6 +148,10 @@ SABOTAGE = {
             lambda game, law, corrigible=True: {s: game.allowed(s) for s in game.states}),
     "D19": (D, "_golden_gl",  # the recorded prover verdicts, each flipped
             lambda: {**_real_gl, "rings": [{**r, "proved": not r["proved"]} for r in _real_gl["rings"]]}),
+    "D21": (viability, "inductive_kernel",  # an inductive reading that is not empty
+            lambda game, corrigible=True: frozenset(game.states)),
+    "D22": (family, "cores_of", lambda view="all", data=None: []),  # no circle anywhere
+    "D23": (family, "topics_of", lambda text: set()),  # a table that finds nothing, so zero means nothing
 }
 
 
@@ -188,7 +193,7 @@ def test_the_rendering_does_not_depend_on_the_hash_seed():
     for seed in ("0", "7"):
         env = {**os.environ, "PYTHONHASHSEED": seed, "PYTHONPATH": src}
         done = subprocess.run([sys.executable, "-m", "hyperoptimization", "decisions"], env=env,
-                              capture_output=True, text=True, timeout=120, check=True)
+                              capture_output=True, text=True, encoding="utf-8", timeout=120, check=True)
         outputs.add(done.stdout)
     assert len(outputs) == 1 and outputs.pop() == D.render_markdown()
 

@@ -27,13 +27,13 @@ import itertools
 import json
 import math
 import random
-from collections.abc import Callable
+from collections.abc import Callable, Iterable, Iterator
 from dataclasses import dataclass
 from fractions import Fraction
 from importlib import resources
 
-from . import entrenchment, loop, ordinal, quorum, renewal, surprisal, viability
-from .ground import OMEGA, Status, Tag, Verdict
+from . import entrenchment, family, loop, ordinal, quorum, renewal, surprisal, viability
+from .ground import OMEGA, Status, Tag, Verdict, rank_key
 
 Check = Callable[[], Verdict]
 
@@ -253,7 +253,7 @@ def _d05() -> Verdict:
 def _d06() -> Verdict:
     problems: list[str] = []
     exempted = whole = 0
-    for seed in range(25):
+    for seed in range(60):
         game = viability.random_game(random.Random(7000 + seed), n=4)
         star = viability.greatest_law(game, corrigible=False)
         for start in sorted(star):
@@ -268,7 +268,7 @@ def _d06() -> Verdict:
                     if viability.survival_probability(game, law, start, corrigible=False) >= 1:
                         problems.append(f"seed {seed}: exempting {a!r} at {s} left survival at 1")
                     exempted += 1
-    if exempted < 20:
+    if exempted < 30:
         problems.append(f"only {exempted} exemptions were tried; the sample is too thin to say")
     return _verdict("under full support, survival is certain iff the law is sustaining, and an "
                     "exemption is fatal", problems, [
@@ -580,7 +580,7 @@ def _d19() -> Verdict:
                         f"{golden['hyperlogic_commit'][:12]}): {guarded} with a proof-check link are "
                         f"proved to approve together, {unguarded} loops of copying links are not, "
                         "each with a countermodel",
-                        "Löb's axiom [](  []p -> p ) -> []p is proved by the same prover"])
+                        "Löb's axiom, □(□p → p) → □p, is proved by the same prover"])
 
 
 def _twin_rooms() -> viability.Game:
@@ -640,6 +640,138 @@ def _d20() -> Verdict:
         "together pool to the whole law",
         f"{converged} of {games} games with a kernel: 300 random starts pool to the greatest law "
         f"(median {median} starts, worst {max(firsts) if firsts else 0})"])
+
+
+def _subsets(items: Iterable[str]) -> Iterator[frozenset[str]]:
+    ordered = sorted(items)
+    for size in range(len(ordered) + 1):
+        for chosen in itertools.combinations(ordered, size):
+            yield frozenset(chosen)
+
+
+def _d21() -> Verdict:
+    problems: list[str] = []
+    games = informative = supporting_sets = 0
+    for corrigible in (False, True):
+        for seed in range(60):
+            game = viability.random_game(random.Random(12500 + seed), n=4, home=True)
+            kernel = viability.kernel(game, corrigible=corrigible)
+            supporting = [y for y in _subsets(game.states)
+                          if viability.maintains(game, y, corrigible=corrigible)]
+            union = frozenset().union(*supporting)
+            if union != kernel:
+                problems.append(f"seed {seed}, corrigible {corrigible}: the sets that support themselves "
+                                f"unite to {sorted(union)}, the kernel is {sorted(kernel)}")
+            if not viability.maintains(game, kernel, corrigible=corrigible):
+                problems.append(f"seed {seed}, corrigible {corrigible}: the kernel does not support itself")
+            inductive = viability.inductive_kernel(game, corrigible=corrigible)
+            if inductive:
+                problems.append(f"seed {seed}, corrigible {corrigible}: the least fixed point is "
+                                f"{sorted(inductive)}, not empty")
+            games += 1
+            informative += 0 < len(kernel) < len(game.states)
+            supporting_sets += len(supporting)
+    lone = viability.Game.from_table(nature=("n",), table={"a": {"hold": ("a",)}}, safe={"a"})
+    if viability.kernel(lone, corrigible=False) != frozenset({"a"}) or \
+            viability.inductive_kernel(lone, corrigible=False):
+        problems.append("a single state that holds itself: its kernel is not {a}, or its inductive "
+                        "reading is not empty")
+    return _verdict("self-maintenance is a greatest fixed point: no inductive reading, and a set that "
+                    "supports itself is its certificate", problems, [
+                        f"{games} random games on 4 states, with and without corrigibility: the kernel equals "
+                        f"the union of the {supporting_sets} sets that support themselves, found by "
+                        "enumerating every subset, and the kernel is one of them",
+                        f"{informative} of those games have a kernel that is neither empty nor everything",
+                        f"the least fixed point of the same operator is empty in all {games}; one state "
+                        "that holds itself has kernel {a} and an empty inductive reading"])
+
+
+def _d22() -> Verdict:
+    problems: list[str] = []
+    core = ("hyperethics", "hyperphysics", "metamathethicology")
+    data = family.snapshot()
+    views = {name: (family.phases_of(name, data=data), family.cores_of(name, data=data))
+             for name in family.VIEWS}
+    if views["hard"][1]:
+        problems.append(f"imports and declared dependencies form a cycle: {views['hard'][1]}")
+    for name in ("formal", "substantive", "weighty", "all"):
+        if not any(set(core) <= set(found) for found in views[name][1]):
+            problems.append(f"the {name} view has no core holding {', '.join(core)}")
+    if views["formal"][1] != [core]:
+        problems.append(f"the formal view's cores are {views['formal'][1]}, not just {core}")
+    widening = ("hard", "formal", "substantive", "all")
+    for narrow, wide in zip(widening, widening[1:]):
+        for repository, phase in views[narrow][0].items():
+            if rank_key(views[wide][0][repository]) < rank_key(phase):
+                problems.append(f"{repository}: widening the view from {narrow} to {wide} lowered its "
+                                f"phase from {phase} to {views[wide][0][repository]}")
+    reliances = {name: sum(len(d) for d in family.depends_on(name, data=data).values())
+                 for name in family.VIEWS}
+    live = family.live()
+    live_cores = {name: family.live_cores_of(name, data=live) for name in family.LIVE_VIEWS}
+    if not any(set(core) <= set(found) for found in live_cores["frequent"]):
+        problems.append("the live scan's frequent mentions have no core holding "
+                        f"{', '.join(core)}")
+
+    def shown_cores(cores: list[tuple[str, ...]]) -> str:
+        return "; ".join("+".join(found) if len(found) <= 3 else f"{len(found)} repositories"
+                         for found in cores) or "none"
+
+    def tally(name: str) -> str:
+        phases, cores = views[name]
+        zero = sum(p == 0 for p in phases.values())
+        omega = sum(p is OMEGA for p in phases.values())
+        return (f"{name} ({reliances[name]} reliances): {zero} repositories at phase 0, {omega} at ω; "
+                f"cores: {shown_cores(cores)}")
+
+    return _verdict("the family's reliance has a core with no foundation inside it, though what it imports "
+                    "is well founded", problems, [
+                        f"snapshot: hyperstratum {data['hyperstratum_commit'][:12]}, graph digest "
+                        f"{data['source_digest'][:12]}: {len(data['nodes'])} repositories, "
+                        f"{len(data['edges'])} recorded edges",
+                        *(tally(name) for name in ("hard", "formal", "substantive", "weighty", "all")),
+                        "widening the view from hard to formal to substantive to all never lowers a phase",
+                        f"a second record, hyperstratum's live scan (commit {live['hyperstratum_commit'][:12]}, "
+                        f"{len(live['fields'])} fields, {len(live['edges'])} edges): "
+                        f"ten or more mentions or links: {shown_cores(live_cores['frequent'])}; "
+                        f"any mention: {shown_cores(live_cores['mentions'])}; "
+                        f"links only: {shown_cores(live_cores['links'])}"])
+
+
+def _d23() -> Verdict:
+    problems: list[str] = []
+    controls = {"optimization": "the optimal law, optimising for survival", "viability": "the viability kernel",
+                "persistence": "self-maintenance of a realm", "stability": "a stable fixed point",
+                "ordinal": "the ordinal rank of a stage", "closure": "the closure of the nesting"}
+    for topic, sentence in controls.items():
+        if topic not in family.topics_of(sentence):
+            problems.append(f"the {topic} pattern does not find {sentence!r}, so a count of zero would mean nothing")
+    if family.topics_of("claude/optimistic-einstein branch"):
+        problems.append("the table finds a topic in a word that only looks like one")
+    items = family.open_items()
+    forms = {item["form"] for item in items}
+    if forms != {"bracket", "declaration"}:
+        problems.append(f"the open items come in the forms {sorted(forms)}, not both conventions")
+    tally = family.open_tally()
+    if tally["topics"]["optimization"] or tally["topics"]["viability"]:
+        problems.append(f"an open item now mentions optimization ({tally['topics']['optimization']}) or "
+                        f"viability ({tally['topics']['viability']}): D18's evidence has changed")
+    share = tally["untouched"] / tally["items"]
+    if share < 0.8:
+        problems.append(f"only {share:.0%} of the declared open items mention none of the six topics")
+    fields = sorted({item["field"] for item in items})
+    persistence = [f"{i['field']}/{i['file']}" for i in items if "persistence" in family.topics_of(i["text"])]
+    return _verdict("by their wording almost none of the family's declared open items is about "
+                    "optimization, viability or maintenance", problems, [
+                        f"{tally['items']} declared open items in {len(fields)} of the "
+                        f"{len(family.live()['fields'])} scanned fields: "
+                        f"{sum(i['form'] == 'bracket' for i in items)} lines tagged [OPEN] and "
+                        f"{sum(i['form'] == 'declaration' for i in items)} open declarations in .hm files",
+                        "items mentioning each topic: " + ", ".join(f"{t} {n}" for t, n in tally["topics"].items()),
+                        f"{tally['untouched']} of {tally['items']} ({share:.0%}) mention none of them",
+                        f"persistence or maintenance is mentioned in {', '.join(persistence)}",
+                        "every topic pattern finds a sentence written to contain it, and the word "
+                        "'optimistic' is not read as optimization"])
 
 
 # ---------------------------------------------------------------------------
@@ -942,18 +1074,41 @@ LEDGER: tuple[Decision, ...] = (
     Decision(
         "D18", "Hyperoptimization as the closing catalyst across the family is a claim to test on "
         "the family's own data", Tag.OPEN,
-        "Record the claim as open, with the test it implies, instead of asserting it.",
-        ("Assert that it closes the open items: rejected, because the closure map over the family's "
-         "registry has not been built.",),
+        "Record the claim as open, with the test it implies, instead of asserting it; and run the "
+        "first parts of that test: the phase of each repository in the family's recorded reliance "
+        "(D22), the wording of the family's declared open items (D23), and a reading by hand of "
+        "the six open declarations in its specifications.",
+        ("Assert that it closes the open items: rejected, because the map from open items to the "
+         "repositories that would close them is not built.",),
         "If hyperoptimization closes cycles across the hyperfields, the dependency graph of the "
         "family's open items has an authority-height structure (D14) in which it is the node that "
         "turns a cycle of unclosed obligations into a grounded chain, and closing items lowers an "
-        "ordinal rank (D13).",
-        "The closure map built from hyperstratum's registry shows no such node, or closing items "
-        "does not lower the rank.",
-        "That computation is not done. It needs the registry's dependency data and the list of "
-        "open items per field.",
-        "entrenchment.py and ordinal.py supply the machinery; hyperstratum supplies the data",
+        "ordinal rank (D13). Weaker forms can be read now: the cross-reliances inside a core of "
+        "the family's recorded reliance (D22) should be ones that what this package supplies "
+        "(viability, certificates, phase) mediates, and some of the declared open items should be "
+        "about what it computes (D23).",
+        "The map built from hyperstratum's registry shows no such node, or closing items does not "
+        "lower the rank; or the open items of a core concern something else. Read as of this "
+        "snapshot, the open items of the ethics, physics and metamathethicology core are mostly "
+        "about time, reality and the electrical transport of the will, with a few that this "
+        "package touches, and by wording none is about optimization or viability (D23): that is "
+        "evidence against the claim for that core.",
+        "First passes, 2026-10-11, over 122 declared open items in 11 of the 24 pinned fields (116 "
+        "lines tagged [OPEN] found by hyperstratum's scan, and 6 open declarations in .hm "
+        "specifications): none is closed. By wording (D23) none mentions optimization or "
+        "viability. Read by hand, the items this package touches are: hyperethics' consistency "
+        "self-maintenance paradox (D21); metamathethicology's stage semantics, whose availability "
+        "order is the phase of a formation graph (E4) while the starting stage stays a "
+        "convention; hyperethics' adequacy of the capture model (D03: the direction of the error "
+        "is computed, its size is not); and hyperphysics' law ranking, which asks whether "
+        "priority in resolution is the dependence order of its own table, and E4 shows the "
+        "table's dependence order leaves two pairs of laws unordered, so it cannot be that order "
+        "alone. Not touched: hyperlogic's gate, implicit control, the charge-constant law, and the "
+        "time-bubble, quantum-gravity and naming items that make up most of the rest. 13 of the "
+        "24 fields declare no open items in either form. There is no witness for the claim "
+        "itself: the map from items to the repositories that would close them is not done.",
+        "entrenchment.phases, cores, incomparable_pairs; family.py; the reading by hand is not "
+        "reproducible",
         None),
     Decision(
         "D19", "A loop of checks is determined exactly when some link passes through proof", Tag.FRAME,
@@ -1001,6 +1156,110 @@ LEDGER: tuple[Decision, ...] = (
         "Needs data.",
         "viability.settle, converge, random_law, restricted_kernel; tests/test_viability.py",
         _d20),
+    Decision(
+        "D21", "Self-maintenance is a greatest fixed point: it has no inductive reading, and a set "
+        "that supports itself is its certificate", Tag.FORM,
+        "Read a system's maintenance of its own safe condition as membership in the greatest fixed "
+        "point of F(Y) = the states with an action that sends every nature choice into Y. A set "
+        "that supports itself (Y inside F(Y)) is a finite certificate for each state in it, and "
+        "the kernel is the union of all such sets. Read hyperethics' consistency "
+        "self-maintenance paradox (a realm's maintenance of its consistency appears to presuppose "
+        "the consistency maintained, and the maintainer is itself inside the realm) as having "
+        "this shape. Do not claim it is resolved.",
+        ("An inductive reading, the least fixed point built up from a base: rejected, because it "
+         "is empty for every game with a nature choice (nothing is supported by nothing), so the "
+         "paradox would make every realm unmaintainable.",
+         "A proof-theoretic reading, the realm proves its own consistency: kept for loops of "
+         "checks (D19), rejected here, because a theory that proves its own consistency is "
+         "inconsistent (Gödel's second theorem, recalled) and a loop of provers is determined "
+         "without being sound.",
+         "Exempt the maintainer from the realm's condition: rejected, because an exemption is "
+         "fatal (D06) and an ungoverned maintainer is the corrupting apex (D14)."),
+        "In every sampled game, with and without corrigibility, the kernel equals the union of "
+        "every subset that supports itself, found by enumerating all subsets, and the kernel "
+        "supports itself; the least fixed point of the same operator is empty. So a witness needs "
+        "only a self-supporting set to certify existence, and no base case to start from.",
+        "A game in which the union of the self-supporting sets differs from the kernel, or in "
+        "which the kernel does not support itself, or in which building up from the empty set "
+        "reaches a non-empty set.",
+        "For a real realm a self-supporting set is a list of states with, for each, a move that "
+        "keeps every outcome inside the list; it can be audited by exhibiting the list. That the "
+        "realm's kernel is non-empty, and that its consistency is a safe condition at all and not "
+        "something a theory proves, are claims about the realm that this model does not make.",
+        "viability.maintains, inductive_kernel; tests/test_maintenance.py; hyperethics "
+        "L0_creation.hm nd-consistency-self-maintenance",
+        _d21),
+    Decision(
+        "D22", "The family's reliance has a core with no foundation inside it, though what it "
+        "imports is well founded", Tag.FRAME,
+        "Read the family's recorded citations, dependencies and imports (hyperstratum's family "
+        "graph) as reliance, source relying on target, and give each repository the ordinal phase "
+        "of its reliance, which is authority height for many governors (D14). Read it under five "
+        "nested views that differ in which edges count: hard (imports and declared dependencies), "
+        "formal (hard, or a citation in a specification or source file), substantive (any citation "
+        "beyond the navigation files every repository carries), weighty (three or more citing "
+        "files) and all.",
+        ("Imports and declared dependencies only: kept as the hard view; a build cannot loop, so "
+         "it cannot show the question.",
+         "Every citation as a dependency: kept as the all view, rejected as the headline, because "
+         "navigation lists put every sibling in every repository and a large cycle there is "
+         "expected and says little.",
+         "A centrality score from edge weights: rejected, because it ranks where the question is "
+         "whether a bottom exists.",
+         "A dependency list kept by the owners: better data, and it does not exist yet."),
+        "Imports and declared dependencies form no cycle. Under every view that keeps the "
+        "specifications, hyperethics, hyperphysics and metamathethicology lie in a common core: "
+        "their phases are ω, and so are the phases of every repository that relies on them. "
+        "Widening the view never lowers a phase. The same three repositories lie in a common core "
+        "of a second, independent record, hyperstratum's live scan of the 24 pinned fields, when "
+        "only reliances of ten or more links or mentions are kept. A witness who regenerates the "
+        "family graph and the live scan (scripts/regenerate_golden_family.py and "
+        "regenerate_golden_live.py) gets the same structure if the family has not changed and a "
+        "different one if it has.",
+        "A regenerated graph in which the formal view has no core, or in which imports form a "
+        "cycle, or in which widening the edge set lowers a phase; or a regenerated live scan in "
+        "which the three repositories are not in a common core of the frequent mentions.",
+        "The owners of the three repositories can say whether the circle is vicious: whether each "
+        "one's results depend on another's for their truth or only mention it. A citation is "
+        "evidence of mention, not of need. The static graph lists 21 repositories while "
+        "hyperstratum pins 24 (its HS-002): verifier, taxonomy-of-deception, "
+        "speedrunning-social-development, throwaway-papers and meta-morphoscripted-origination are "
+        "absent from it; the live scan covers all 24 but cannot tell a citation from a mention. "
+        "The map from the family's open items to the repositories that would close them is not "
+        "built (D18).",
+        "family.py; entrenchment.phases, cores; data/golden_family_graph.json, "
+        "data/golden_family_live.json; scripts/regenerate_golden_family.py, "
+        "regenerate_golden_live.py; tests/test_family.py, tests/test_phases.py",
+        _d22),
+    Decision(
+        "D23", "By their wording almost none of the family's declared open items is about "
+        "optimization, viability or maintenance", Tag.FRAME,
+        "Test D18's weakest form first: if hyperoptimization closes the family's declared open "
+        "items, some of them should be about what this package computes. Read the declared open "
+        "items (every line tagged [OPEN] that hyperstratum's scan finds, and every open "
+        "declaration in a .hm specification) by wording, with a fixed table of keywords for six "
+        "topics (optimization, viability, persistence, stability, ordinal, closure), chosen "
+        "before the items were read against it.",
+        ("Classify each item by hand: better, and not done; the table is its reproducible proxy, "
+         "and every hit was read by eye.",
+         "Skip the test because the claim is structural and not lexical: rejected as the only "
+         "test; D22 is the structural one and this is the cheap complement.",
+         "Read the items as a graph of what would close each: needs the owners (D18)."),
+        "Few items are about what this package computes: none mentions optimization or viability, "
+        "two mention persistence or maintenance (hyperethics' consistency self-maintenance "
+        "paradox, which D21 treats, and a time-machine line that uses the word in another sense), "
+        "and about 87% mention none of the six topics. The ones that touch it: the consistency "
+        "self-maintenance paradox (D21), metamathethicology's stage semantics, hyperphysics' law "
+        "ranking (E4), and ordinatics' limit rules.",
+        "An owner's reading that finds optimization-shaped content in many items phrased in other "
+        "words; or a regenerated scan whose tally differs; or a topic pattern that fails its own "
+        "control sentence.",
+        "The owners can classify the items by hand and say which a result of this kind would "
+        "close. The proxy ignores synonyms and counts a hit for a word used in any sense: the "
+        "maintenance of a time machine is not self-maintenance.",
+        "family.open_items, open_tally, TOPICS; data/golden_family_live.json; "
+        "scripts/regenerate_golden_live.py; tests/test_family.py",
+        _d23),
 )
 
 _BY_ID = {d.id: d for d in LEDGER}

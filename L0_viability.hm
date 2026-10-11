@@ -93,6 +93,14 @@ primitive Action :: Type
 primitive Nature :: Type
     -- What the environment chooses against the system at each step.
 
+primitive Party :: Type
+    -- Something that can be compromised: a seat, or a holder of one. Parties are independent
+    -- unless a common principal is named.
+
+primitive Norm :: Type
+    -- A yes-or-no relation. Used only to say that something holds of states or actions; it
+    -- carries no ought.
+
 primitive Rank :: Type
     -- An ordinal: a natural number, omega, or (for nested structure) an ordinal below
     -- epsilon_0 in Cantor normal form. The phase of a state or of a process.
@@ -255,6 +263,19 @@ derive d-breadth-and-synthesis:
     -- Status: FORM, verified by scripts/verify_against_hyperethics.py against hyperethics'
     -- own code (it needs hyperethics, so it is not part of the test suite).
 
+derive d-self-maintenance-is-coinductive:
+    -- The kernel is the union of every set of states that supports itself (each state in it has an
+    -- allowed action sending every nature choice back into the set), and is itself one; the least
+    -- fixed point of the same operator is empty. Maintenance has no base case to be built up from,
+    -- so a set that supports itself is its only certificate.
+    -- Status: FORM (every subset of every sampled game, with and without corrigibility).
+
+derive d-dependency-phase:
+    -- In a finite graph of reliance a node has a finite phase (0 if it relies on nothing, else one
+    -- more than the largest phase among what it relies on) iff nothing it reaches lies on a cycle;
+    -- every other node has phase omega. It is authority height for nodes with many governors.
+    -- Status: FORM (every digraph on up to four nodes, self-loops included, against the longest walk).
+
 
 -- =============================================================================
 -- SECTION V: WHAT THIS LAYER DOES NOT CONTAIN
@@ -278,13 +299,29 @@ non-derive nd-determinacy-is-soundness:
 non-derive nd-welfare-from-viability:
     -- NOT DERIVED. Nothing here ranks outcomes for participants, and the model has no payoffs.
 
+non-derive nd-consistency-self-maintenance-resolved:
+    -- NOT DERIVED. That d-self-maintenance-is-coinductive resolves hyperethics' principal open
+    -- problem, the Universal Consistency Self-Maintenance Paradox (L0_creation.hm,
+    -- nd-consistency-self-maintenance). It shows the circularity is the kind a greatest fixed point
+    -- has and a base case cannot, and it turns the question into whether the realm's kernel is
+    -- non-empty. It does not show that it is, or that consistency is a safe condition at all and not
+    -- something a theory proves (decision D21).
+
+non-derive nd-citation-is-need:
+    -- NOT DERIVED. That a repository which cites another needs it. The cores found in the family's
+    -- recorded reliance are where mentions go round in a circle; whether the circle is vicious is for
+    -- the owners to say (decision D22).
+
 open nd-persistence-is-optimal:
     -- OPEN (see above).
 
 open nd-closing-catalyst:
     -- OPEN. That hyperoptimization closes cycles across the hyperfields is a claim to test on
-    -- the family's own dependency data with the machinery of entrenchment.py and ordinal.py. The
-    -- computation is not done (decision D18).
+    -- the family's own dependency data with the machinery of entrenchment.py and ordinal.py. First
+    -- passes are done: the phases of the family's recorded reliance in two records (decision D22),
+    -- and the wording of 122 declared open items (decision D23; none is about optimization or
+    -- viability, four are touched by hand, none is closed). The map from open items to the
+    -- repositories that would close them is not done (decision D18).
 
 open nd-mean-field-adequacy:
     -- OPEN. The loop model is mean-field. A real ring or graph of bodies has correlated

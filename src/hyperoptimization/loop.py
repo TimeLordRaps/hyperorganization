@@ -264,7 +264,7 @@ def capture_gain(m: int, q: int) -> float:
     negative once (T is convex then concave), so the supremum is where it crosses zero. For
     q = 1 the supremum is the limit m as c -> 0; for q = m it is 1, reached as c -> 1.
     """
-    Q._size(m, q)
+    Q.check_quorum(m, q)
     if q == 1:
         return float(m)
     if q == m:

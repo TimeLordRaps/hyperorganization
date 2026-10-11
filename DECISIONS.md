@@ -26,6 +26,9 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 | D18 | Hyperoptimization as the closing catalyst across the family is a claim to test on the family's own data | OPEN | none (by design) |
 | D19 | A loop of checks is determined exactly when some link passes through proof | FRAME | HOLDS_IN_MODEL |
 | D20 | The optimal law is what many simulated law structures converge to, and no single start need reach it | FRAME | HOLDS_IN_MODEL |
+| D21 | Self-maintenance is a greatest fixed point: it has no inductive reading, and a set that supports itself is its certificate | FORM | HOLDS_IN_MODEL |
+| D22 | The family's reliance has a core with no foundation inside it, though what it imports is well founded | FRAME | HOLDS_IN_MODEL |
+| D23 | By their wording almost none of the family's declared open items is about optimization, viability or maintenance | FRAME | HOLDS_IN_MODEL |
 
 ## D01. A price is the surprisal of a compromise
 
@@ -159,8 +162,8 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 **Where.** viability.survival_probability; tests/test_viability.py
 
 **Model check:** HOLDS_IN_MODEL — under full support, survival is certain iff the law is sustaining, and an exemption is fatal
-- 48 starts: the greatest law survives with probability exactly 1
-- 22 single permissions added outside it: survival below 1 each time
+- 119 starts: the greatest law survives with probability exactly 1
+- 85 single permissions added outside it: survival below 1 each time
 
 ## D07. Corrigibility is staying where an overseer can still bring the system home
 
@@ -408,18 +411,18 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 
 **Tag:** OPEN
 
-**Choice.** Record the claim as open, with the test it implies, instead of asserting it.
+**Choice.** Record the claim as open, with the test it implies, instead of asserting it; and run the first parts of that test: the phase of each repository in the family's recorded reliance (D22), the wording of the family's declared open items (D23), and a reading by hand of the six open declarations in its specifications.
 
 **Not chosen.**
-- Assert that it closes the open items: rejected, because the closure map over the family's registry has not been built.
+- Assert that it closes the open items: rejected, because the map from open items to the repositories that would close them is not built.
 
-**Expectation.** If hyperoptimization closes cycles across the hyperfields, the dependency graph of the family's open items has an authority-height structure (D14) in which it is the node that turns a cycle of unclosed obligations into a grounded chain, and closing items lowers an ordinal rank (D13).
+**Expectation.** If hyperoptimization closes cycles across the hyperfields, the dependency graph of the family's open items has an authority-height structure (D14) in which it is the node that turns a cycle of unclosed obligations into a grounded chain, and closing items lowers an ordinal rank (D13). Weaker forms can be read now: the cross-reliances inside a core of the family's recorded reliance (D22) should be ones that what this package supplies (viability, certificates, phase) mediates, and some of the declared open items should be about what it computes (D23).
 
-**Refuter.** The closure map built from hyperstratum's registry shows no such node, or closing items does not lower the rank.
+**Refuter.** The map built from hyperstratum's registry shows no such node, or closing items does not lower the rank; or the open items of a core concern something else. Read as of this snapshot, the open items of the ethics, physics and metamathethicology core are mostly about time, reality and the electrical transport of the will, with a few that this package touches, and by wording none is about optimization or viability (D23): that is evidence against the claim for that core.
 
-**World witness.** That computation is not done. It needs the registry's dependency data and the list of open items per field.
+**World witness.** First passes, 2026-10-11, over 122 declared open items in 11 of the 24 pinned fields (116 lines tagged [OPEN] found by hyperstratum's scan, and 6 open declarations in .hm specifications): none is closed. By wording (D23) none mentions optimization or viability. Read by hand, the items this package touches are: hyperethics' consistency self-maintenance paradox (D21); metamathethicology's stage semantics, whose availability order is the phase of a formation graph (E4) while the starting stage stays a convention; hyperethics' adequacy of the capture model (D03: the direction of the error is computed, its size is not); and hyperphysics' law ranking, which asks whether priority in resolution is the dependence order of its own table, and E4 shows the table's dependence order leaves two pairs of laws unordered, so it cannot be that order alone. Not touched: hyperlogic's gate, implicit control, the charge-constant law, and the time-bubble, quantum-gravity and naming items that make up most of the rest. 13 of the 24 fields declare no open items in either form. There is no witness for the claim itself: the map from items to the repositories that would close them is not done.
 
-**Where.** entrenchment.py and ordinal.py supply the machinery; hyperstratum supplies the data
+**Where.** entrenchment.phases, cores, incomparable_pairs; family.py; the reading by hand is not reproducible
 
 ## D19. A loop of checks is determined exactly when some link passes through proof
 
@@ -442,7 +445,7 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 
 **Model check:** HOLDS_IN_MODEL — a loop of checks is determined exactly when some link passes through proof
 - 27 rings of 1..5 checkers (hyperlogic 09231650d419): 22 with a proof-check link are proved to approve together, 5 loops of copying links are not, each with a countermodel
-- Löb's axiom [](  []p -> p ) -> []p is proved by the same prover
+- Löb's axiom, □(□p → p) → □p, is proved by the same prover
 
 ## D20. The optimal law is what many simulated law structures converge to, and no single start need reach it
 
@@ -468,3 +471,83 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 - 40 games: settling the fully permissive law gives the greatest law in one step
 - twin rooms: a start that mentions only the left room settles on ['hub', 'left']; two starts together pool to the whole law
 - 22 of 22 games with a kernel: 300 random starts pool to the greatest law (median 6 starts, worst 19)
+
+## D21. Self-maintenance is a greatest fixed point: it has no inductive reading, and a set that supports itself is its certificate
+
+**Tag:** FORM
+
+**Choice.** Read a system's maintenance of its own safe condition as membership in the greatest fixed point of F(Y) = the states with an action that sends every nature choice into Y. A set that supports itself (Y inside F(Y)) is a finite certificate for each state in it, and the kernel is the union of all such sets. Read hyperethics' consistency self-maintenance paradox (a realm's maintenance of its consistency appears to presuppose the consistency maintained, and the maintainer is itself inside the realm) as having this shape. Do not claim it is resolved.
+
+**Not chosen.**
+- An inductive reading, the least fixed point built up from a base: rejected, because it is empty for every game with a nature choice (nothing is supported by nothing), so the paradox would make every realm unmaintainable.
+- A proof-theoretic reading, the realm proves its own consistency: kept for loops of checks (D19), rejected here, because a theory that proves its own consistency is inconsistent (Gödel's second theorem, recalled) and a loop of provers is determined without being sound.
+- Exempt the maintainer from the realm's condition: rejected, because an exemption is fatal (D06) and an ungoverned maintainer is the corrupting apex (D14).
+
+**Expectation.** In every sampled game, with and without corrigibility, the kernel equals the union of every subset that supports itself, found by enumerating all subsets, and the kernel supports itself; the least fixed point of the same operator is empty. So a witness needs only a self-supporting set to certify existence, and no base case to start from.
+
+**Refuter.** A game in which the union of the self-supporting sets differs from the kernel, or in which the kernel does not support itself, or in which building up from the empty set reaches a non-empty set.
+
+**World witness.** For a real realm a self-supporting set is a list of states with, for each, a move that keeps every outcome inside the list; it can be audited by exhibiting the list. That the realm's kernel is non-empty, and that its consistency is a safe condition at all and not something a theory proves, are claims about the realm that this model does not make.
+
+**Where.** viability.maintains, inductive_kernel; tests/test_maintenance.py; hyperethics L0_creation.hm nd-consistency-self-maintenance
+
+**Model check:** HOLDS_IN_MODEL — self-maintenance is a greatest fixed point: no inductive reading, and a set that supports itself is its certificate
+- 120 random games on 4 states, with and without corrigibility: the kernel equals the union of the 338 sets that support themselves, found by enumerating every subset, and the kernel is one of them
+- 51 of those games have a kernel that is neither empty nor everything
+- the least fixed point of the same operator is empty in all 120; one state that holds itself has kernel {a} and an empty inductive reading
+
+## D22. The family's reliance has a core with no foundation inside it, though what it imports is well founded
+
+**Tag:** FRAME
+
+**Choice.** Read the family's recorded citations, dependencies and imports (hyperstratum's family graph) as reliance, source relying on target, and give each repository the ordinal phase of its reliance, which is authority height for many governors (D14). Read it under five nested views that differ in which edges count: hard (imports and declared dependencies), formal (hard, or a citation in a specification or source file), substantive (any citation beyond the navigation files every repository carries), weighty (three or more citing files) and all.
+
+**Not chosen.**
+- Imports and declared dependencies only: kept as the hard view; a build cannot loop, so it cannot show the question.
+- Every citation as a dependency: kept as the all view, rejected as the headline, because navigation lists put every sibling in every repository and a large cycle there is expected and says little.
+- A centrality score from edge weights: rejected, because it ranks where the question is whether a bottom exists.
+- A dependency list kept by the owners: better data, and it does not exist yet.
+
+**Expectation.** Imports and declared dependencies form no cycle. Under every view that keeps the specifications, hyperethics, hyperphysics and metamathethicology lie in a common core: their phases are ω, and so are the phases of every repository that relies on them. Widening the view never lowers a phase. The same three repositories lie in a common core of a second, independent record, hyperstratum's live scan of the 24 pinned fields, when only reliances of ten or more links or mentions are kept. A witness who regenerates the family graph and the live scan (scripts/regenerate_golden_family.py and regenerate_golden_live.py) gets the same structure if the family has not changed and a different one if it has.
+
+**Refuter.** A regenerated graph in which the formal view has no core, or in which imports form a cycle, or in which widening the edge set lowers a phase; or a regenerated live scan in which the three repositories are not in a common core of the frequent mentions.
+
+**World witness.** The owners of the three repositories can say whether the circle is vicious: whether each one's results depend on another's for their truth or only mention it. A citation is evidence of mention, not of need. The static graph lists 21 repositories while hyperstratum pins 24 (its HS-002): verifier, taxonomy-of-deception, speedrunning-social-development, throwaway-papers and meta-morphoscripted-origination are absent from it; the live scan covers all 24 but cannot tell a citation from a mention. The map from the family's open items to the repositories that would close them is not built (D18).
+
+**Where.** family.py; entrenchment.phases, cores; data/golden_family_graph.json, data/golden_family_live.json; scripts/regenerate_golden_family.py, regenerate_golden_live.py; tests/test_family.py, tests/test_phases.py
+
+**Model check:** HOLDS_IN_MODEL — the family's reliance has a core with no foundation inside it, though what it imports is well founded
+- snapshot: hyperstratum 87aadc390fea, graph digest b56f1a3c61d9: 21 repositories, 74 recorded edges
+- hard (4 reliances): 20 repositories at phase 0, 0 at ω; cores: none
+- formal (15 reliances): 16 repositories at phase 0, 4 at ω; cores: hyperethics+hyperphysics+metamathethicology
+- substantive (52 reliances): 9 repositories at phase 0, 11 at ω; cores: 7 repositories; hyperspace+hypertime
+- weighty (27 reliances): 11 repositories at phase 0, 9 at ω; cores: hyperethics+hyperphysics+metamathethicology; hypergrammar+hypermath
+- all (67 reliances): 5 repositories at phase 0, 16 at ω; cores: 11 repositories; hyperobjectivity+hypersubjectivity; hyperspace+hypertime
+- widening the view from hard to formal to substantive to all never lowers a phase
+- a second record, hyperstratum's live scan (commit 87aadc390fea, 24 fields, 149 edges): ten or more mentions or links: hyperethics+hyperphysics+metamathethicology; hypergrammar+hypermath+verifier; hyperspace+hypertime; any mention: 16 repositories; links only: 4 repositories; hyperethics+metamathethicology; hyperobjectivity+hypersubjectivity; hyperreality+hyperspace+hypertime
+
+## D23. By their wording almost none of the family's declared open items is about optimization, viability or maintenance
+
+**Tag:** FRAME
+
+**Choice.** Test D18's weakest form first: if hyperoptimization closes the family's declared open items, some of them should be about what this package computes. Read the declared open items (every line tagged [OPEN] that hyperstratum's scan finds, and every open declaration in a .hm specification) by wording, with a fixed table of keywords for six topics (optimization, viability, persistence, stability, ordinal, closure), chosen before the items were read against it.
+
+**Not chosen.**
+- Classify each item by hand: better, and not done; the table is its reproducible proxy, and every hit was read by eye.
+- Skip the test because the claim is structural and not lexical: rejected as the only test; D22 is the structural one and this is the cheap complement.
+- Read the items as a graph of what would close each: needs the owners (D18).
+
+**Expectation.** Few items are about what this package computes: none mentions optimization or viability, two mention persistence or maintenance (hyperethics' consistency self-maintenance paradox, which D21 treats, and a time-machine line that uses the word in another sense), and about 87% mention none of the six topics. The ones that touch it: the consistency self-maintenance paradox (D21), metamathethicology's stage semantics, hyperphysics' law ranking (E4), and ordinatics' limit rules.
+
+**Refuter.** An owner's reading that finds optimization-shaped content in many items phrased in other words; or a regenerated scan whose tally differs; or a topic pattern that fails its own control sentence.
+
+**World witness.** The owners can classify the items by hand and say which a result of this kind would close. The proxy ignores synonyms and counts a hit for a word used in any sense: the maintenance of a time machine is not self-maintenance.
+
+**Where.** family.open_items, open_tally, TOPICS; data/golden_family_live.json; scripts/regenerate_golden_live.py; tests/test_family.py
+
+**Model check:** HOLDS_IN_MODEL — by their wording almost none of the family's declared open items is about optimization, viability or maintenance
+- 122 declared open items in 11 of the 24 scanned fields: 116 lines tagged [OPEN] and 6 open declarations in .hm files
+- items mentioning each topic: optimization 0, viability 0, persistence 2, stability 4, ordinal 6, closure 6
+- 106 of 122 (87%) mention none of them
+- persistence or maintenance is mentioned in hyperethics/L0_creation.hm, hyperphysics/docs/research/TIME_BUBBLE_SHEET.md
+- every topic pattern finds a sentence written to contain it, and the word 'optimistic' is not read as optimization

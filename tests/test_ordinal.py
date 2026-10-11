@@ -89,6 +89,28 @@ def test_terms_must_descend_and_coefficients_be_positive():
         Ord.of(True)
 
 
+def test_the_constructor_refuses_what_is_not_a_tuple_of_pairs_of_an_ordinal_and_a_count():
+    with pytest.raises(TypeError, match="tuple"):
+        Ord([(ZERO, 1)])
+    with pytest.raises(TypeError, match="pair"):
+        Ord((ZERO,))
+    with pytest.raises(TypeError, match="pair"):
+        Ord(((ZERO, 1, 2),))
+    with pytest.raises(TypeError, match="Ordinal"):
+        Ord(((1, 1),))
+    with pytest.raises(ValueError, match="positive"):
+        Ord(((ZERO, False),))  # a bool is not a count
+
+
+def test_adding_what_is_not_an_ordinal_is_refused_and_the_repr_shows_the_normal_form():
+    with pytest.raises(TypeError):
+        W + 1
+    with pytest.raises(TypeError):
+        1 + W
+    assert repr(W) == "Ordinal(ω)" and repr(ZERO) == "Ordinal(0)"
+    assert repr(w_pow(W) * 2 + ONE) == "Ordinal(ω^ω·2+1)"
+
+
 def test_zero_successor_and_limit_are_told_apart():
     assert ZERO.is_zero and not ZERO.is_limit and not ZERO.is_successor
     assert Ord.of(3).is_successor and not Ord.of(3).is_limit

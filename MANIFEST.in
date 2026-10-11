@@ -4,6 +4,10 @@ include DESIGN.md
 include VALIDATION.md
 include PROVENANCE.md
 include DECISIONS.md
+include TECHNICAL_DEBT.md
 include L0_viability.hm
 recursive-include validation *.json
 recursive-include src/hyperoptimization/data *.json
+recursive-include tests *.py
+recursive-include scripts *.py
+global-exclude __pycache__ *.py[cod]

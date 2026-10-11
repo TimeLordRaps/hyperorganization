@@ -38,7 +38,7 @@ What this does and does not settle
 from __future__ import annotations
 
 import math
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 
 from .ground import OMEGA, Omega
@@ -150,4 +150,100 @@ def protection(rules: Iterable[Rule]) -> dict[str, float]:
     return {name: weakest_link(table.values(), name)[1] for name in table}
 
 
-__all__ = ["Rule", "apex", "authority_height", "cycles", "protection", "weakest_link"]
+# ---------------------------------------------------------------------------
+# Many governors: the phase of a dependency graph.
+# ---------------------------------------------------------------------------
+
+
+def _dependencies(depends_on: Mapping[str, Iterable[str]]) -> dict[str, frozenset[str]]:
+    graph: dict[str, frozenset[str]] = {}
+    for name, deps in depends_on.items():
+        if type(name) is not str or not name:
+            raise ValueError("every node needs a name")
+        if isinstance(deps, str):
+            raise TypeError(f"the dependencies of {name!r} are a collection of names, not one string")
+        graph[name] = frozenset(deps)
+    if not graph:
+        raise ValueError("a graph needs at least one node")
+    for name, deps in graph.items():
+        for dep in deps:
+            if dep not in graph:
+                raise ValueError(f"{name!r} relies on {dep!r}, which is not a node")
+    return graph
+
+
+def phases(depends_on: Mapping[str, Iterable[str]]) -> dict[str, int | Omega]:
+    """The ordinal phase of each node of a finite graph of reliance: 0 if it relies on nothing,
+    one more than the largest phase among what it relies on otherwise, and OMEGA if its reliance
+    never bottoms out (it lies on a cycle, or relies, however indirectly, on something that does).
+
+    This is `authority_height` for nodes with any number of governors. A finite phase exists exactly
+    when nothing the node reaches lies on a cycle: round k takes every node whose dependencies were
+    all taken in earlier rounds, and a node never taken relies on a cycle.
+    """
+    graph = _dependencies(depends_on)
+    taken: dict[str, int] = {}
+    layer = 0
+    while True:
+        ready = [name for name, deps in graph.items() if name not in taken and deps.issubset(taken)]
+        if not ready:
+            break
+        for name in ready:
+            taken[name] = layer
+        layer += 1
+    return {name: taken.get(name, OMEGA) for name in graph}
+
+
+def cores(depends_on: Mapping[str, Iterable[str]]) -> list[tuple[str, ...]]:
+    """The groups of nodes that rely on one another, directly or through others: the strongly
+    connected groups of two or more nodes, and each node that relies on itself, alone. Each group is
+    sorted and the groups are listed in the order of their first member.
+
+    A core has no foundation inside it. Every node of a core has phase OMEGA, and so does every
+    node that relies on one.
+    """
+    graph = _dependencies(depends_on)
+    reached = _reached(graph)
+    groups: list[tuple[str, ...]] = []
+    placed: set[str] = set()
+    for name in sorted(graph):
+        if name in placed or name not in reached[name]:
+            continue
+        group = tuple(sorted(other for other in graph if other in reached[name] and name in reached[other]))
+        placed.update(group)
+        groups.append(group)
+    return groups
+
+
+def _reached(graph: Mapping[str, frozenset[str]]) -> dict[str, set[str]]:
+    """For each node, every node it reaches along one or more reliances."""
+    reached: dict[str, set[str]] = {}
+    for start in graph:
+        seen: set[str] = set()
+        frontier = list(graph[start])
+        while frontier:
+            node = frontier.pop()
+            if node not in seen:
+                seen.add(node)
+                frontier.extend(graph[node])
+        reached[start] = seen
+    return reached
+
+
+def incomparable_pairs(depends_on: Mapping[str, Iterable[str]]) -> list[tuple[str, str]]:
+    """The pairs of nodes that neither relies on, directly or through others, sorted.
+
+    Dependence is a partial order (a preorder, around a core): where this list is not empty it
+    leaves some pairs unordered, and a rule of priority that must settle every conflict needs more
+    than the dependence it is read from. A chain leaves nothing; two branches leave the pair of
+    their tops.
+    """
+    graph = _dependencies(depends_on)
+    reached = _reached(graph)
+    names = sorted(graph)
+    return [(a, b) for i, a in enumerate(names) for b in names[i + 1:]
+            if b not in reached[a] and a not in reached[b]]
+
+
+__all__ = ["Rule", "apex", "authority_height", "cores", "cycles", "incomparable_pairs", "phases", "protection",
+           "weakest_link"]

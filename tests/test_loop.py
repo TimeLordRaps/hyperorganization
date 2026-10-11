@@ -35,6 +35,7 @@ from fractions import Fraction as F
 import pytest
 
 from hyperoptimization import loop as L
+from hyperoptimization import poly as P
 from hyperoptimization import quorum as Q
 
 C, V = L.Link.COMMAND, L.Link.VETO
@@ -372,6 +373,48 @@ def test_exact_thresholds_at_a_three_seat_majority_are_where_the_roots_merge():
     assert L.count_fixed_points(C, 3, 2, F(1, 9) - hair) == 2
     assert L.count_fixed_points(C, 3, 2, F(1, 9)) == 1
     assert L.count_fixed_points(C, 3, 2, F(1, 9) + hair) == 0
+
+
+@pytest.mark.parametrize("m", [2, 3, 4, 7, 12])
+def test_when_every_seat_must_fall_the_command_loop_has_a_double_end_root_exactly_at_its_threshold(m):
+    # COMMAND with q = m: G(p) - p = pi + (1 - pi) p^m - p, and p = 1 is always a root. Its slope
+    # there is (1 - pi) m - 1 and its curvature (1 - pi) m (m - 1). At pi = 1 - 1/m the slope is
+    # zero and the curvature is m - 1 > 0, so the end root is exactly double: the interior root
+    # that lived just below has been swallowed by it. Dividing the end root out once would leave
+    # it standing and make the interior count wrong.
+    pi = 1 - F(1, m)
+    f = L.fixed_point_poly(C, m, m, pi)
+    for x in (F(0), F(1, 3), F(1, 2), F(2, 3), F(1), F(3, 2), F(-2)):
+        assert P.peval(f, x) == pi + (1 - pi) * x**m - x
+    assert (1 - pi) * m - 1 == 0 and (1 - pi) * m * (m - 1) == m - 1
+    hair = F(1, 10**6)
+    assert L.count_fixed_points(C, m, m, pi - hair) == 1
+    assert L.count_fixed_points(C, m, m, pi) == 0
+    assert L.count_fixed_points(C, m, m, pi + hair) == 0
+    assert L.fixed_points(C, m, m, pi) == []
+    assert L.outcome(C, m, m, pi - hair) is L.Outcome.HEALTHY
+    assert L.outcome(C, m, m, pi) is L.Outcome.COLLAPSED
+    assert L.threshold(C, m, m) == pytest.approx(float(pi), abs=1e-12)
+
+
+@pytest.mark.parametrize("m", [2, 3, 4, 7, 12])
+def test_when_one_seat_suffices_the_veto_loop_has_a_double_end_root_exactly_at_its_threshold(m):
+    # VETO with q = 1: G(p) - p = pi (1 - (1 - p)^m) - p, and p = 0 is always a root. Its slope
+    # there is pi m - 1 and its curvature -pi m (m - 1); at pi = 1/m the slope vanishes and the
+    # curvature is -(m - 1) < 0, an exactly double root, with no interior root until pi passes 1/m.
+    pi = F(1, m)
+    f = L.fixed_point_poly(V, m, 1, pi)
+    for x in (F(0), F(1, 3), F(1, 2), F(2, 3), F(1), F(3, 2), F(-2)):
+        assert P.peval(f, x) == pi * (1 - (1 - x) ** m) - x
+    assert pi * m - 1 == 0 and -pi * m * (m - 1) == -(m - 1)
+    hair = F(1, 10**6)
+    assert L.count_fixed_points(V, m, 1, pi - hair) == 0
+    assert L.count_fixed_points(V, m, 1, pi) == 0
+    assert L.count_fixed_points(V, m, 1, pi + hair) == 1
+    assert L.fixed_points(V, m, 1, pi) == []
+    assert L.outcome(V, m, 1, pi) is L.Outcome.HEALTHY
+    assert L.outcome(V, m, 1, pi + hair) is L.Outcome.COLLAPSED
+    assert L.threshold(V, m, 1) == pytest.approx(float(pi), abs=1e-12)
 
 
 def test_capture_gain_refuses_a_quorum_that_is_no_quorum():

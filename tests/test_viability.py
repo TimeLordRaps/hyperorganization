@@ -284,7 +284,7 @@ def test_one_permission_outside_the_greatest_law_at_a_reachable_state_ends_exist
                         is Status.FAILS_IN_MODEL
                     assert V.survival_probability(game, exempt, start, corrigible=False) < 1
                     broken += 1
-    assert broken > 150  # non-vacuity: 217 instances at this seed
+    assert broken > 150  # non-vacuity guard; ledger decision D06 reports its own count
 
 
 # --- corrigibility ---------------------------------------------------------------------------------------------
@@ -606,7 +606,7 @@ def test_changing_any_single_rank_to_any_other_value_is_caught():
                 assert V.check_ranks(game, claim, corrigible=False).status is Status.FAILS_IN_MODEL, (
                     game.states, state, value)
                 tampered += 1
-    assert tampered > 3000  # non-vacuity: 3,392 tampered rankings at this seed
+    assert tampered > 3000  # non-vacuity guard; the exact count is printed by ledger decision D08
 
 
 def test_changing_many_ranks_at_once_is_caught_too():
@@ -787,7 +787,7 @@ def test_a_population_of_random_laws_pools_to_the_greatest_law():
         if first is not None:
             converged += 1
             assert first <= 100 and pooled == star
-    assert games > 15 and converged == games  # non-vacuity: 22 games with a kernel; all converge
+    assert games > 15 and converged == games  # non-vacuity guard; ledger decision D20 reports the counts
 
 
 def test_with_a_home_the_population_converges_on_the_corrigible_law():

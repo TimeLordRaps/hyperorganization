@@ -7,12 +7,14 @@ advertisement.
 
 from __future__ import annotations
 
+import itertools
 import math
 from fractions import Fraction
 
 from . import (
     decisions,
     entrenchment,
+    family,
     loop,
     ordinal,
     quorum,
@@ -20,7 +22,7 @@ from . import (
     surprisal,
     viability,
 )
-from .ground import Status, rank_key
+from .ground import OMEGA, Status, rank_key
 
 
 def _cliff() -> viability.Game:
@@ -45,6 +47,18 @@ def _culdesac() -> viability.Game:
             "r": {"hold": ("r",), "dive": ("p",)},
         },
         safe={"p", "q", "r"}, home={"p"}, correct={("r", "p")},
+    )
+
+
+def _twin_rooms() -> viability.Game:
+    """A hub with a way into each of two safe rooms and a way out of both."""
+    return viability.Game.from_table(
+        nature=("n",),
+        table={
+            "hub": {"go-left": ("left",), "go-right": ("right",), "fall": ("x",)},
+            "left": {"stay": ("left",)}, "right": {"stay": ("right",)}, "x": {"stay": ("x",)},
+        },
+        safe={"hub", "left", "right"},
     )
 
 
@@ -112,6 +126,11 @@ def _section_viability() -> list[str]:
     plain = viability.kernel(trap, corrigible=False)
     corrigible = viability.kernel(trap, corrigible=True)
     law_trap = viability.greatest_law(trap, corrigible=True)
+    rooms = _twin_rooms()
+    holding = [chosen for size in range(len(rooms.states) + 1)
+               for chosen in itertools.combinations(sorted(rooms.states), size)
+               if viability.maintains(rooms, chosen, corrigible=False)]
+    inductive = sorted(viability.inductive_kernel(rooms, corrigible=False)) or "empty"
     return [
         "== viability  (existence = staying safe for ever; the optimal law = the least restriction "
         "that preserves it)",
@@ -122,6 +141,9 @@ def _section_viability() -> list[str]:
         f"the corrigible law at p permits {sorted(law_trap['p'])} and forbids the move to the dead end",
         "   The greatest law is unique and names no participant. Adding one permission outside it, at "
         "a state the system reaches, makes survival uncertain: an exemption is fatal.",
+        f"   self-maintenance, twin rooms: kernel {sorted(viability.kernel(rooms, corrigible=False))} is the "
+        f"union of the {len(holding)} sets that support themselves (the empty set among them); the hub holds "
+        f"only inside a set that holds a room; inductive reading: {inductive}",
     ]
 
 
@@ -152,6 +174,36 @@ def _section_entrenchment() -> list[str]:
     ]
 
 
+def _section_family() -> list[str]:
+    data = family.snapshot()
+    lines = [f"== family  (reliance among the family's repositories, from one recorded snapshot of hyperstratum "
+             f"{data['hyperstratum_commit'][:12]}, graph digest {data['source_digest'][:12]}: "
+             f"{len(data['nodes'])} repositories, {len(data['edges'])} edges; source relies on target)",
+             "   view         reliances  phase 0  phase ω   cores (groups that rely on one another)"]
+    for name in ("hard", "formal", "substantive", "weighty", "all"):
+        phases, cores = family.phases_of(name, data=data), family.cores_of(name, data=data)
+        reliances = sum(len(d) for d in family.depends_on(name, data=data).values())
+        shown = "; ".join("+".join(core) if len(core) <= 3 else f"{len(core)} repositories"
+                          for core in cores) or "none"
+        lines.append(f"   {name:<12} {reliances:<10} {sum(p == 0 for p in phases.values()):<8} "
+                     f"{sum(p is OMEGA for p in phases.values()):<9} {shown}")
+    lines.append("   What the family imports is well founded; what its specifications say is not. A citation "
+                 "is evidence of mention, not of need: the cores are where mentions go round in a circle, and "
+                 "whether a circle is vicious is for the owners to say.")
+    record = family.live()
+    frequent = "; ".join("+".join(core) if len(core) <= 3 else f"{len(core)} repositories"
+                         for core in family.live_cores_of("frequent", data=record)) or "none"
+    lines.append(f"   live scan (hyperstratum's own, {len(record['fields'])} fields, {len(record['edges'])} "
+                 f"edges), {family.FREQUENT} or more links or mentions: cores {frequent}")
+    tally = family.open_tally(data=record)
+    topics = ", ".join(f"{topic} {count}" for topic, count in tally["topics"].items())
+    owners = len({item["field"] for item in family.open_items(data=record)})
+    lines.append(f"   {tally['items']} declared open items in {owners} fields; by wording, items mentioning "
+                 f"{topics}; {tally['untouched']} mention none of the six topics (a proxy for a reading by "
+                 "the owners, not a substitute)")
+    return lines
+
+
 def _section_ledger() -> list[str]:
     results = decisions.run_all()
     total = len(results)
@@ -173,7 +225,8 @@ def _section_open() -> list[str]:
         "   OPEN             persistence as optimality: why the law that preserves existence is the "
         "optimal one (D16, the family's GC-5)",
         "   NOT_ESTABLISHED  that physical reality adheres to such a structure (D17); that this closes "
-        "the family's open items (D18)",
+        "the family's open items (D18, D23: of 122 declared open items none is about optimization or "
+        "viability by wording, four are touched, none is closed)",
         "   NOT_ESTABLISHED  mean-field loops stand in for a real ring or graph of bodies; the "
         "thresholds are upper bounds when compromise is positively associated (D03)",
         "   NOT_IMPLEMENTED self-funding capture (reinvestment is positive feedback); a ring or graph "
@@ -189,6 +242,7 @@ def build_report() -> str:
     sections = [
         [f"hyperoptimization {__version__}: existence, freedom, corrigibility and renewal, without money"],
         _section_quorum(), _section_loops(), _section_renewal(), _section_viability(),
-        _section_ordinal(), _section_entrenchment(), _section_ledger(), _section_open(),
+        _section_ordinal(), _section_entrenchment(), _section_family(), _section_ledger(),
+        _section_open(),
     ]
     return "\n\n".join("\n".join(section) for section in sections) + "\n"

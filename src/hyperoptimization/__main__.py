@@ -13,6 +13,14 @@ USAGE = (
 )
 
 
+def _utf8_streams() -> None:
+    """The report is Unicode (ω); a Windows pipe defaults to a code page that cannot hold it."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     args = sys.argv[1:] if argv is None else argv
     if not args:
@@ -26,4 +34,5 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
+    _utf8_streams()
     sys.exit(main())

@@ -57,7 +57,8 @@ class Fate(str, Enum):
     CRITICAL = "critical"  # exactly on the unstable fixed point
 
 
-def _size(m: object, q: object) -> None:
+def check_quorum(m: object, q: object) -> None:
+    """Refuse anything that is not a body of m >= 1 seats and a quorum q >= 0 (both ints)."""
     if type(m) is not int or type(q) is not int:
         raise TypeError("m and q must be ints")
     if m < 1:
@@ -82,7 +83,7 @@ def _probability(x: object) -> Fraction:
 
 def tail(m: int, q: int, x: object) -> Fraction:
     """T(x) = P(at least q of m independent seats are compromised), exactly."""
-    _size(m, q)
+    check_quorum(m, q)
     p = _probability(x)
     if q == 0:
         return Fraction(1)
@@ -94,7 +95,7 @@ def tail(m: int, q: int, x: object) -> Fraction:
 
 def tail_poly(m: int, q: int) -> P.Poly:
     """T as a polynomial in x, constant term first."""
-    _size(m, q)
+    check_quorum(m, q)
     if q == 0:
         return P.poly(1)
     if q > m:
@@ -108,7 +109,7 @@ def tail_poly(m: int, q: int) -> P.Poly:
 
 def tail_slope(m: int, q: int, x: object) -> Fraction:
     """T'(x) = m C(m-1, q-1) x^(q-1) (1-x)^(m-q): the density of the q-th smallest seat."""
-    _size(m, q)
+    check_quorum(m, q)
     p = _probability(x)
     if q < 1 or q > m:
         return Fraction(0)
@@ -117,7 +118,7 @@ def tail_slope(m: int, q: int, x: object) -> Fraction:
 
 def dual(m: int, q: int) -> int:
     """The blocking threshold: the number of compromised seats that stops a body acting."""
-    _size(m, q)
+    check_quorum(m, q)
     return m - q + 1
 
 
@@ -137,7 +138,7 @@ def interior_fixed_points(m: int, q: int) -> int:
     which is the identity), so it is divided by x(x - 1) and Sturm's theorem counts the
     roots of what is left in (0, 1).
     """
-    _size(m, q)
+    check_quorum(m, q)
     if m == 1 and q == 1:
         raise ValueError("a one-seat body is the identity map: every point is a fixed point")
     if q == 0 or q > m:
@@ -189,7 +190,7 @@ def critical_slope(m: int, q: int) -> float:
 
 def flow(m: int, q: int, x0: object, depth: int) -> list[Fraction]:
     """[x0, T(x0), ..., T^depth(x0)], exactly."""
-    _size(m, q)
+    check_quorum(m, q)
     if type(depth) is not int or depth < 0:
         raise ValueError("depth is a natural number")
     if m**depth > _EXACT_FLOW_LIMIT:
@@ -205,7 +206,7 @@ def flow(m: int, q: int, x0: object, depth: int) -> list[Fraction]:
 
 def flow_float(m: int, q: int, x0: float, depth: int) -> list[float]:
     """The same orbit in floats, for depths exact arithmetic cannot reach."""
-    _size(m, q)
+    check_quorum(m, q)
     if type(depth) is not int or depth < 0:
         raise ValueError("depth is a natural number")
     orbit = [float(_probability(x0))]
@@ -276,7 +277,7 @@ def _log_binomial(n: int, k: int) -> float:
 
 def tail_float(m: int, q: int, x: float) -> float:
     """T(x) in floats, summed in log space so that m in the thousands does not overflow."""
-    _size(m, q)
+    check_quorum(m, q)
     if q == 0:
         return 1.0
     if q > m or x <= 0.0:
@@ -291,7 +292,7 @@ def tail_float(m: int, q: int, x: float) -> float:
 
 def critical_point_float(m: int, q: int) -> float:
     """x_c in floats by bisection on the sign of T(x) - x."""
-    _size(m, q)
+    check_quorum(m, q)
     if not 2 <= q <= m - 1:
         raise ValueError(f"({m}, {q}) has no interior fixed point to be critical")
     lo, hi = 0.0, 1.0
@@ -306,7 +307,7 @@ def critical_point_float(m: int, q: int) -> float:
 
 def tail_slope_float(m: int, q: int, x: float) -> float:
     """T'(x) in floats, from the density form, for m too large for exact arithmetic."""
-    _size(m, q)
+    check_quorum(m, q)
     if q < 1 or q > m:
         return 0.0
     if x <= 0.0:

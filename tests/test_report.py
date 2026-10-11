@@ -8,20 +8,23 @@ in any model that moves a headline figure fails a test instead of quietly changi
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
 
-from hyperoptimization import report
-from hyperoptimization.__main__ import main
+import pytest
+
+from hyperoptimization import decisions, report
+from hyperoptimization.__main__ import _utf8_streams, main
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
 def test_the_report_names_each_part_of_the_package():
     text = report.build_report()
-    for heading in ("quorum", "loops", "renewal", "viability", "ordinal", "entrenchment", "ledger",
-                    "open"):
+    for heading in ("quorum", "loops", "renewal", "viability", "ordinal", "entrenchment", "family",
+                    "ledger", "open"):
         assert f"== {heading}" in text.lower(), heading
 
 
@@ -39,9 +42,27 @@ def test_the_headline_figures_are_the_ones_the_models_compute():
     assert "protected by 5 bits" in text
 
 
-def test_the_ledger_summary_counts_match_the_ledger():
-    from hyperoptimization import decisions
+def test_self_maintenance_is_shown_as_the_union_of_the_sets_that_support_themselves():
+    text = report.build_report()
+    # the twin-rooms game, worked by hand: the empty set, each room, both rooms, and the hub with
+    # either room or with both; the hub cannot hold itself up alone
+    assert "the 7 sets that support themselves" in text and "inductive reading: empty" in text
+    assert "kernel ['hub', 'left', 'right']" in text
 
+
+def test_the_family_section_shows_the_phases_the_recorded_snapshot_gives():
+    text = report.build_report()
+    assert "87aadc390fea" in text and "b56f1a3c61d9" in text  # the snapshot is named
+    assert re.search(r"hard\s+4\s+20\s+0\s+none", text)  # what is imported is well founded
+    assert re.search(r"formal\s+15\s+16\s+4\s+hyperethics\+hyperphysics\+metamathethicology", text)  # what is meant is not
+    assert "A citation is evidence of mention, not of need" in text
+    # a second record, and what the family's declared open items are about
+    assert "live scan" in text and "24 fields" in text and "hypergrammar+hypermath+verifier" in text
+    assert "122 declared open items in 11 fields" in text
+    assert "optimization 0, viability 0, persistence 2" in text and "106 mention none" in text
+
+
+def test_the_ledger_summary_counts_match_the_ledger():
     text = report.build_report()
     total = len(decisions.LEDGER)
     checked = sum(d.check is not None for d in decisions.LEDGER)
@@ -62,9 +83,42 @@ def test_the_report_is_deterministic_and_independent_of_the_hash_seed():
     for seed in ("0", "5"):
         env = {**os.environ, "PYTHONHASHSEED": seed, "PYTHONPATH": str(ROOT / "src")}
         done = subprocess.run([sys.executable, "-m", "hyperoptimization"], env=env,
-                              capture_output=True, text=True, timeout=120, check=True)
+                              capture_output=True, text=True, encoding="utf-8", timeout=120, check=True)
         outputs.add(done.stdout)
     assert len(outputs) == 1
+
+
+@pytest.mark.parametrize("args", [[], ["decisions"]])
+def test_the_command_line_writes_utf8_whatever_the_console_code_page(args):
+    # A Windows pipe defaults to cp1252, which cannot hold the omega the report and the ledger use;
+    # PYTHONIOENCODING reproduces that here. The text must still arrive, and as UTF-8.
+    env = {**os.environ, "PYTHONIOENCODING": "cp1252", "PYTHONPATH": str(ROOT / "src")}
+    done = subprocess.run([sys.executable, "-m", "hyperoptimization", *args], env=env,
+                          capture_output=True, timeout=120)
+    assert done.returncode == 0, done.stderr.decode("utf-8", "replace")[-400:]
+    text = done.stdout.decode("utf-8").replace("\r\n", "\n")
+    assert "ω" in text
+    assert text == (decisions.render_markdown() if args else report.build_report())
+
+
+def test_both_output_streams_are_reconfigured_and_one_that_cannot_be_is_left_alone(monkeypatch):
+    seen = []
+
+    class Stream:
+        def __init__(self, name):
+            self.name = name
+
+        def reconfigure(self, **kwargs):
+            seen.append((self.name, kwargs))
+
+    monkeypatch.setattr(sys, "stdout", Stream("out"))
+    monkeypatch.setattr(sys, "stderr", Stream("err"))
+    _utf8_streams()
+    assert seen == [("out", {"encoding": "utf-8"}), ("err", {"encoding": "utf-8"})]
+    seen.clear()
+    monkeypatch.setattr(sys, "stderr", object())  # no `reconfigure`: left alone, and no error
+    _utf8_streams()
+    assert seen == [("out", {"encoding": "utf-8"})]
 
 
 def test_the_command_line(capsys):

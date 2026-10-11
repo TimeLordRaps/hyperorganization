@@ -271,16 +271,26 @@ def _region(game: Game, corrigible: bool) -> frozenset[str]:
     return game.safe
 
 
+def _supported(game: Game, candidates: Iterable[str], within: frozenset[str],
+               permitted: Mapping[str, frozenset[str]] | None = None) -> frozenset[str]:
+    """F(within): the candidates with a permitted action that sends every nature choice into `within`.
+
+    The one operator behind the kernel, the ranks and the greatest law. Its greatest fixed point
+    inside the region is the kernel; its least fixed point is the empty set.
+    """
+    return frozenset(
+        s for s in candidates
+        if any(all(game.target(s, a, b) in within for b in game.nature)
+               for a in (game.allowed(s) if permitted is None else permitted.get(s, frozenset())))
+    )
+
+
 def _stages(game: Game, region: frozenset[str],
             permitted: Mapping[str, frozenset[str]] | None = None) -> list[frozenset[str]]:
     current = region
     stages = [current]
     while True:
-        following = frozenset(
-            s for s in current
-            if any(all(game.target(s, a, b) in current for b in game.nature)
-                   for a in (game.allowed(s) if permitted is None else permitted.get(s, frozenset())))
-        )
+        following = _supported(game, current, current, permitted)
         if following == current:
             return stages
         stages.append(following)
@@ -290,6 +300,40 @@ def _stages(game: Game, region: frozenset[str],
 def kernel(game: Game, *, corrigible: bool = True) -> frozenset[str]:
     """The states from which the system can stay in the region for ever against any nature."""
     return _stages(game, _region(game, corrigible))[-1]
+
+
+def maintains(game: Game, held: Iterable[str], *, corrigible: bool = True) -> bool:
+    """Whether `held` supports itself: it lies in the region, and each of its states has an allowed
+    action that sends every nature choice back into it.
+
+    Such a set is a finite certificate that every state in it exists for ever (the coinduction
+    principle). The kernel is the union of all of them, and is itself one. The empty set supports
+    itself vacuously.
+    """
+    inside = frozenset(held)
+    for state in inside:
+        _check_state(game, state)
+    return inside <= _region(game, corrigible) and _supported(game, inside, inside) == inside
+
+
+def inductive_kernel(game: Game, *, corrigible: bool = True) -> frozenset[str]:
+    """The LEAST fixed point of the operator whose greatest fixed point is the kernel, built upward
+    from the empty set.
+
+    It is empty for every game: a game has at least one nature choice (the constructor insists), so
+    no state is supported by nothing, and the iteration stops where it starts. Maintenance has no
+    base case to be built up from; the kernel is its only reading, and that reading is coinductive.
+    (The loop is for the case the constructor excludes: with no nature choice F(empty) is not empty,
+    the iteration climbs, and the least fixed point is not empty either. The tests use that as a
+    negative control.)
+    """
+    region = _region(game, corrigible)
+    current: frozenset[str] = frozenset()
+    while True:
+        following = _supported(game, region, current)
+        if following == current:
+            return current
+        current = following
 
 
 def ranks(game: Game, *, corrigible: bool = True) -> dict[str, int | Omega]:
@@ -617,7 +661,8 @@ def repair_game(m: int, q: int, *, attack: int, repair: int) -> Game:
 
 
 __all__ = [
-    "Game", "Law", "OMEGA", "all_laws", "check_ranks", "forced_moves", "freedom", "greatest_law", "kernel", "ranks",
+    "Game", "Law", "OMEGA", "all_laws", "check_ranks", "forced_moves", "freedom", "greatest_law",
+    "inductive_kernel", "kernel", "maintains", "ranks",
     "random_game", "random_law", "reach_home", "reachable", "repair_game", "restricted_kernel",
     "settle", "converge", "survival_probability", "sustaining",
 ]
