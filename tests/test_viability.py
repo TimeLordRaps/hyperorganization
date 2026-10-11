@@ -705,3 +705,113 @@ def test_a_renaming_must_cover_exactly_and_must_not_merge():
     with pytest.raises(ValueError, match="must not merge"):
         game.relabel(states={"a": "z", "b": "z", "c": "c", "x": "x"})
     assert game.relabel() == game
+
+
+# --- convergence from many simulated laws ---------------------------------------------------------------------------
+
+
+def twin_rooms():
+    """Two separate safe rooms behind a hub. A law that mentions only one room cannot find the other."""
+    return V.Game.from_table(
+        nature=("n",),
+        table={
+            "hub": {"go-left": ("left",), "go-right": ("right",), "fall": ("x",)},
+            "left": {"stay": ("left",)},
+            "right": {"stay": ("right",)},
+            "x": {"stay": ("x",)},
+        },
+        safe={"hub", "left", "right"},
+    )
+
+
+def test_settling_never_ends_above_the_greatest_law_and_what_it_leaves_is_sustaining():
+    rng = random.Random(101)
+    checked = 0
+    for _ in range(300):
+        game = random_game(rng)
+        star = V.greatest_law(game, corrigible=False)
+        law = V.random_law(game, rng, density=rng.choice([0.2, 0.5, 0.8, 1.0]))
+        out = V.settle(game, law, corrigible=False)
+        assert set(out) <= set(star)
+        assert V.restricted_kernel(game, law, corrigible=False) <= V.kernel(game, corrigible=False)
+        for s, permitted in out.items():
+            assert permitted and permitted <= star[s]
+            assert V.sustaining(game, out, s, corrigible=False).status is Status.HOLDS_IN_MODEL
+            checked += 1
+    assert checked > 200
+
+
+def test_settling_is_monotone_and_idempotent():
+    rng = random.Random(102)
+    for _ in range(300):
+        game = random_game(rng, home=rng.random() < 0.5)
+        small = V.random_law(game, rng, density=0.4)
+        extra = V.random_law(game, rng, density=0.4)
+        big = {s: small[s] | extra[s] for s in game.states}
+        a, b = V.settle(game, small), V.settle(game, big)
+        assert set(a) <= set(b) and all(a[s] <= b[s] for s in a)
+        assert V.settle(game, a) == a
+
+
+def test_settling_the_fully_permissive_law_gives_the_greatest_law_in_one_step():
+    rng = random.Random(103)
+    for _ in range(300):
+        game = random_game(rng, home=rng.random() < 0.5)
+        permissive = {s: game.allowed(s) for s in game.states}
+        assert V.settle(game, permissive) == V.greatest_law(game)
+
+
+def test_one_start_can_be_stuck_below_the_optimum_and_a_population_is_not():
+    game = twin_rooms()
+    star = V.greatest_law(game, corrigible=False)
+    assert star["hub"] == frozenset({"go-left", "go-right"})
+    left_only = {"hub": frozenset({"go-left"}), "left": frozenset({"stay"})}
+    right_only = {"hub": frozenset({"go-right"}), "right": frozenset({"stay"})}
+    stuck = V.settle(game, left_only, corrigible=False)
+    assert stuck == {"hub": frozenset({"go-left"}), "left": frozenset({"stay"})} != star
+    other = V.settle(game, right_only, corrigible=False)
+    pooled = {s: stuck.get(s, frozenset()) | other.get(s, frozenset()) for s in star}
+    assert pooled == star
+
+
+def test_a_population_of_random_laws_pools_to_the_greatest_law():
+    converged = games = 0
+    for seed in range(40):
+        game = random_game(random.Random(11000 + seed), n=4, na=2, nb=2)
+        star = V.greatest_law(game, corrigible=False)
+        if not star:
+            continue
+        games += 1
+        pooled, first = V.converge(game, random.Random(seed), 300, corrigible=False)
+        assert all(pooled[s] <= star[s] for s in pooled)  # never above, at any population
+        if first is not None:
+            converged += 1
+            assert first <= 100 and pooled == star
+    assert games > 15 and converged == games  # non-vacuity: 22 games with a kernel; all converge
+
+
+def test_with_a_home_the_population_converges_on_the_corrigible_law():
+    games = converged = 0
+    for seed in range(40):
+        game = random_game(random.Random(12000 + seed), n=4, na=2, nb=2, home=True)
+        star = V.greatest_law(game, corrigible=True)
+        if not star:
+            continue
+        games += 1
+        pooled, first = V.converge(game, random.Random(seed), 300, corrigible=True)
+        assert all(pooled[s] <= star[s] for s in pooled)
+        converged += first is not None
+    assert games > 10 and converged == games
+
+
+def test_random_laws_are_reproducible_from_the_seed_and_checked():
+    game = random_game(random.Random(5))
+    assert V.random_law(game, random.Random(9)) == V.random_law(game, random.Random(9))
+    assert V.random_law(game, random.Random(9), density=0.0) == {s: frozenset() for s in game.states}
+    assert V.random_law(game, random.Random(9), density=1.0) == {s: game.allowed(s) for s in game.states}
+    with pytest.raises(ValueError, match="probability"):
+        V.random_law(game, random.Random(9), density=1.5)
+    with pytest.raises(ValueError, match="natural"):
+        V.converge(game, random.Random(9), -1)
+    pooled, first = V.converge(game, random.Random(9), 0, corrigible=False)
+    assert all(not v for v in pooled.values()) and (first == 0 or first is None)

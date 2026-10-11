@@ -24,6 +24,8 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 | D16 | Why persistence should count as optimality is unresolved | OPEN | none (by design) |
 | D17 | That physical reality adheres to an optimal hyperethical structure cannot be witnessed here | HYPER | none (by design) |
 | D18 | Hyperoptimization as the closing catalyst across the family is a claim to test on the family's own data | OPEN | none (by design) |
+| D19 | A loop of checks is determined exactly when some link passes through proof | FRAME | HOLDS_IN_MODEL |
+| D20 | The optimal law is what many simulated law structures converge to, and no single start need reach it | FRAME | HOLDS_IN_MODEL |
 
 ## D01. A price is the surprisal of a compromise
 
@@ -418,3 +420,51 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 **World witness.** That computation is not done. It needs the registry's dependency data and the list of open items per field.
 
 **Where.** entrenchment.py and ordinal.py supply the machinery; hyperstratum supplies the data
+
+## D19. A loop of checks is determined exactly when some link passes through proof
+
+**Tag:** FRAME
+
+**Choice.** Read a checker that approves only what it can prove safe as the provability modality of GL, and an approval that copies another's as a plain link. A ring of such links has a self-consistent outcome, unique and the same for every member, if and only if at least one link is a proof-check.
+
+**Not chosen.**
+- Trust as a number that propagates (D10): kept; it answers how much pressure a loop survives, not whether its outcome is determined.
+- A monotone-operator fixed point: gives existence but not uniqueness for loops of copying links, which is exactly where the outcome is indeterminate.
+- A game-theoretic equilibrium of mutual oversight: rejected, because it needs payoffs.
+
+**Expectation.** A theorem prover for GL, run on every ring of up to five checkers, proves that the members all approve whenever the defining equations are theorems and one link goes through the box, and fails with a countermodel on every ring of copying links. Löb's axiom is proved by the same prover. Determinacy is not soundness: the unique outcome is that everyone approves, whether or not approval was warranted.
+
+**Refuter.** A ring with a proof-check link that the prover cannot settle, or a ring of copying links that it settles.
+
+**World witness.** Bodies whose reviewers each approve because another reviewer approved, and none checks the substance, can reach opposite outcomes on the same proposal with nothing in their structure to choose between them. Observable as flipped outcomes under noise. Needs data.
+
+**Where.** scripts/regenerate_golden_gl.py; data/golden_gl_loops.json; hyperlogic.provability
+
+**Model check:** HOLDS_IN_MODEL — a loop of checks is determined exactly when some link passes through proof
+- 27 rings of 1..5 checkers (hyperlogic 09231650d419): 22 with a proof-check link are proved to approve together, 5 loops of copying links are not, each with a countermodel
+- Löb's axiom [](  []p -> p ) -> []p is proved by the same prover
+
+## D20. The optimal law is what many simulated law structures converge to, and no single start need reach it
+
+**Tag:** FRAME
+
+**Choice.** Define convergence by a settling map: prune what a law cannot survive on, then permit every action that stays inside what does. Pool the settled laws of many random starts.
+
+**Not chosen.**
+- Evolutionary dynamics with mutation and selection: deferred, because it adds a population model whose parameters mean nothing here.
+- Gradient or best-response learning of the law: rejected, because it needs payoffs.
+- Iterate from the fully permissive law: kept, as the one-step special case; it is the greatest law itself.
+
+**Expectation.** A settled law never lies above the greatest law; settling is monotone and idempotent; settling the fully permissive law gives the greatest law in one step; a start that mentions only one of two separate safe regions is stuck below the optimum; and the pool of settled random starts reaches the greatest law. Greatest fixed points are found from above, so what converges is the diversity of starts, not any one of them.
+
+**Refuter.** A settled law with a permission outside the greatest law, or a population that pools above it, or a single small start that finds a region its law never mentions.
+
+**World witness.** A population of institutions with varied rules in one environment: the rules of those that persist should lie inside one maximal rule set, and pooling the persisting rules of enough varied institutions should approach it, while a single institution can be stuck below. Needs data.
+
+**Where.** viability.settle, converge, random_law, restricted_kernel; tests/test_viability.py
+
+**Model check:** HOLDS_IN_MODEL — the optimal law is what many simulated law structures converge to
+- 200 settled random laws on 40 games: none lies above the greatest law
+- 40 games: settling the fully permissive law gives the greatest law in one step
+- twin rooms: a start that mentions only the left room settles on ['hub', 'left']; two starts together pool to the whole law
+- 22 of 22 games with a kernel: 300 random starts pool to the greatest law (median 6 starts, worst 19)

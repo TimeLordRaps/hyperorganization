@@ -271,14 +271,15 @@ def _region(game: Game, corrigible: bool) -> frozenset[str]:
     return game.safe
 
 
-def _stages(game: Game, region: frozenset[str]) -> list[frozenset[str]]:
+def _stages(game: Game, region: frozenset[str],
+            permitted: Mapping[str, frozenset[str]] | None = None) -> list[frozenset[str]]:
     current = region
     stages = [current]
     while True:
         following = frozenset(
             s for s in current
             if any(all(game.target(s, a, b) in current for b in game.nature)
-                   for a in game.allowed(s))
+                   for a in (game.allowed(s) if permitted is None else permitted.get(s, frozenset())))
         )
         if following == current:
             return stages
@@ -348,6 +349,66 @@ def greatest_law(game: Game, *, corrigible: bool = True) -> Law:
                      if all(game.target(s, a, b) in inside for b in game.nature))
         for s in sorted(inside)
     }
+
+
+def restricted_kernel(game: Game, law: Mapping[str, frozenset[str]], *,
+                      corrigible: bool = True) -> frozenset[str]:
+    """The states from which the system survives for ever using only what `law` permits.
+
+    A state where the law permits nothing is lost. This is the kernel of the same game with
+    the allowed actions cut down to the law's, so it lies inside the true kernel.
+    """
+    permitted = {s: frozenset(law.get(s, frozenset())) & game.allowed(s) for s in game.states}
+    return _stages(game, _region(game, corrigible), permitted)[-1]
+
+
+def settle(game: Game, law: Mapping[str, frozenset[str]], *, corrigible: bool = True) -> Law:
+    """Prune what cannot survive, then permit everything that stays inside what does.
+
+    The result is the greatest law that the survivors of `law` can vouch for. It never lies
+    above the greatest law (it is built inside a smaller kernel), is monotone in `law`, and is
+    unchanged by settling again. It is also built UPWARD from `law`'s own survivors, so a law
+    that forbids the only way to reach some self-sustaining region cannot discover it:
+    greatest fixed points are found from above, and a start that is too small is stuck.
+    """
+    inside = restricted_kernel(game, law, corrigible=corrigible)
+    return {
+        s: frozenset(a for a in game.allowed(s)
+                     if all(game.target(s, a, b) in inside for b in game.nature))
+        for s in sorted(inside)
+    }
+
+
+def random_law(game: Game, rng: random.Random, density: float = 0.5) -> Law:
+    """A law permitting each allowed action independently with probability `density`."""
+    if not 0.0 <= density <= 1.0:
+        raise ValueError("density is a probability")
+    return {
+        s: frozenset(a for a in sorted(game.allowed(s)) if rng.random() < density)
+        for s in game.states
+    }
+
+
+def converge(game: Game, rng: random.Random, population: int, *, density: float = 0.5,
+             corrigible: bool = True) -> tuple[Law, int | None]:
+    """Settle `population` random laws and pool what they permit.
+
+    Returns the pooled law and the number of laws it took before the pool equalled the greatest
+    law (None if it never did). The pool never lies above the greatest law; whether it reaches
+    it depends on the starts together covering the survivors, which is why diversity of starts
+    is what converges, not any single start.
+    """
+    if type(population) is not int or population < 0:
+        raise ValueError("population is a natural number")
+    target = greatest_law(game, corrigible=corrigible)
+    pooled: Law = {s: frozenset() for s in target}
+    reached: int | None = 0 if pooled == target else None
+    for count in range(1, population + 1):
+        for s, permitted in settle(game, random_law(game, rng, density), corrigible=corrigible).items():
+            pooled[s] = pooled[s] | permitted
+        if reached is None and pooled == target:
+            reached = count
+    return pooled, reached
 
 
 def forced_moves(law: Mapping[str, frozenset[str]]) -> dict[str, str]:
@@ -557,5 +618,6 @@ def repair_game(m: int, q: int, *, attack: int, repair: int) -> Game:
 
 __all__ = [
     "Game", "Law", "OMEGA", "all_laws", "check_ranks", "forced_moves", "freedom", "greatest_law", "kernel", "ranks",
-    "random_game", "reach_home", "reachable", "repair_game", "survival_probability", "sustaining",
+    "random_game", "random_law", "reach_home", "reachable", "repair_game", "restricted_kernel",
+    "settle", "converge", "survival_probability", "sustaining",
 ]

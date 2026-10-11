@@ -63,6 +63,11 @@ def _golden() -> dict:
     return json.loads(text.read_text(encoding="utf-8"))
 
 
+def _golden_gl() -> dict:
+    text = resources.files("hyperoptimization").joinpath("data/golden_gl_loops.json")
+    return json.loads(text.read_text(encoding="utf-8"))
+
+
 def _decode(value: object) -> float:
     return math.inf if value == "inf" else value  # type: ignore[return-value]
 
@@ -551,6 +556,92 @@ def _d15() -> Verdict:
         "and the diagnostic cause irreversible-without-ex-ante-check is the corrigible kernel (D07)"])
 
 
+def _d19() -> Verdict:
+    golden = _golden_gl()
+    problems: list[str] = []
+    if not golden["lob"]["proved"]:
+        problems.append("Löb's axiom is not proved")
+    guarded = unguarded = 0
+    for ring in golden["rings"]:
+        want = any(ring["guards"])
+        if ring["proved"] != want:
+            problems.append(f"ring of {ring['n']} with guards {ring['guards']}: proved "
+                            f"{ring['proved']}, expected {want}")
+        if not ring["proved"] and not ring["countermodel_nodes"]:
+            problems.append(f"ring of {ring['n']} with guards {ring['guards']}: unproved with no "
+                            "countermodel recorded")
+        guarded += want
+        unguarded += not want
+    if not guarded or not unguarded:
+        problems.append("the golden file lacks guarded or unguarded rings")
+    return _verdict("a loop of checks is determined exactly when some link passes through proof",
+                    problems, [
+                        f"{len(golden['rings'])} rings of 1..5 checkers (hyperlogic "
+                        f"{golden['hyperlogic_commit'][:12]}): {guarded} with a proof-check link are "
+                        f"proved to approve together, {unguarded} loops of copying links are not, "
+                        "each with a countermodel",
+                        "Löb's axiom [](  []p -> p ) -> []p is proved by the same prover"])
+
+
+def _twin_rooms() -> viability.Game:
+    return viability.Game.from_table(
+        nature=("n",),
+        table={
+            "hub": {"go-left": ("left",), "go-right": ("right",), "fall": ("x",)},
+            "left": {"stay": ("left",)}, "right": {"stay": ("right",)}, "x": {"stay": ("x",)},
+        },
+        safe={"hub", "left", "right"},
+    )
+
+
+def _d20() -> Verdict:
+    problems: list[str] = []
+    settled = topdown = converged = games = 0
+    firsts: list[int] = []
+    for seed in range(40):
+        game = viability.random_game(random.Random(11000 + seed), n=4, na=2, nb=2)
+        star = viability.greatest_law(game, corrigible=False)
+        for k in range(5):
+            law = viability.random_law(game, random.Random(100 * seed + k), density=0.5)
+            out = viability.settle(game, law, corrigible=False)
+            settled += 1
+            if not (set(out) <= set(star) and all(out[t] <= star[t] for t in out)):
+                problems.append(f"seed {seed}: a settled law lies above the greatest law")
+        permissive = {t: game.allowed(t) for t in game.states}
+        if viability.settle(game, permissive, corrigible=False) != star:
+            problems.append(f"seed {seed}: settling the permissive law is not the greatest law")
+        topdown += 1
+        if star:
+            games += 1
+            pooled, first = viability.converge(game, random.Random(seed), 300, corrigible=False)
+            if not all(pooled[t] <= star[t] for t in pooled):
+                problems.append(f"seed {seed}: the pooled law lies above the greatest law")
+            if first is None:
+                problems.append(f"seed {seed}: 300 starts did not pool to the greatest law")
+            else:
+                converged += 1
+                firsts.append(first)
+    rooms = _twin_rooms()
+    star = viability.greatest_law(rooms, corrigible=False)
+    left = viability.settle(rooms, {"hub": frozenset({"go-left"}), "left": frozenset({"stay"})},
+                            corrigible=False)
+    right = viability.settle(rooms, {"hub": frozenset({"go-right"}), "right": frozenset({"stay"})},
+                             corrigible=False)
+    pooled = {t: left.get(t, frozenset()) | right.get(t, frozenset()) for t in star}
+    if left == star or right == star:
+        problems.append("twin rooms: a start that mentions one room reached the whole optimum")
+    if pooled != star:
+        problems.append("twin rooms: two starts together did not pool to the greatest law")
+    median = sorted(firsts)[len(firsts) // 2] if firsts else -1
+    return _verdict("the optimal law is what many simulated law structures converge to", problems, [
+        f"{settled} settled random laws on 40 games: none lies above the greatest law",
+        f"{topdown} games: settling the fully permissive law gives the greatest law in one step",
+        f"twin rooms: a start that mentions only the left room settles on {sorted(left)}; two starts "
+        "together pool to the whole law",
+        f"{converged} of {games} games with a kernel: 300 random starts pool to the greatest law "
+        f"(median {median} starts, worst {max(firsts) if firsts else 0})"])
+
+
 # ---------------------------------------------------------------------------
 # The ledger.
 # ---------------------------------------------------------------------------
@@ -864,6 +955,52 @@ LEDGER: tuple[Decision, ...] = (
         "open items per field.",
         "entrenchment.py and ordinal.py supply the machinery; hyperstratum supplies the data",
         None),
+    Decision(
+        "D19", "A loop of checks is determined exactly when some link passes through proof", Tag.FRAME,
+        "Read a checker that approves only what it can prove safe as the provability modality of GL, "
+        "and an approval that copies another's as a plain link. A ring of such links has a "
+        "self-consistent outcome, unique and the same for every member, if and only if at least one "
+        "link is a proof-check.",
+        ("Trust as a number that propagates (D10): kept; it answers how much pressure a loop "
+         "survives, not whether its outcome is determined.",
+         "A monotone-operator fixed point: gives existence but not uniqueness for loops of copying "
+         "links, which is exactly where the outcome is indeterminate.",
+         "A game-theoretic equilibrium of mutual oversight: rejected, because it needs payoffs."),
+        "A theorem prover for GL, run on every ring of up to five checkers, proves that the members "
+        "all approve whenever the defining equations are theorems and one link goes through the box, "
+        "and fails with a countermodel on every ring of copying links. Löb's axiom is proved by the "
+        "same prover. Determinacy is not soundness: the unique outcome is that everyone approves, "
+        "whether or not approval was warranted.",
+        "A ring with a proof-check link that the prover cannot settle, or a ring of copying links that "
+        "it settles.",
+        "Bodies whose reviewers each approve because another reviewer approved, and none checks the "
+        "substance, can reach opposite outcomes on the same proposal with nothing in their structure "
+        "to choose between them. Observable as flipped outcomes under noise. Needs data.",
+        "scripts/regenerate_golden_gl.py; data/golden_gl_loops.json; hyperlogic.provability",
+        _d19),
+    Decision(
+        "D20", "The optimal law is what many simulated law structures converge to, and no single "
+        "start need reach it", Tag.FRAME,
+        "Define convergence by a settling map: prune what a law cannot survive on, then permit "
+        "every action that stays inside what does. Pool the settled laws of many random starts.",
+        ("Evolutionary dynamics with mutation and selection: deferred, because it adds a population "
+         "model whose parameters mean nothing here.",
+         "Gradient or best-response learning of the law: rejected, because it needs payoffs.",
+         "Iterate from the fully permissive law: kept, as the one-step special case; it is the "
+         "greatest law itself."),
+        "A settled law never lies above the greatest law; settling is monotone and idempotent; "
+        "settling the fully permissive law gives the greatest law in one step; a start that "
+        "mentions only one of two separate safe regions is stuck below the optimum; and the pool of "
+        "settled random starts reaches the greatest law. Greatest fixed points are found from above, "
+        "so what converges is the diversity of starts, not any one of them.",
+        "A settled law with a permission outside the greatest law, or a population that pools above "
+        "it, or a single small start that finds a region its law never mentions.",
+        "A population of institutions with varied rules in one environment: the rules of those that "
+        "persist should lie inside one maximal rule set, and pooling the persisting rules of enough "
+        "varied institutions should approach it, while a single institution can be stuck below. "
+        "Needs data.",
+        "viability.settle, converge, random_law, restricted_kernel; tests/test_viability.py",
+        _d20),
 )
 
 _BY_ID = {d.id: d for d in LEDGER}

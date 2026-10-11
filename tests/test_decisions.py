@@ -119,6 +119,7 @@ def _wrong_gate_bits(prices, controls, need):
 
 _tail = quorum.tail
 _capture = surprisal.capture_probability
+_real_gl = D._golden_gl()
 _closing = loop.closing_price
 _protection = entrenchment.protection
 
@@ -142,6 +143,10 @@ SABOTAGE = {
     "D14": (entrenchment, "protection",
             lambda rules: {r.name: float("inf") for r in rules}),
     "D15": (renewal, "mean_lifetime", lambda *a, **k: Fraction(100)),
+    "D20": (viability, "settle",  # never prunes: it permits everything, fatal moves included
+            lambda game, law, corrigible=True: {s: game.allowed(s) for s in game.states}),
+    "D19": (D, "_golden_gl",  # the recorded prover verdicts, each flipped
+            lambda: {**_real_gl, "rings": [{**r, "proved": not r["proved"]} for r in _real_gl["rings"]]}),
 }
 
 
@@ -194,3 +199,12 @@ def test_the_whole_ledger_runs_in_a_few_seconds():
     start = time.perf_counter()
     D.run_all()
     assert time.perf_counter() - start < 20
+
+
+def test_the_recorded_prover_runs_name_the_checkout_they_came_from():
+    golden = D._golden_gl()
+    assert len(golden["hyperlogic_commit"]) == 40 and "regenerate_golden_gl.py" in golden["command"]
+    assert golden["lob"]["proved"] is True
+    shapes = {(r["n"], tuple(r["guards"])) for r in golden["rings"]}
+    assert len(shapes) == len(golden["rings"])  # no ring recorded twice
+    assert {n for n, _ in shapes} == {1, 2, 3, 4, 5}

@@ -417,3 +417,19 @@ def test_a_principal_commands_at_least_one_seat_and_an_impossible_joint_event_ha
     with pytest.raises(ValueError, match="at least one seat"):
         S.common_principal_joint(F(1, 10), [])
     assert S.additivity_gap(F(0), [F(0), F(1, 2)]) == 0.0
+
+
+def test_grouping_seats_under_principals_raises_capture_risk_above_the_mean_and_lowers_it_below():
+    x = F(1, 4)  # a seat is compromised with probability 1/4, so m seats average m/4
+    for m, q, groups in [(6, 4, 2), (6, 4, 3), (8, 5, 2), (8, 5, 4), (9, 6, 3)]:  # quorum above the mean
+        grouped = S.capture_probability([S.Block(f"g{i}", x, m // groups) for i in range(groups)], q)
+        assert grouped > Q.tail(m, q, x), (m, q, groups)
+    # worked by hand: two groups of three, quorum four: both groups must fall, probability x^2
+    two = S.capture_probability([S.Block("a", x, 3), S.Block("b", x, 3)], 4)
+    assert two == F(1, 16) and Q.tail(6, 4, x) < two
+    y = F(2, 3)  # now the mean (4 of 6) is above a quorum of 2: the direction reverses
+    for groups in (2, 3):
+        grouped = S.capture_probability([S.Block(f"g{i}", y, 6 // groups) for i in range(groups)], 2)
+        assert grouped < Q.tail(6, 2, y), groups
+    # one group of everything: the seats are one event, and the capture probability is x itself
+    assert S.capture_probability([S.Block("all", x, 6)], 4) == x

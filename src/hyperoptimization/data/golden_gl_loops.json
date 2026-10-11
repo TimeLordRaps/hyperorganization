@@ -1,0 +1,320 @@
+{
+  "command": "PYTHONPATH=<hyperlogic>/src python scripts/regenerate_golden_gl.py <hyperlogic>",
+  "hyperlogic_commit": "09231650d41919708824dd734a082ac9259d2f16",
+  "lob": {
+    "formula": "([]([]p -> p) -> []p)",
+    "proved": true
+  },
+  "rings": [
+    {
+      "countermodel_nodes": null,
+      "formula": "((((A0 -> []A0) & ([]A0 -> A0)) & []((A0 -> []A0) & ([]A0 -> A0))) -> A0)",
+      "guards": [
+        true
+      ],
+      "n": 1,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": 1,
+      "formula": "((((A0 -> A0) & (A0 -> A0)) & []((A0 -> A0) & (A0 -> A0))) -> A0)",
+      "guards": [
+        false
+      ],
+      "n": 1,
+      "proved": false
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "(((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> []A0) & ([]A0 -> A1))) & [](((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> []A0) & ([]A0 -> A1)))) -> (A0 & A1))",
+      "guards": [
+        true,
+        true
+      ],
+      "n": 2,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "(((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> A0) & (A0 -> A1))) & [](((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> A0) & (A0 -> A1)))) -> (A0 & A1))",
+      "guards": [
+        true,
+        false
+      ],
+      "n": 2,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "(((((A0 -> A1) & (A1 -> A0)) & ((A1 -> []A0) & ([]A0 -> A1))) & [](((A0 -> A1) & (A1 -> A0)) & ((A1 -> []A0) & ([]A0 -> A1)))) -> (A0 & A1))",
+      "guards": [
+        false,
+        true
+      ],
+      "n": 2,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": 1,
+      "formula": "(((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A0) & (A0 -> A1))) & [](((A0 -> A1) & (A1 -> A0)) & ((A1 -> A0) & (A0 -> A1)))) -> (A0 & A1))",
+      "guards": [
+        false,
+        false
+      ],
+      "n": 2,
+      "proved": false
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> []A0) & ([]A0 -> A2))) & []((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> []A0) & ([]A0 -> A2)))) -> ((A0 & A1) & A2))",
+      "guards": [
+        true,
+        true,
+        true
+      ],
+      "n": 3,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> A0) & (A0 -> A2))) & []((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> A0) & (A0 -> A2)))) -> ((A0 & A1) & A2))",
+      "guards": [
+        true,
+        true,
+        false
+      ],
+      "n": 3,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> []A0) & ([]A0 -> A2))) & []((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> []A0) & ([]A0 -> A2)))) -> ((A0 & A1) & A2))",
+      "guards": [
+        true,
+        false,
+        true
+      ],
+      "n": 3,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A0) & (A0 -> A2))) & []((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A0) & (A0 -> A2)))) -> ((A0 & A1) & A2))",
+      "guards": [
+        true,
+        false,
+        false
+      ],
+      "n": 3,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> []A0) & ([]A0 -> A2))) & []((((A0 -> A1) & (A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> []A0) & ([]A0 -> A2)))) -> ((A0 & A1) & A2))",
+      "guards": [
+        false,
+        true,
+        true
+      ],
+      "n": 3,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> A0) & (A0 -> A2))) & []((((A0 -> A1) & (A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> A0) & (A0 -> A2)))) -> ((A0 & A1) & A2))",
+      "guards": [
+        false,
+        true,
+        false
+      ],
+      "n": 3,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> []A0) & ([]A0 -> A2))) & []((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> []A0) & ([]A0 -> A2)))) -> ((A0 & A1) & A2))",
+      "guards": [
+        false,
+        false,
+        true
+      ],
+      "n": 3,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": 1,
+      "formula": "((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A0) & (A0 -> A2))) & []((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A0) & (A0 -> A2)))) -> ((A0 & A1) & A2))",
+      "guards": [
+        false,
+        false,
+        false
+      ],
+      "n": 3,
+      "proved": false
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "(((((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> []A3) & ([]A3 -> A2))) & ((A3 -> []A0) & ([]A0 -> A3))) & [](((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> []A3) & ([]A3 -> A2))) & ((A3 -> []A0) & ([]A0 -> A3)))) -> (((A0 & A1) & A2) & A3))",
+      "guards": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "n": 4,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "(((((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A0) & (A0 -> A3))) & [](((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A0) & (A0 -> A3)))) -> (((A0 & A1) & A2) & A3))",
+      "guards": [
+        true,
+        false,
+        false,
+        false
+      ],
+      "n": 4,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "(((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A0) & (A0 -> A3))) & [](((((A0 -> A1) & (A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A0) & (A0 -> A3)))) -> (((A0 & A1) & A2) & A3))",
+      "guards": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "n": 4,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "(((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> []A3) & ([]A3 -> A2))) & ((A3 -> A0) & (A0 -> A3))) & [](((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> []A3) & ([]A3 -> A2))) & ((A3 -> A0) & (A0 -> A3)))) -> (((A0 & A1) & A2) & A3))",
+      "guards": [
+        false,
+        false,
+        true,
+        false
+      ],
+      "n": 4,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "(((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> []A0) & ([]A0 -> A3))) & [](((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> []A0) & ([]A0 -> A3)))) -> (((A0 & A1) & A2) & A3))",
+      "guards": [
+        false,
+        false,
+        false,
+        true
+      ],
+      "n": 4,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": 1,
+      "formula": "(((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A0) & (A0 -> A3))) & [](((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A0) & (A0 -> A3)))) -> (((A0 & A1) & A2) & A3))",
+      "guards": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "n": 4,
+      "proved": false
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> []A3) & ([]A3 -> A2))) & ((A3 -> []A4) & ([]A4 -> A3))) & ((A4 -> []A0) & ([]A0 -> A4))) & []((((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> []A3) & ([]A3 -> A2))) & ((A3 -> []A4) & ([]A4 -> A3))) & ((A4 -> []A0) & ([]A0 -> A4)))) -> ((((A0 & A1) & A2) & A3) & A4))",
+      "guards": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "n": 5,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A4) & (A4 -> A3))) & ((A4 -> A0) & (A0 -> A4))) & []((((((A0 -> []A1) & ([]A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A4) & (A4 -> A3))) & ((A4 -> A0) & (A0 -> A4)))) -> ((((A0 & A1) & A2) & A3) & A4))",
+      "guards": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "n": 5,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A4) & (A4 -> A3))) & ((A4 -> A0) & (A0 -> A4))) & []((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> []A2) & ([]A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A4) & (A4 -> A3))) & ((A4 -> A0) & (A0 -> A4)))) -> ((((A0 & A1) & A2) & A3) & A4))",
+      "guards": [
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "n": 5,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> []A3) & ([]A3 -> A2))) & ((A3 -> A4) & (A4 -> A3))) & ((A4 -> A0) & (A0 -> A4))) & []((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> []A3) & ([]A3 -> A2))) & ((A3 -> A4) & (A4 -> A3))) & ((A4 -> A0) & (A0 -> A4)))) -> ((((A0 & A1) & A2) & A3) & A4))",
+      "guards": [
+        false,
+        false,
+        true,
+        false,
+        false
+      ],
+      "n": 5,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> []A4) & ([]A4 -> A3))) & ((A4 -> A0) & (A0 -> A4))) & []((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> []A4) & ([]A4 -> A3))) & ((A4 -> A0) & (A0 -> A4)))) -> ((((A0 & A1) & A2) & A3) & A4))",
+      "guards": [
+        false,
+        false,
+        false,
+        true,
+        false
+      ],
+      "n": 5,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": null,
+      "formula": "((((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A4) & (A4 -> A3))) & ((A4 -> []A0) & ([]A0 -> A4))) & []((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A4) & (A4 -> A3))) & ((A4 -> []A0) & ([]A0 -> A4)))) -> ((((A0 & A1) & A2) & A3) & A4))",
+      "guards": [
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "n": 5,
+      "proved": true
+    },
+    {
+      "countermodel_nodes": 1,
+      "formula": "((((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A4) & (A4 -> A3))) & ((A4 -> A0) & (A0 -> A4))) & []((((((A0 -> A1) & (A1 -> A0)) & ((A1 -> A2) & (A2 -> A1))) & ((A2 -> A3) & (A3 -> A2))) & ((A3 -> A4) & (A4 -> A3))) & ((A4 -> A0) & (A0 -> A4)))) -> ((((A0 & A1) & A2) & A3) & A4))",
+      "guards": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "n": 5,
+      "proved": false
+    }
+  ],
+  "source": "hyperlogic.provability.prove / countermodel, the rule form of the loop theorem"
+}
