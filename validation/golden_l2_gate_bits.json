@@ -1,0 +1,275 @@
+{
+  "command": "PYTHONPATH=<hyperethics>/src python scripts/regenerate_golden.py <hyperethics>",
+  "hyperethics_commit": "a13770716f570934812503e785da98652af91160",
+  "source": "hyperethics.capture.gate_cost with prices read as bits",
+  "systems": [
+    {
+      "controls": [],
+      "gates": {
+        "judge": {
+          "gate_cost": 6,
+          "need": [
+            "A",
+            "B"
+          ]
+        },
+        "legislate": {
+          "gate_cost": 6,
+          "need": [
+            "A",
+            "B"
+          ]
+        }
+      },
+      "name": "two-key",
+      "parties": {
+        "A": 3,
+        "B": 3
+      }
+    },
+    {
+      "controls": [],
+      "gates": {
+        "w0": {
+          "gate_cost": 9,
+          "need": [
+            "A",
+            "B",
+            "C"
+          ]
+        },
+        "w1": {
+          "gate_cost": 9,
+          "need": [
+            "B",
+            "C",
+            "D"
+          ]
+        },
+        "w2": {
+          "gate_cost": 9,
+          "need": [
+            "A",
+            "C",
+            "D"
+          ]
+        },
+        "w3": {
+          "gate_cost": 9,
+          "need": [
+            "A",
+            "B",
+            "D"
+          ]
+        }
+      },
+      "name": "ring-of-four",
+      "parties": {
+        "A": 3,
+        "B": 3,
+        "C": 3,
+        "D": 3
+      }
+    },
+    {
+      "controls": [],
+      "gates": {
+        "elect": {
+          "gate_cost": 12,
+          "need": [
+            "E",
+            "J",
+            "L",
+            "V"
+          ]
+        },
+        "execute": {
+          "gate_cost": 12,
+          "need": [
+            "E",
+            "J",
+            "L",
+            "V"
+          ]
+        },
+        "legislate": {
+          "gate_cost": 12,
+          "need": [
+            "E",
+            "J",
+            "L",
+            "V"
+          ]
+        },
+        "review": {
+          "gate_cost": 12,
+          "need": [
+            "E",
+            "J",
+            "L",
+            "V"
+          ]
+        }
+      },
+      "name": "separated-powers",
+      "parties": {
+        "E": 3,
+        "J": 4,
+        "L": 3,
+        "V": 2
+      }
+    },
+    {
+      "controls": [
+        [
+          "Boss",
+          "A"
+        ],
+        [
+          "Boss",
+          "B"
+        ]
+      ],
+      "gates": {
+        "judge": {
+          "gate_cost": 3,
+          "need": [
+            "A",
+            "B"
+          ]
+        },
+        "legislate": {
+          "gate_cost": 3,
+          "need": [
+            "A",
+            "B"
+          ]
+        }
+      },
+      "name": "common-principal",
+      "parties": {
+        "A": 3,
+        "B": 3,
+        "Boss": 3
+      }
+    },
+    {
+      "controls": [
+        [
+          "Patron",
+          "A"
+        ],
+        [
+          "Patron",
+          "B"
+        ]
+      ],
+      "gates": {
+        "judge": {
+          "gate_cost": 0,
+          "need": [
+            "A",
+            "B"
+          ]
+        },
+        "legislate": {
+          "gate_cost": 0,
+          "need": [
+            "A",
+            "B"
+          ]
+        }
+      },
+      "name": "client-state",
+      "parties": {
+        "A": 3,
+        "B": 3,
+        "Patron": 0
+      }
+    },
+    {
+      "controls": [],
+      "gates": {
+        "judge": {
+          "gate_cost": 3,
+          "need": [
+            "A",
+            "B"
+          ]
+        },
+        "legislate": {
+          "gate_cost": 3,
+          "need": [
+            "A",
+            "B"
+          ]
+        }
+      },
+      "name": "suzerain",
+      "parties": {
+        "A": 3,
+        "B": 0
+      }
+    },
+    {
+      "controls": [
+        [
+          "C",
+          "D"
+        ]
+      ],
+      "gates": {
+        "judge": {
+          "gate_cost": 6,
+          "need": [
+            "A",
+            "B"
+          ]
+        },
+        "legislate": {
+          "gate_cost": 6,
+          "need": [
+            "A",
+            "B"
+          ]
+        }
+      },
+      "name": "hidden-only",
+      "parties": {
+        "A": 3,
+        "B": 3,
+        "C": 3,
+        "D": 3
+      }
+    },
+    {
+      "controls": [
+        [
+          "Exec",
+          "Court"
+        ]
+      ],
+      "gates": {
+        "govern": {
+          "gate_cost": 3,
+          "need": [
+            "Court",
+            "Exec"
+          ]
+        },
+        "review": {
+          "gate_cost": 3,
+          "need": [
+            "Court",
+            "Exec"
+          ]
+        }
+      },
+      "name": "shadow-court",
+      "parties": {
+        "Court": 3,
+        "Exec": 3
+      }
+    }
+  ]
+}
