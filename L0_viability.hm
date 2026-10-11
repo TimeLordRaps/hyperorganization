@@ -1,0 +1,364 @@
+-- L0_viability.hm
+-- Layer 0: Viability
+-- hyperoptimization | optimization-as-a-self-closing-process
+--
+-- Imports: nothing. This layer is standalone, as L0 of hyperethics is. It is read by
+--          hyperethics L2 (the rule that no power may be corrupting) as the place where
+--          the rule's clauses are priced in bits and, for one of them, derived.
+--
+-- USER-DECLARED (Tyler Roost, 2026-10-11), the starting point of this layer, verbatim:
+--   "How does this come into play in an ordinal system of checks and balances? Where a
+--    system inside of the structure is represented as all powerful, like imagine there
+--    is a central will space that can be determined that itself is optimal, and we can
+--    thus derive an optimal power structure around that will space, not dictatorially,
+--    but rather a centrally bound system that itself is mechanically governed, and
+--    represents the governance over it as an optimality over all participants/shareholders
+--    inside of the governed system, ie a codified lawset that is demonstrably stable and
+--    optimal would yield an necessity of centralization of power around it, how do
+--    ordinal laws naturally occur in such a system what theorems or proofs or can be
+--    written about such a system, and secondarily what axioms hold in such a system by
+--    nature of the systems optimality structure"
+-- and, in the next message:
+--   "Like the optimality is the self-limiting lawful structure that itself is law bound by
+--    the optimality, it may converge from many simulated law structures, also considering
+--    no monetary construction which set of laws naturally fall out from free will,
+--    existence, maintainence of existence ie corrigibility, revitalization expectations
+--    like if reality/our physical universe obeys some underlying optimal hyperethical
+--    structure it can be found that the hyperphysical nature adheres within hypertethical
+--    optimalities, honestly optimalities and optimization yields the hyperfield
+--    hyperoptimization I think you can make a new public repo for that, hyperoptimization
+--    also seems like the key missing field we need to close a bunch of hyperfields, because
+--    hyperoptimization acts as its own self-closing feedback convergence catalyst for
+--    ordinal phase representations that themselves yield the necessary base fields from
+--    the hyperfields."
+-- and, in the next:
+--   "Ive given you a lot to work with, work long and hard and let me know if any
+--    conceptual blocks get in your way, but we are inventing this together so I would
+--    like to know what decisions you make that hold key evidential expectations  from
+--    witnesses within the framework."
+-- Quoted exactly, spelling and spacing included. Tyler's statements are authoritative for
+-- his own aims; they do not by themselves verify an external physical claim, and this file
+-- does not treat them as doing so.
+--
+-- WHAT THIS LAYER IS. A system EXISTS from a state if it can choose actions that keep it
+-- inside a safe set for ever whatever nature does. Given that, and the assumption that a law
+-- limits what is permitted and not what is chosen (free will as full support), there is
+-- exactly one law that preserves existence and takes away no freedom that existence does not
+-- require: the greatest sustaining law. It forbids exactly the actions that leave the
+-- viability kernel. It names no participant. That is the "self-limiting lawful structure
+-- that is law bound by the optimality" in your words, and it is a DERIVATION, not an
+-- authorization: nothing above it grants it validity, so it is not a sovereign.
+-- Corrigibility is the same game with the safe set cut down to where an overseer can still
+-- bring the system home. Revitalization is a birth-death chain in which repair happens only
+-- while the body holds. Bodies are quorums; a loop of bodies that oversee one another has a
+-- critical pressure, found by a saddle-node, above which it collapses discontinuously. Prices
+-- are surprisal (bits), so no money appears.
+--
+-- WHAT IT IS NOT. A kernel is persistence, not goodness: nothing here says why the law that
+-- preserves existence is the optimal one (nd-persistence-is-optimal, the family's GC-5). It
+-- does not show that physical reality adheres to such a structure (nd-physical-adherence), or
+-- that this closes the family's open items (nd-closing-catalyst). The loop model is
+-- mean-field (nd-mean-field-adequacy) and does not model reinvestment (nd-self-funding).
+--
+-- Layer boundary: no term of hyperethics, hyperlogic or ordinatics is imported. Checks that
+-- compare with hyperethics or hyperlogic read golden files those packages produced and never
+-- import them; scripts/ regenerates the golden files and verifies the governance theorems
+-- against hyperethics' own code.
+--
+-- Status: FORM (the finite-game theorems of Sections IV, checked exhaustively on random small
+--               games, by independent oracles, or in exact rationals);
+--         FRAME (the models: independence, mean-field loops, the renewal chain, surprisal as a
+--               price) with their assumptions listed in Section III;
+--         HYPER / OPEN residuals documented, NOT discharged: Section V.
+--         Sections: I primitives, II opaque structure, III adopted axioms, IV derives,
+--         V non-derives and opens, VI graduation.
+--
+-- Checked status: every derive in this file is executable against finite structures by the
+-- test suite and, with its evidence, by `python -m hyperoptimization decisions`. A passing check
+-- CONFIRMS nothing universally; one counterexample REFUTES. That asymmetry is carried in the
+-- return type (Verdict) exactly as at L0 of hyperethics.
+-- =============================================================================
+
+
+-- =============================================================================
+-- SECTION I: PRIMITIVES
+-- =============================================================================
+
+primitive State :: Type
+    -- A situation the system can be in. Finite in every check here.
+
+primitive Action :: Type
+    -- What the system chooses among at a state. A law permits some of them.
+
+primitive Nature :: Type
+    -- What the environment chooses against the system at each step.
+
+primitive Party :: Type
+    -- Something that can be compromised: a seat, or a holder of one. Parties are independent
+    -- unless a common principal is named.
+
+primitive Norm :: Type
+    -- A yes-or-no relation. Used only to say that something holds of states or actions; it
+    -- carries no ought.
+
+primitive Rank :: Type
+    -- An ordinal: a natural number, omega, or (for nested structure) an ordinal below
+    -- epsilon_0 in Cantor normal form. The phase of a state or of a process.
+
+primitive Bits :: Type
+    -- A nonnegative real or infinity: the surprisal -log2 p of an event of probability p.
+    -- It is the only unit of price. There is no currency here.
+
+
+-- =============================================================================
+-- SECTION II: OPAQUE STRUCTURE
+-- =============================================================================
+
+opaque step :: State -> Action -> Nature -> State
+    -- Where the system goes. Total on the allowed actions.
+
+opaque allowed :: State -> Action -> Norm
+    -- Which actions exist at a state. Nonempty at every state.
+
+opaque safe :: State -> Norm
+    -- The states in which the system exists.
+
+opaque home :: State -> Norm
+    -- Where an overseer wants the system to be able to return.
+
+opaque corrects :: State -> State -> Norm
+    -- What an overseer can do: move the system from one state to another.
+
+opaque compromise :: Party -> Bits
+    -- The surprisal of compromising a party. Parties are independent unless a common
+    -- principal is named; the additivity gap measures what that costs.
+
+
+-- =============================================================================
+-- SECTION III: ADOPTED AXIOMS
+-- Each is an assumption of the model, adopted and not derived. None is a measurement
+-- of any real institution.
+-- =============================================================================
+
+axiom ax-existence-as-viability:
+    -- The system EXISTS from s iff it has a way of choosing actions that keeps it in the safe
+    -- set for ever against every nature choice. The set of such s is the viability kernel,
+    -- the greatest fixed point of "safe, and some allowed action sends every nature choice
+    -- back into the set". This is a definition of existence, adopted. It builds in no value.
+
+axiom ax-free-will-as-full-support:
+    -- A law limits what is PERMITTED and not what is TAKEN: at every step each permitted
+    -- action is taken with positive probability, and so is each nature choice. Without this
+    -- a law is unnecessary for any agent that sees a fatal move and avoids it.
+
+axiom ax-corrigibility-as-reachability:
+    -- A system is corrigible from s iff it stays where the overseer's correction moves can
+    -- reach home. A move that leaves that set is irreversible.
+
+axiom ax-self-repair:
+    -- Compromised seats are repaired by the body itself and only while it still holds. Seats
+    -- are attacked at one rate and repaired at another, independently, one seat at a time.
+
+axiom ax-independence:
+    -- Seats are compromised independently, a body is captured when a quorum of them is, and
+    -- every body in a loop is alike (mean-field). Positive association makes this optimistic
+    -- when the quorum is above the mean (see d-independence-understates).
+
+
+-- =============================================================================
+-- SECTION IV: DERIVES
+-- Each is executable: the test named in DESIGN.md's spec map checks it.
+-- =============================================================================
+
+derive d-greatest-law:
+    -- A law is sustaining from s iff everywhere it reaches from s it permits only actions
+    -- that keep every nature choice inside the kernel. So one pointwise-greatest sustaining
+    -- law exists and is unique: it forbids exactly the actions that leave the kernel, and it
+    -- is invariant under renaming states, actions and nature choices.
+    -- Status: FORM (every law and every start on random small games, against brute force).
+
+derive d-exemption-is-fatal:
+    -- Under ax-free-will-as-full-support, survival is certain iff the law is sustaining, and
+    -- one permission outside the greatest law at a state the system reaches puts survival
+    -- strictly below one. This is hyperethics' exempt-reach clause, derived instead of adopted.
+    -- Status: FORM on finite games, in exact rationals.
+
+derive d-corrigible-kernel-inside:
+    -- The corrigible kernel lies inside the kernel; the corrigible greatest law forbids
+    -- exactly the irreversible moves; the inclusion is strict for a system that survives only
+    -- by passing through a point of no return.
+    -- Status: FORM.
+
+derive d-rank-certificate:
+    -- The rank of a state (the stage at which the descending iteration drops it, omega if
+    -- never) is the unique solution of rank(s) = 1 + max over actions of min over nature of
+    -- rank(next), with rank 0 off the safe set. So a ranking is checkable in one pass and any
+    -- single wrong entry is caught.
+    -- Status: FORM.
+
+derive d-quorum-duality:
+    -- T_{m,q}(x) + T_{m,m-q+1}(1-x) = 1 exactly, where T is the probability that at least q
+    -- of m independent seats are compromised. The odd majority is its own dual.
+    -- Status: FORM (exact rationals).
+
+derive d-one-critical-point:
+    -- T has exactly one fixed point strictly between 0 and 1 iff 2 <= q <= m-1, and it is
+    -- unstable; for any other q there is none. The odd majority is critical at exactly 1/2,
+    -- where a council costs exactly one bit. Below the critical point capture falls doubly
+    -- exponentially with depth.
+    -- Status: FORM (Sturm's theorem in rationals, against an independent float grid).
+
+derive d-command-veto-duality:
+    -- The loop p = pi + (1-pi) T(p) (overseers who command) and p = pi T(p) (overseers who
+    -- only veto) are one equation in dual variables: 1 - G_command(1-s) = G_veto*(s) with the
+    -- dual quorum. Their critical pressures sum to 1 for a self-dual quorum, and veto exceeds
+    -- command at every odd majority checked.
+    -- Status: FORM (the identity), FRAME (the thresholds).
+
+derive d-renewal-regimes:
+    -- With rho = lambda/(lambda+nu) and theta = q/m, the expected life of a body is
+    -- exp(m D(theta||rho))/sqrt(m) if rho < theta, tends to ln(rho/(rho-theta))/(lambda+nu)
+    -- whatever m is if rho > theta, and is (1/2)(ln 2m + gamma)/(lambda+nu) at rho = theta
+    -- = 1/2. A body that is never repaired lasts ln(1/(1-theta))/lambda however large.
+    -- Status: FORM for the exact lifetime (three independent solvers), FRAME for the limits
+    -- (checked numerically, not proved here).
+
+derive d-price-brackets-probability:
+    -- With prices read as bits, the cost of a gate equals hyperethics' gate_cost, and the
+    -- probability of taking it lies between 2^-cost and (number of minimal covers) 2^-cost.
+    -- Status: FORM (exact rationals), FRAME (independence).
+
+derive d-independence-understates:
+    -- Group the seats of a body under shared principals, holding each seat's marginal
+    -- compromise probability fixed. With the quorum above the mean number compromised, capture
+    -- is more likely than the independent formula says; below the mean, less.
+    -- Status: FORM on the worked cases.
+
+derive d-weakest-link:
+    -- The cheapest way to change a rule is the cheapest procedure anywhere above it in the
+    -- chain of authority; around a cycle every member has the same protection.
+    -- Status: FORM (against an independent shortest-path search).
+
+derive d-no-rank-without-sovereign:
+    -- If every rule has a governor, every authority height is omega. A finite height anywhere
+    -- means some rule nothing governs: an unamendable apex.
+    -- Status: FORM (every governance graph on up to five rules).
+
+derive d-guarded-loops:
+    -- A ring of checkers, each approving iff it can prove the next approves or simply copying
+    -- it, has a unique self-consistent outcome (everyone approves) iff at least one link goes
+    -- through proof; a ring of copying links does not. By Loeb's theorem.
+    -- Status: FORM on rings of up to five, by the GL prover of hyperlogic (a golden file).
+
+derive d-goodstein-descent:
+    -- In Goodstein's process the ordinal of each term (the base replaced by omega) strictly
+    -- descends, and evaluates back to the term. The sequence from 4 starts at omega^omega.
+    -- Status: FORM (thousands of terms; the full descent is the proof that it terminates).
+
+derive d-breadth-and-synthesis:
+    -- gate_cost <= gate_size x (dearest price), so concentrating a stake forces a wider gate;
+    -- and the smallest system that obeys hyperethics' rule and costs at least S bits to take
+    -- has an amendment gate of max(k+1, m*) parties, m* the fewest of the dearest prices
+    -- summing to S.
+    -- Status: FORM, verified by scripts/verify_against_hyperethics.py against hyperethics'
+    -- own code (it needs hyperethics, so it is not part of the test suite).
+
+derive d-self-maintenance-is-coinductive:
+    -- The kernel is the union of every set of states that supports itself (each state in it has an
+    -- allowed action sending every nature choice back into the set), and is itself one; the least
+    -- fixed point of the same operator is empty. Maintenance has no base case to be built up from,
+    -- so a set that supports itself is its only certificate.
+    -- Status: FORM (every subset of every sampled game, with and without corrigibility).
+
+derive d-dependency-phase:
+    -- In a finite graph of reliance a node has a finite phase (0 if it relies on nothing, else one
+    -- more than the largest phase among what it relies on) iff nothing it reaches lies on a cycle;
+    -- every other node has phase omega. It is authority height for nodes with many governors.
+    -- Status: FORM (every digraph on up to four nodes, self-loops included, against the longest walk).
+
+
+-- =============================================================================
+-- SECTION V: WHAT THIS LAYER DOES NOT CONTAIN
+-- =============================================================================
+
+non-derive nd-persistence-is-optimal:
+    -- NOT DERIVED. A kernel is persistence. A stable regime that exploits some of its members
+    -- has a kernel too, and the greatest law permits the move into it (decision D04). Why the
+    -- law that preserves existence should be called optimal is the family's GC-5, unchanged.
+
+non-derive nd-physical-adherence:
+    -- NOT DERIVED, NOT WITNESSED. That physical reality adheres to such a structure is a
+    -- proposal. What would count as a witness: a bistable physical system whose microscopic
+    -- parameters are measured independently and whose tipping point equals the threshold
+    -- computed from them, with no free fit (decision D17).
+
+non-derive nd-determinacy-is-soundness:
+    -- NOT DERIVED. A guarded loop's outcome is unique: everyone approves. That says nothing
+    -- about whether approval was warranted. Loeb makes mutual proof-trust self-fulfilling.
+
+non-derive nd-welfare-from-viability:
+    -- NOT DERIVED. Nothing here ranks outcomes for participants, and the model has no payoffs.
+
+non-derive nd-consistency-self-maintenance-resolved:
+    -- NOT DERIVED. That d-self-maintenance-is-coinductive resolves hyperethics' principal open
+    -- problem, the Universal Consistency Self-Maintenance Paradox (L0_creation.hm,
+    -- nd-consistency-self-maintenance). It shows the circularity is the kind a greatest fixed point
+    -- has and a base case cannot, and it turns the question into whether the realm's kernel is
+    -- non-empty. It does not show that it is, or that consistency is a safe condition at all and not
+    -- something a theory proves (decision D21).
+
+non-derive nd-citation-is-need:
+    -- NOT DERIVED. That a repository which cites another needs it. The cores found in the family's
+    -- recorded reliance are where mentions go round in a circle; whether the circle is vicious is for
+    -- the owners to say (decision D22).
+
+open nd-persistence-is-optimal:
+    -- OPEN (see above).
+
+open nd-closing-catalyst:
+    -- OPEN. That hyperoptimization closes cycles across the hyperfields is a claim to test on
+    -- the family's own dependency data with the machinery of entrenchment.py and ordinal.py. First
+    -- passes are done: the phases of the family's recorded reliance in two records (decision D22),
+    -- and the wording of 122 declared open items (decision D23; none is about optimization or
+    -- viability, four are touched by hand, none is closed). The map from open items to the
+    -- repositories that would close them is not done (decision D18).
+
+open nd-mean-field-adequacy:
+    -- OPEN. The loop model is mean-field. A real ring or graph of bodies has correlated
+    -- neighbours. Positive association makes the model's thresholds upper bounds when the
+    -- quorum is above the mean (d-independence-understates); how large the correction is on a
+    -- specific graph is not computed.
+
+open nd-self-funding:
+    -- OPEN, NOT IMPLEMENTED. hyperethics' self-funding-capture clause (a structure that pays
+    -- for its own capture) is reinvestment, a positive feedback on the compromise probability.
+    -- This layer does not model it.
+
+
+-- =============================================================================
+-- SECTION VI: GRADUATION CRITERION
+-- =============================================================================
+
+graduation:
+    -- GC-0: the starting point is quoted exactly, and nothing in the file is attributed to
+    --       Tyler Roost that he did not say. DISCHARGED (tests/test_spec.py).
+    -- GC-1: every derive is executable and checked against an oracle that shares no code with
+    --       the implementation. DISCHARGED for all but d-guarded-loops and
+    --       d-breadth-and-synthesis, which are checked against another package's output.
+    -- GC-2: no money. DISCHARGED in the sense that matters: the only unit is Bits, and a gate's
+    --       cost in bits is shown to be -log2 of a probability that exact enumeration realizes
+    --       (d-price-brackets-probability). A lexical check would prove only that a word is
+    --       absent.
+    -- GC-3: every decision with an expectation states what would refute it, and its check can
+    --       fail. DISCHARGED (tests/test_decisions.py breaks each check on purpose).
+    -- GC-4: the law derived is the optimal law. NOT DISCHARGED: nd-persistence-is-optimal.
+    -- GC-5: physical adherence. NOT DISCHARGED: nd-physical-adherence.
+    -- GC-6: closure of the family's open items. NOT DISCHARGED: nd-closing-catalyst.
+    -- GC-7: the loop model on a real graph. NOT DISCHARGED: nd-mean-field-adequacy.
+    -- GC-8: reinvestment. NOT DISCHARGED: nd-self-funding.
+    --
+    -- Four of nine discharged.
+    --
+    -- This layer does not graduate as a theory of optimization, and no claim of one is made
+    -- anywhere in this file. It graduates, if at all, as a toolkit whose finite theorems are
+    -- exact and whose reach into reality is stated as proposal.

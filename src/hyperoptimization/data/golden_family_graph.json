@@ -1,0 +1,854 @@
+{
+  "command": "python scripts/regenerate_golden_family.py <hyperstratum>",
+  "edges": [
+    {
+      "evidence": [
+        "AGENTS.md",
+        "GOVERNANCE.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "grounded-hypercalculi",
+      "target": "grounded-hyperset-theory",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "AGENTS.md",
+        "GOVERNANCE.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "grounded-hypercalculi",
+      "target": "hypermath",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "AGENTS.md",
+        "GOVERNANCE.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "grounded-hypercalculi",
+      "target": "ordinatics",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "kind": "citation",
+      "source": "grounded-hyperset-theory",
+      "target": "grounded-hypercalculi",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "AGENTS.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "grounded-hyperset-theory",
+      "target": "hypermath",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "AGENTS.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "grounded-hyperset-theory",
+      "target": "ordinatics",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "COMPOSITION_CONTRACT.md"
+      ],
+      "kind": "citation",
+      "source": "hyperchemistry",
+      "target": "hyperbiology",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "COMPOSITION_CONTRACT.md",
+        "README.md",
+        "TECHNICAL_DEBT.md"
+      ],
+      "kind": "citation",
+      "source": "hyperchemistry",
+      "target": "hyperphysics",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "L0_creation.hm",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hyperethics",
+      "target": "hypermath",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "L1_will.hm",
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "kind": "citation",
+      "source": "hyperethics",
+      "target": "hyperphysics",
+      "weight": 4
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "L1_will.hm",
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "kind": "citation",
+      "source": "hyperethics",
+      "target": "metamathethicology",
+      "weight": 4
+    },
+    {
+      "evidence": [
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hypergrammar",
+      "target": "grounded-hypercalculi",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "DEFINITIONAL_SPACE.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hypergrammar",
+      "target": "grounded-hyperset-theory",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "DEFINITIONAL_SPACE.md"
+      ],
+      "kind": "citation",
+      "source": "hypergrammar",
+      "target": "hyperethics",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "DEFINITIONAL_SPACE.md"
+      ],
+      "kind": "citation",
+      "source": "hypergrammar",
+      "target": "hyperlogic",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "AGENTS.md",
+        "DEFINITIONAL_SPACE.md",
+        "PAPER.md",
+        "README.md",
+        "TIME.md",
+        "docs/prerequisites/00_learning_path.md",
+        "docs/prerequisites/21_hypertopologies.md",
+        "docs/prerequisites/scaffolds/21_hypertopologies/21_hypertopologies_hyperstructure.txt"
+      ],
+      "kind": "citation",
+      "source": "hypergrammar",
+      "target": "hypermath",
+      "weight": 8
+    },
+    {
+      "evidence": [
+        "PAPER.md",
+        "TIME.md",
+        "docs/prerequisites/00_learning_path.md",
+        "docs/prerequisites/21_hypertopologies.md",
+        "docs/prerequisites/scaffolds/21_hypertopologies/21_hypertopologies_hyperstructure.txt"
+      ],
+      "kind": "citation",
+      "source": "hypergrammar",
+      "target": "hyperorder",
+      "weight": 5
+    },
+    {
+      "evidence": [
+        "DEFINITIONAL_SPACE.md"
+      ],
+      "kind": "citation",
+      "source": "hypergrammar",
+      "target": "hyperphysics",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "DEFINITIONAL_SPACE.md"
+      ],
+      "kind": "citation",
+      "source": "hypergrammar",
+      "target": "hyperstratum",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "DEFINITIONAL_SPACE.md"
+      ],
+      "kind": "citation",
+      "source": "hypergrammar",
+      "target": "metamathethicology",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "DEFINITIONAL_SPACE.md",
+        "README.md",
+        "TIME.md"
+      ],
+      "kind": "citation",
+      "source": "hypergrammar",
+      "target": "ordinatics",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "L0_triangle.hm",
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "kind": "citation",
+      "source": "hyperlogic",
+      "target": "grounded-hypercalculi",
+      "weight": 4
+    },
+    {
+      "evidence": [
+        "DESIGN.md"
+      ],
+      "kind": "citation",
+      "source": "hyperlogic",
+      "target": "grounded-hyperset-theory",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "L0_triangle.hm",
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "kind": "citation",
+      "source": "hyperlogic",
+      "target": "hyperethics",
+      "weight": 4
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "L0_triangle.hm",
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "kind": "citation",
+      "source": "hyperlogic",
+      "target": "hypermath",
+      "weight": 4
+    },
+    {
+      "evidence": [
+        "DESIGN.md"
+      ],
+      "kind": "citation",
+      "source": "hyperlogic",
+      "target": "hyperphysics",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "L0_triangle.hm",
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "kind": "citation",
+      "source": "hyperlogic",
+      "target": "metamathethicology",
+      "weight": 4
+    },
+    {
+      "evidence": [
+        "DESIGN.md"
+      ],
+      "kind": "citation",
+      "source": "hyperlogic",
+      "target": "ordinatics",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "kind": "citation",
+      "source": "hypermath",
+      "target": "grounded-hypercalculi",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "kind": "citation",
+      "source": "hypermath",
+      "target": "grounded-hyperset-theory",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "README.md",
+        "docs/research/NATIVE_TRANSPORT_OBLIGATION.md",
+        "docs/research/SEQUENCING_LAWS.md"
+      ],
+      "kind": "citation",
+      "source": "hypermath",
+      "target": "hypergrammar",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "AGENTS.md",
+        "L1_relations.hm",
+        "L2_operations.hm",
+        "L3_ordinatics.hm",
+        "README.md",
+        "docs/research/HYPERSET_THEORY_ORDINATICS.md",
+        "docs/research/SOURCE_MAP.md"
+      ],
+      "kind": "citation",
+      "source": "hypermath",
+      "target": "ordinatics",
+      "weight": 7
+    },
+    {
+      "evidence": [
+        "FIELD_SPEC.md"
+      ],
+      "kind": "citation",
+      "source": "hyperobjectivity",
+      "target": "hyperemergence",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "PROVENANCE.md"
+      ],
+      "kind": "citation",
+      "source": "hyperobjectivity",
+      "target": "hyperstratum",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hyperobjectivity",
+      "target": "hypersubjectivity",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "FIELD_STACK.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hyperphysics",
+      "target": "hyperbiology",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "FIELD_STACK.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hyperphysics",
+      "target": "hyperchemistry",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "README.md",
+        "VALIDATION.md",
+        "electrical.hm"
+      ],
+      "kind": "citation",
+      "source": "hyperphysics",
+      "target": "hyperethics",
+      "weight": 4
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hyperphysics",
+      "target": "hypermath",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "FIELD_STACK.md",
+        "README.md",
+        "VALIDATION.md",
+        "electrical.hm"
+      ],
+      "kind": "citation",
+      "source": "hyperphysics",
+      "target": "metamathethicology",
+      "weight": 5
+    },
+    {
+      "evidence": [
+        "FIELD_SPEC.md",
+        "PROVENANCE.md"
+      ],
+      "kind": "citation",
+      "source": "hyperreality",
+      "target": "hyperethics",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "PROVENANCE.md"
+      ],
+      "kind": "citation",
+      "source": "hyperreality",
+      "target": "hyperobjectivity",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "FIELD_SPEC.md"
+      ],
+      "kind": "citation",
+      "source": "hyperreality",
+      "target": "hyperprobability",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "FIELD_SPEC.md",
+        "PROVENANCE.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hyperreality",
+      "target": "hyperspace",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "FIELD_SPEC.md",
+        "PROVENANCE.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hyperreality",
+      "target": "hyperstratum",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "PROVENANCE.md"
+      ],
+      "kind": "citation",
+      "source": "hyperreality",
+      "target": "hypersubjectivity",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "FIELD_SPEC.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hyperreality",
+      "target": "hypertime",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "AGENT_HANDOFF.md",
+        "FIELD_SPEC.md",
+        "PROVENANCE.md",
+        "TECHNICAL_DEBT.md"
+      ],
+      "kind": "citation",
+      "source": "hyperreality",
+      "target": "metamathethicology",
+      "weight": 4
+    },
+    {
+      "evidence": [
+        "FIELD_SPEC.md",
+        "PROVENANCE.md"
+      ],
+      "kind": "citation",
+      "source": "hyperspace",
+      "target": "hyperstratum",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "PROVENANCE.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hyperspace",
+      "target": "hypertime",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hyperstratum",
+      "target": "hypergrammar",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "FIELD_SPEC.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hypersubjectivity",
+      "target": "hyperemergence",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "PROVENANCE.md"
+      ],
+      "kind": "citation",
+      "source": "hypersubjectivity",
+      "target": "hyperethics",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "PROVENANCE.md"
+      ],
+      "kind": "citation",
+      "source": "hypersubjectivity",
+      "target": "hyperobjectivity",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "PROVENANCE.md"
+      ],
+      "kind": "citation",
+      "source": "hypersubjectivity",
+      "target": "hyperstratum",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "FIELD_SPEC.md",
+        "PROVENANCE.md",
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "hypertime",
+      "target": "hyperspace",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "FIELD_SPEC.md",
+        "PROVENANCE.md"
+      ],
+      "kind": "citation",
+      "source": "hypertime",
+      "target": "hyperstratum",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "kind": "citation",
+      "source": "metamathethicology",
+      "target": "grounded-hypercalculi",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "grounded-hypercalculi @ git+https://github.com/TimeLordRaps/grounded-hypercalculi.git@4018ac3086dc6ee1a223697711fb322e30cd0417"
+      ],
+      "kind": "dependency",
+      "source": "metamathethicology",
+      "target": "grounded-hypercalculi",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "tests/test_ecosystem.py"
+      ],
+      "kind": "import",
+      "source": "metamathethicology",
+      "target": "grounded-hypercalculi",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "kind": "citation",
+      "source": "metamathethicology",
+      "target": "grounded-hyperset-theory",
+      "weight": 2
+    },
+    {
+      "evidence": [
+        "grounded-hyperset-theory @ git+https://github.com/TimeLordRaps/grounded-hyperset-theory.git@9a86434450416cf135ca1e23aa5c04b511fdbee8"
+      ],
+      "kind": "dependency",
+      "source": "metamathethicology",
+      "target": "grounded-hyperset-theory",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "tests/test_ecosystem.py"
+      ],
+      "kind": "import",
+      "source": "metamathethicology",
+      "target": "grounded-hyperset-theory",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "README.md",
+        "VALIDATION.md",
+        "will_electrophysics.hm"
+      ],
+      "kind": "citation",
+      "source": "metamathethicology",
+      "target": "hyperethics",
+      "weight": 4
+    },
+    {
+      "evidence": [
+        "tests/test_citations.py"
+      ],
+      "kind": "import",
+      "source": "metamathethicology",
+      "target": "hyperethics",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "DESIGN.md"
+      ],
+      "kind": "citation",
+      "source": "metamathethicology",
+      "target": "hyperlogic",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "README.md"
+      ],
+      "kind": "citation",
+      "source": "metamathethicology",
+      "target": "hypermath",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "README.md",
+        "VALIDATION.md",
+        "will_electrophysics.hm"
+      ],
+      "kind": "citation",
+      "source": "metamathethicology",
+      "target": "hyperphysics",
+      "weight": 4
+    },
+    {
+      "evidence": [
+        "DESIGN.md",
+        "README.md",
+        "VALIDATION.md"
+      ],
+      "kind": "citation",
+      "source": "metamathethicology",
+      "target": "ordinatics",
+      "weight": 3
+    },
+    {
+      "evidence": [
+        "ordinatics @ git+https://github.com/TimeLordRaps/ordinatics.git@ded754dd7b64410ee5c1ec0b0c47688c78fdcca1"
+      ],
+      "kind": "dependency",
+      "source": "metamathethicology",
+      "target": "ordinatics",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "src/metamathethicology/examples.py",
+        "src/metamathethicology/representation.py",
+        "src/metamathethicology/spaces.py",
+        "src/metamathethicology/will_electrophysics.py",
+        "tests/test_ecosystem.py",
+        "tests/test_spaces.py",
+        "tests/test_will_electrophysics.py"
+      ],
+      "kind": "import",
+      "source": "metamathethicology",
+      "target": "ordinatics",
+      "weight": 7
+    },
+    {
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "kind": "citation",
+      "source": "ordinatics",
+      "target": "grounded-hypercalculi",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "kind": "citation",
+      "source": "ordinatics",
+      "target": "grounded-hyperset-theory",
+      "weight": 1
+    },
+    {
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "kind": "citation",
+      "source": "ordinatics",
+      "target": "hypermath",
+      "weight": 1
+    }
+  ],
+  "hyperstratum_commit": "87aadc390fea2197b8525e13489d3c839e7ab545",
+  "nodes": [
+    {
+      "id": "grounded-hypercalculi",
+      "tier": "foundation"
+    },
+    {
+      "id": "grounded-hyperset-theory",
+      "tier": "foundation"
+    },
+    {
+      "id": "hyperbiology",
+      "tier": "declared"
+    },
+    {
+      "id": "hyperchaos",
+      "tier": "unplaced"
+    },
+    {
+      "id": "hyperchemistry",
+      "tier": "unplaced"
+    },
+    {
+      "id": "hyperemergence",
+      "tier": "unplaced"
+    },
+    {
+      "id": "hyperethics",
+      "tier": "applied"
+    },
+    {
+      "id": "hypergrammar",
+      "tier": "language"
+    },
+    {
+      "id": "hyperlogic",
+      "tier": "language"
+    },
+    {
+      "id": "hypermath",
+      "tier": "foundation"
+    },
+    {
+      "id": "hyperobjectivity",
+      "tier": "unplaced"
+    },
+    {
+      "id": "hyperorder",
+      "tier": "unplaced"
+    },
+    {
+      "id": "hyperphysics",
+      "tier": "applied"
+    },
+    {
+      "id": "hyperprobability",
+      "tier": "applied"
+    },
+    {
+      "id": "hyperreality",
+      "tier": "unplaced"
+    },
+    {
+      "id": "hyperspace",
+      "tier": "unplaced"
+    },
+    {
+      "id": "hyperstratum",
+      "tier": "foundation"
+    },
+    {
+      "id": "hypersubjectivity",
+      "tier": "unplaced"
+    },
+    {
+      "id": "hypertime",
+      "tier": "unplaced"
+    },
+    {
+      "id": "metamathethicology",
+      "tier": "combination"
+    },
+    {
+      "id": "ordinatics",
+      "tier": "foundation"
+    }
+  ],
+  "schema": "vstd-family-graph/1",
+  "source": "hyperstratum docs/family/family-graph.json",
+  "source_digest": "b56f1a3c61d95fb3ee00170ec09120f826b0f0ba05ae29edaef6ba502f013217"
+}
