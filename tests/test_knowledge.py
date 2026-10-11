@@ -158,6 +158,8 @@ def test_names_that_are_not_states_are_refused():
         kernel_within(game, ("a", "nowhere"))
     with pytest.raises(ValueError):
         viability.greatest_law_within(game, ["nowhere"])
+    with pytest.raises(TypeError):
+        kernel_within(game, "ab")  # a collection of state names, not one string
 
 
 # --- pooling ---------------------------------------------------------------------------------------------------------------------
@@ -260,9 +262,11 @@ def test_no_party_ever_certifies_less_by_pooling():
             assert result.alone[party] | result.gains[party] == held
 
 
-def test_gain_is_mutual_in_most_splits_one_sided_in_some_and_absent_in_others():
+def split_counts(count=150):
+    """How the gain from pooling is shared over every split of the states between two parties, in the random
+    games that have a non-empty greatest law: in both hands (mutual), in one (one-sided) or in neither (none)."""
     counts = {"mutual": 0, "one-sided": 0, "none": 0}
-    for corrigible, game in games(150):
+    for corrigible, game in games(count):
         if not viability.greatest_law(game, corrigible=corrigible):
             continue
         for assignment in itertools.product("AB", repeat=len(game.states)):
@@ -273,6 +277,11 @@ def test_gain_is_mutual_in_most_splits_one_sided_in_some_and_absent_in_others():
             gains = knowledge.surplus(game, territory, owner, corrigible=corrigible).gains
             held = sum(bool(g) for g in gains.values())
             counts["mutual" if held == 2 else "one-sided" if held == 1 else "none"] += 1
+    return counts
+
+
+def test_gain_is_mutual_in_most_splits_one_sided_in_some_and_absent_in_others():
+    counts = split_counts()
     assert all(counts.values()), counts
     assert counts["mutual"] > counts["one-sided"]  # these random games depend on each other more often than not
 
@@ -366,3 +375,13 @@ def test_the_inputs_are_checked():
         knowledge.minimal_knowledge(game, ("nowhere", "hold"))
     with pytest.raises(TypeError):
         knowledge.crossings(game, {"a": "A", "b": "B"}.items())  # a mapping, not its items
+    with pytest.raises(ValueError):
+        knowledge.crossings(game, {"a": "", "b": "B"})  # every owner has a name
+    with pytest.raises(TypeError):
+        knowledge.pooled(game, [("A", {"a"})])  # knowledge is a mapping
+    with pytest.raises(ValueError):
+        knowledge.pooled(game, {"": {"a"}})  # every party has a name
+    with pytest.raises(TypeError):
+        knowledge.pooled(game, {"A": "a"})  # a collection of states, not one string
+    with pytest.raises(ValueError):
+        knowledge.pooled(game, {"A": {"nowhere"}})  # and the states are the game's

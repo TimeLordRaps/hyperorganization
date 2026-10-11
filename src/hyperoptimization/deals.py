@@ -17,10 +17,11 @@ games:
 
     closure        a freedom must come with the freedoms it enables. A door opened onto a room that
                    permits nothing leaves the system stuck in the doorway: not coherent. So coherent
-                   openings are closed bundles, never single permissions.
+                   openings are closed under what they enable (a single permission is coherent only
+                   when everything it leads to is already permitted).
     no trade-off   among coherent openings the greatest corrigible law is best in every coordinate at
-                   once. Within lawful existence nothing competes for a price to settle: freedom of this
-                   kind is not scarce. The scarce things are knowledge (`knowledge`), attention and
+                   once. Given non-rival permissions, nothing within lawful existence competes for a
+                   price to settle: freedom of this kind is not scarce. The scarce things are knowledge (`knowledge`), attention and
                    understanding (`comprehension`).
     admission      an opening is admitted only if it is coherent AND the people deciding understand its
                    footprint. A coalition that understands the material of an opening can certify it

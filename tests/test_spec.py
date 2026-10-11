@@ -4,7 +4,7 @@
 untranslated, so nothing mechanical ties it to the code. These tests are that tie. DESIGN.md carries
 a table (the spec map) with one row per name the spec declares; this file checks the rows against
 the spec, against the code, against the tests, and against the decision ledger, and it checks that
-Tyler Roost's three messages are in the spec and in PROVENANCE.md exactly as he sent them.
+Tyler Roost's four messages are in their specs and in PROVENANCE.md exactly as he sent them.
 """
 
 from __future__ import annotations
@@ -19,6 +19,8 @@ from hyperoptimization import decisions
 
 ROOT = Path(__file__).resolve().parent.parent
 SPEC = (ROOT / "L0_viability.hm").read_text(encoding="utf-8")
+SPEC1 = (ROOT / "L1_exchange.hm").read_text(encoding="utf-8")
+BOTH = SPEC + "\n" + SPEC1
 DESIGN = (ROOT / "DESIGN.md").read_text(encoding="utf-8")
 PROVENANCE = (ROOT / "PROVENANCE.md").read_text(encoding="utf-8")
 README = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -48,7 +50,18 @@ MESSAGES = (
     "Ive given you a lot to work with, work long and hard and let me know if any conceptual blocks "
     "get in your way, but we are inventing this together so I would like to know what decisions you "
     "make that hold key evidential expectations  from witnesses within the framework.",
+    "subagents should always be haiku 5.5 just so you know, also for there to be no money we need "
+    "information asymmetric deal making through informationally richer channels than single "
+    "dimensional $. Also for a decision to be makable in the first place a comprehensive "
+    "understanding of the material and its impacts is a necessity, this sets the quorum size, and "
+    "also determines the barrier to entry for decision making, for deal making we should utilize "
+    "quantum game theoretical optionality to determine entangled decisions which themselves by "
+    "simply existing in an entangled state provide value for exclusively win win deals since we no "
+    "longer use money and instead represent deals by value of freedom allowed and degree to which "
+    "those freedoms allow other freedoms and the dimensions along which those freedoms all cohere "
+    "with the overall systems lawful existence.",
 )
+WHERE = (SPEC, SPEC, SPEC, SPEC1)  # the spec each message is quoted in
 
 
 def flat(text: str) -> str:
@@ -57,7 +70,7 @@ def flat(text: str) -> str:
 
 
 def declared(kind: str) -> list[str]:
-    return re.findall(rf"^{kind} ([a-z0-9-]+):", SPEC, flags=re.M)
+    return re.findall(rf"^{kind} ([a-z0-9-]+):", BOTH, flags=re.M)
 
 
 def spec_map() -> list[dict[str, str]]:
@@ -88,6 +101,8 @@ def test_the_spec_declares_the_axioms_derives_and_non_derives_the_design_maps():
     assert declared("axiom") == [
         "ax-existence-as-viability", "ax-free-will-as-full-support",
         "ax-corrigibility-as-reachability", "ax-self-repair", "ax-independence",
+        "ax-ignorance-is-pessimism", "ax-understanding-is-a-set", "ax-common-interest",
+        "ax-freedom-is-non-rival",
     ]
     assert declared("derive") == [
         "d-greatest-law", "d-exemption-is-fatal", "d-corrigible-kernel-inside", "d-rank-certificate",
@@ -95,15 +110,26 @@ def test_the_spec_declares_the_axioms_derives_and_non_derives_the_design_maps():
         "d-price-brackets-probability", "d-independence-understates", "d-weakest-link",
         "d-no-rank-without-sovereign", "d-guarded-loops", "d-goodstein-descent",
         "d-breadth-and-synthesis", "d-self-maintenance-is-coinductive", "d-dependency-phase",
+        "d-view-is-sound", "d-certificate-is-a-self-supporting-set", "d-pooling-needs-a-border",
+        "d-footprint-holds-cores", "d-quorum-is-cover-and-attendance",
+        "d-necessary-voices-are-sole-witnesses", "d-barrier-is-monotone",
+        "d-barrier-costs-capture-resistance", "d-opening-closure",
+        "d-no-trade-off-within-lawful-existence", "d-comprehension-certifies",
+        "d-price-blind-to-the-balanced-deal", "d-alternative-of-prices-and-blends",
+        "d-coherence-is-not-a-currency", "d-entangled-beats-classical",
+        "d-value-of-a-state-is-its-degree", "d-entanglement-moves-no-information",
+        "d-entanglement-is-consumed", "d-no-signalling-is-not-quantum",
     ]
     assert declared("non-derive") == [
         "nd-persistence-is-optimal", "nd-physical-adherence", "nd-determinacy-is-soundness",
         "nd-welfare-from-viability", "nd-consistency-self-maintenance-resolved",
         "nd-citation-is-need",
+        "nd-win-win-by-construction", "nd-understanding-is-measured",
+        "nd-institutions-are-entangled", "nd-quantum-dilemma",
     ]
     assert declared("open") == [
         "nd-persistence-is-optimal", "nd-closing-catalyst", "nd-mean-field-adequacy",
-        "nd-self-funding",
+        "nd-self-funding", "nd-rival-freedoms", "nd-comprehension-instrument",
     ]
 
 
@@ -153,10 +179,10 @@ def test_an_item_with_a_test_has_code_and_an_item_with_neither_is_a_non_derive_o
 # --- what was said ------------------------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("index", range(3))
-def test_each_message_is_in_the_spec_and_in_provenance_exactly(index):
+@pytest.mark.parametrize("index", range(4))
+def test_each_message_is_in_its_spec_and_in_provenance_exactly(index):
     message = " ".join(MESSAGES[index].split())
-    assert message in flat(SPEC), f"message {index + 1} is missing or altered in L0_viability.hm"
+    assert message in flat(WHERE[index]), f"message {index + 1} is missing or altered in its specification"
     assert message in flat(PROVENANCE), f"message {index + 1} is missing or altered in PROVENANCE.md"
 
 
@@ -165,7 +191,7 @@ def test_the_doubled_space_in_the_third_message_survives_in_provenance():
 
 
 def test_nothing_is_attributed_to_the_owner_beyond_what_was_said():
-    # every blockquote in PROVENANCE is one of the three messages or the L2 rule it cites
+    # every blockquote in PROVENANCE is one of the four messages or the L2 rule it cites
     quoted = [" ".join(line[1:].split()) for line in PROVENANCE.splitlines() if line.startswith(">")]
     allowed = [" ".join(m.split()) for m in MESSAGES]
     assert quoted and all(q in allowed for q in quoted)
@@ -177,6 +203,24 @@ def test_nothing_is_attributed_to_the_owner_beyond_what_was_said():
 @pytest.mark.parametrize("gc", [f"GC-{n}" for n in range(9)])
 def test_the_spec_grades_every_graduation_criterion(gc):
     assert re.search(rf"{gc}: ", SPEC)
+
+
+@pytest.mark.parametrize("gc", [f"GC-L1-{n}" for n in range(7)])
+def test_the_second_spec_grades_every_graduation_criterion(gc):
+    assert re.search(rf"{gc}: ", SPEC1)
+
+
+def test_the_second_spec_is_honest_about_its_status():
+    text = flat(SPEC1)
+    for admission in (
+        "Each is an assumption of the model, adopted and not derived",
+        "A passing check CONFIRMS nothing universally",
+        "This layer does not graduate as a theory of exchange",
+        "Four of seven discharged",
+        "Win-win holds by construction here",
+        "That human or institutional decisions can be entangled is a proposal with no witness",
+    ):
+        assert admission in text, admission
 
 
 def test_the_spec_is_honest_about_its_status():
@@ -192,7 +236,7 @@ def test_the_spec_is_honest_about_its_status():
 
 
 def test_the_spec_declares_no_evaluative_primitive():
-    primitives = re.findall(r"^(?:primitive|opaque) ([a-zA-Z0-9-]+) ::", SPEC, flags=re.M)
+    primitives = re.findall(r"^(?:primitive|opaque) ([a-zA-Z0-9-_]+) ::", BOTH, flags=re.M)
     assert primitives
     for banned in ("good", "ought", "prefer", "value", "harm", "choose", "welfare", "utility"):
         assert banned not in [p.lower() for p in primitives]
@@ -200,7 +244,7 @@ def test_the_spec_declares_no_evaluative_primitive():
 
 def test_the_only_unit_of_price_is_bits():
     assert re.search(r"^primitive Bits ::", SPEC, flags=re.M)
-    assert not re.search(r"^primitive (Money|Currency|Cost|Dollar)", SPEC, flags=re.M | re.I)
+    assert not re.search(r"^primitive (Money|Currency|Cost|Dollar|Price)", BOTH, flags=re.M | re.I)
 
 
 def test_the_readme_mentions_every_module_of_the_package():

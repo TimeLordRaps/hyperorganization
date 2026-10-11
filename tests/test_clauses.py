@@ -21,8 +21,20 @@ from pathlib import Path
 import pytest
 from test_decisions import SABOTAGE
 
+from hyperoptimization import (
+    comprehension,
+    deals,
+    entangled,
+    entrenchment,
+    family,
+    knowledge,
+    loop,
+    ordinal,
+    quorum,
+    surprisal,
+    viability,
+)
 from hyperoptimization import decisions as D
-from hyperoptimization import entrenchment, family, loop, ordinal, quorum, surprisal, viability
 from hyperoptimization.ground import OMEGA, Status, Verdict
 
 _greatest = viability.greatest_law
@@ -40,6 +52,55 @@ def _one_state_game() -> viability.Game:
 def _without_twins(game, corrigible=True):
     """The real greatest law, except that it forgets any state whose name starts with a capital S."""
     return {s: p for s, p in _greatest(game, corrigible=corrigible).items() if not s.startswith("S")}
+
+
+_surplus = knowledge.Surplus
+
+
+def _gains_everywhere(game, held, owner, corrigible=True):
+    """A pooling that always reports a gain for every party, whatever the territories do."""
+    gain = frozenset({("s0", "x")})
+    return _surplus({p: frozenset() for p in held}, frozenset(), {p: gain for p in held}, frozenset(owner.values()))
+
+
+def _hamlets_alone(game, known, corrigible=True):
+    """Each hamlet can certify its own move without the other, but only in the two-state game."""
+    if set(game.states) == {"a", "b"}:
+        return frozenset({("a", "hold")})
+    return _real_certified(game, known, corrigible=corrigible)
+
+
+def _unrelated_cover(knowledge_, nodes, pool=None):
+    return 0
+
+
+_real_certified = knowledge.certified
+_real_ghz = entangled.ghz_strategy
+_real_collapse = entangled.collapse
+_real_widths = comprehension.Footprint
+
+
+def _flat_footprint(depends_on, targets):
+    """A footprint that is only the targets, so a core is cut."""
+    chosen = frozenset(targets)
+    return comprehension.Footprint(chosen, chosen, chosen)
+
+
+def _all_alone(depends_on):
+    return {n: comprehension.Footprint(frozenset({n}), frozenset({n}), frozenset({n})) for n in depends_on}
+
+
+def _reversed_sweep(knowledge_, nodes, barriers):
+    return [comprehension.requirement(knowledge_, nodes, b) for b in reversed(list(barriers))]
+
+
+def _nonmonotone_view(game, known, corrigible=True):
+    """Sound, and not monotone: it sees the kernel through an even number of states and nothing through an odd one."""
+    return viability.kernel(game, corrigible=corrigible) & frozenset(known) if len(known) % 2 == 0 else frozenset()
+
+
+def _constant_zero_box():
+    return {(x, y): {(0, 0): Fraction(1)} for x in (0, 1) for y in (0, 1)}
 
 
 # (decision, object to break, attribute, what to put there, text the witness must contain)
@@ -136,6 +197,51 @@ CLAUSES = [
      "an open item now mentions optimization"),
     ("D23", family, "open_tally",  # most items now touch a topic
      lambda data=None: {**_tally, "untouched": 10}, "mention none of the six topics"),
+    ("D24", deals, "admissible", lambda value: False, "the greatest corrigible law is not a coherent opening"),
+    ("D24", deals, "at_least", lambda a, b: False, "beats the greatest corrigible law somewhere"),
+    ("D24", deals, "efficient", lambda items: [], "the three doors are not three coherent and mutually incomparable"),
+    ("D24", deals, "price_invisible", lambda points: [], "the balanced door is not the one option no price will choose"),
+    ("D24", deals, "select_by_price", lambda points, weights: [2], "a price chose the balanced door"),
+    ("D24", deals, "supporting_weights", lambda points, i: None, "a supporting price and a dominating blend both exist or neither"),
+    ("D24", deals, "supporting_weights",  # a price that rates nothing
+     lambda points, i: [Fraction(0)] * len(points[i]), "the supporting price does not rate it highest"),
+    ("D24", deals, "dominating_combination",  # a blend that is the option itself
+     lambda points, i: [Fraction(int(j == i)) for j in range(len(points))], "the blend does not strictly dominate it"),
+    ("D24", deals, "admissible", lambda value: True, "rooms is a coherent opening"),
+    ("D24", deals, "priced", lambda point, weights: 0, "the trap first outscores the safe opening at"),
+    ("D24", deals, "price_invisible", lambda points: [0], "an option hidden from every price is not one of at least three"),
+    ("D24", deals, "win_win", lambda *a, **k: False, "the joint opening of the two hamlets is not a win for both"),
+    ("D24", deals, "admissible", lambda value: True, "opening alone"),
+    ("D25", viability, "kernel_within", lambda game, known, corrigible=True: frozenset(game.states), "outside the kernel"),
+    ("D25", viability, "maintains", lambda game, held, corrigible=True: False,
+     "not the union of the sets it holds that support themselves"),
+    ("D25", viability, "kernel_within", lambda game, known, corrigible=True: frozenset(),
+     "closed under its own moves does not certify exactly"),
+    ("D25", viability, "kernel_within", _nonmonotone_view, "certified less than knowing"),
+    ("D25", knowledge, "pooled", lambda game, held, parties=None, corrigible=True: frozenset(), "certified less than the parts"),
+    ("D25", knowledge, "surplus", _gains_everywhere, "territories with no crossing gained from pooling"),
+    ("D25", knowledge, "certified", _hamlets_alone, "the two hamlets do not need each other"),
+    ("D25", knowledge, "surplus", _gains_everywhere, "the refuge is not a one-sided gift"),
+    ("D26", comprehension, "cover_number", _unrelated_cover, "a footprint nobody understands is said to have a cover"),
+    ("D26", comprehension, "cover_number", lambda knowledge_, nodes, pool=None: 99,
+     "the cover number is not the size of the smallest group"),
+    ("D26", comprehension, "robust_quorum", lambda knowledge_, nodes, pool=None: 1,
+     "the robust quorum is not the attendance at which whoever comes understands"),
+    ("D26", comprehension, "necessary_voices", lambda knowledge_, nodes, pool=None: frozenset(),
+     "are not the sole witnesses"),
+    ("D26", comprehension, "sweep", _reversed_sweep, "grew the pool, lowered the cover or made an unmakeable decision makeable"),
+    ("D26", comprehension, "footprint", _flat_footprint, "holds part of the core"),
+    ("D26", surprisal, "council_bits", lambda m, q, x: 1.0, "a body with more seats is not dearer to capture"),
+    ("D26", comprehension, "loads", _all_alone, "the family's footprints in the formal view are not as recorded"),
+    ("D27", entangled, "classical_value", lambda game: Fraction(1), "the classical value of"),
+    ("D27", entangled, "table_value", lambda game, given: Fraction(1, 2), "the entangled strategy wins"),
+    ("D27", entangled, "ghz_strategy", lambda alpha=1, beta=1: _real_ghz(1, 1), "the GHZ-type state"),
+    ("D27", entangled, "product_state", lambda parts: _real_ghz(1, 1).state, "a product state beat the classical value of GHZ"),
+    ("D27", entangled, "quantum_value", lambda game, strategy: Fraction(1), "exceeded Tsirelson's bound"),
+    ("D27", entangled, "is_no_signalling", lambda game, given: False, "output distribution depends on another's input"),
+    ("D27", entangled, "pr_box", _constant_zero_box, "the PR box is not a no-signalling table"),
+    ("D27", entangled, "collapse", lambda state, observables, outcomes: state, "after the measurements the state still wins GHZ"),
+    ("D27", entangled, "magic_square_ledgers", lambda: 3, "classical ledgers of nine signs satisfy every row and column"),
 ]
 
 _results: dict[object, tuple[Status, tuple[str, ...]]] = {}

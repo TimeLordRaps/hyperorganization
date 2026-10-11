@@ -1,6 +1,6 @@
 # hyperoptimization
 
-Optimization as a self-closing process: existence, freedom, corrigibility and renewal, without money.
+Optimization as a self-closing process: existence, freedom, corrigibility and renewal, and the exchange of freedom among parties who see only parts of the world, without money.
 
 **Status, 2026-10-11.** `0.1.0.dev0`. Standard library only, Python 3.10 or later. Every result carries one of the family's tags: `[FORM]` checked exactly, `[FRAME]` holds in stated assumptions, `[HYPER]` a proposal nothing here witnesses, `[OPEN]` unresolved. Nothing here shows that reality adheres to any of it.
 
@@ -8,7 +8,7 @@ Optimization as a self-closing process: existence, freedom, corrigibility and re
 
 A toolkit of small finite models for one question: when does a system that wants to persist, is free to act, can be corrected and can renew itself end up under a *single optimal law*, and what does that law look like from the inside?
 
-The starting point is Tyler Roost's, quoted in full in [PROVENANCE.md](PROVENANCE.md). Short form: the optimality is "the self-limiting lawful structure that itself is law bound by the optimality"; it "may converge from many simulated law structures"; and there should be "no monetary construction". The answer this package gives, in one paragraph, is in [DESIGN.md](DESIGN.md) §2; the numbered results with their proofs or oracles are §3 to §9.
+The starting point is Tyler Roost's, quoted in full in [PROVENANCE.md](PROVENANCE.md), in four messages: the first three ask for the optimal law and what falls out of free will, existence, corrigibility and renewal ([L0_viability.hm](L0_viability.hm)); the fourth asks how deals are made once there is no money, with information asymmetric between the parties ([L1_exchange.hm](L1_exchange.hm), [DESIGN.md](DESIGN.md) §14). Short form: the optimality is "the self-limiting lawful structure that itself is law bound by the optimality"; it "may converge from many simulated law structures"; and there should be "no monetary construction". The answer this package gives, in one paragraph, is in [DESIGN.md](DESIGN.md) §2; the numbered results with their proofs or oracles are §3 to §9.
 
 ## Run it
 
@@ -18,6 +18,11 @@ The starting point is Tyler Roost's, quoted in full in [PROVENANCE.md](PROVENANC
     python -m pytest                          # verbose, per-test timeout, slowest ten listed
 
 The tests are run verbose with a 60 second per-test timeout (`pyproject.toml`), because a quiet suite hides which test is slow or stuck.
+
+    pip install -e ".[dev]"                   # adds sympy (the quantum reference oracle), ruff and build
+    python scripts/differential_oracles.py    # the package against three independent reference implementations
+
+The three reference implementations in `scripts/oracle_*.py` (footprint and quorum, exact quantum values, the price test) were written by subagents from a written specification, without sight of this package, and each stage is killed at a deadline and reported as unknown if it does not finish. Agreement shows that implementation slips of the kinds sampled are caught. It does not show the definitions are right, because both were written from the same text (`TECHNICAL_DEBT.md`, HO-024). One earlier reference, built on sympy's simplex, was dropped because it hangs for some hash seeds and returned points that violate its own constraints (HO-025; `scripts/probe_sympy_lpmax.py` reproduces it).
 
 ## What is in it
 
@@ -35,7 +40,7 @@ The tests are run verbose with a 60 second per-test timeout (`pyproject.toml`), 
 | `entrenchment` | protection as the weakest link; authority height; cycles; the phase of a dependency graph with many governors, and its cores | independent shortest-path search; every governance graph on up to five rules; the longest walk on every digraph on up to four nodes |
 | `family` | the family's recorded citations, dependencies and imports read as reliance, with the phase of each repository under five views; a second record from hyperstratum's live scan; the declared open items and what they are about, by wording | two recorded snapshots of hyperstratum; definitions that share no code with `entrenchment`; a keyword table fixed before the items were read |
 | `ordinal` | Cantor normal form below ε₀; Goodstein sequences with an ordinal for every term | an independent valuation; hand-worked terms |
-| `decisions` | 23 decisions: choice, what was not chosen, what a witness should see, what would refute it, and an executable check for 20 of them | each check, and each of its failure clauses, is broken on purpose in the tests and must then fail |
+| `decisions` | 30 decisions: choice, what was not chosen, what a witness should see, what would refute it, and an executable check for 24 of them | each check, and each of its failure clauses, is broken on purpose in the tests and must then fail |
 | `report` | one page of computed numbers and the open obligations | numbers pinned by value |
 
 ## How to read a result
@@ -46,6 +51,15 @@ The tests are run verbose with a 60 second per-test timeout (`pyproject.toml`), 
 
 A price is the surprisal of a compromise, `bits(p) = -log2 p`. Probabilities of independent events multiply and bits add, so hyperethics' cover search is unchanged: the cheapest cover of a gate is its most probable way in, and the probability of taking the gate lies between `2^-cost` and `N * 2^-cost` for `N` minimal covers. A stake is how many independent attempts a prize attracts, in `log2`. Where compromises are not independent, `additivity_gap` says by how many bits the price is overstated.
 
+## Exchange without money
+
+A price turns a deal into one number. Four small models say what replaces it, each exact on the cases it enumerates.
+
+* **What is exchanged is a certificate** (`knowledge`). What a party cannot see it must treat as unsafe, so what it can certify as permitted is a part of the greatest law, and it grows as the party learns. Pooling the views of parties that each hold a territory certifies more than the parts only where the territories touch (and not everywhere they touch): two hamlets that each shelter in the other in a storm cannot certify their own safe moves alone and can together. A certificate is a set of situations that supports itself, which anyone can check; a number cannot be checked for safety.
+* **Understanding gates deciding** (`comprehension`). The footprint of a decision is what it rests on together with what rests on it, to any depth. The decision is makeable only if the people deciding between them understand it; the required quorum is the larger of a majority of the pool and the attendance at which whoever comes understands everything; the barrier to entry is a share of the footprint, and a smaller body is cheaper to capture, so the barrier is paid for in bits of capture resistance.
+* **A deal is a vector** (`deals`): the freedom it allows, the freedom that enables, and four dimensions along which it coheres with lawful existence. Within lawful existence, given non-rival permissions, nothing competes (the greatest corrigible law is best in every coordinate), a price is blind to the balanced deal where options do compete, and no finite price on lawfulness outweighs a large enough lawless opening: coherence is a constraint, not a currency.
+* **Entangled decisions** (`entangled`). In games where everyone wins or loses together and no one can talk, a shared entangled state beats every classical strategy by exact amounts (three parties, the GHZ game after Greenberger, Horne and Zeilinger: 3/4 to 1; two parties, the Mermin–Peres magic square: 8/9 to 1; two parties, the CHSH game after Clauser, Horne, Shimony and Holt, in which each receives a bit and they win when the XOR of the bits they give equals the AND of the bits they received: 3/4 to 577/676), for a GHZ-type state with the standard measurements its value is a formula in its degree of entanglement (1/2 + (sin 2t)/2), it carries no message, and one use consumes it.
+
 ## What it does not show
 
 Written down in [DESIGN.md](DESIGN.md) §11 and, one by one with what would resolve each, in [DECISIONS.md](DECISIONS.md). The ones that matter most:
@@ -53,6 +67,8 @@ Written down in [DESIGN.md](DESIGN.md) §11 and, one by one with what would reso
 * A viability kernel is persistence, not goodness. The greatest law permits some stable arrangements a participant would call tyranny. Why the law that preserves existence should be called optimal is the family's open GC-5.
 * The loop thresholds are mean-field. Positive association between compromises makes them upper bounds when the quorum is above the mean; how large the correction is on a real graph is not computed.
 * That physical reality adheres to such a structure is a proposal, with a stated form of refuter, and no witness.
+* Win-win holds here by construction: the permissions are not rival and a gain is a permission nobody could certify before. With rival freedoms it would be expected to fail for some deals, none of which is modelled, and an exchange without money would be needed; top trading cycles is the standard answer and is not built (D30).
+* Understanding is a set handed in; nothing measures it, and whoever certifies understanding holds the gate (D29). That institutional decisions can be entangled in the physical sense is a proposal with no witness (D28).
 * That this closes the family's open items is untested, and the first passes do not support it. Of 122 declared open items (116 lines tagged `[OPEN]` and 6 `.hm` declarations, in 11 of 24 pinned fields) none is about optimization or viability by wording, four are touched by hand and none is closed; the ordinal phase of each repository is computed in two independent records of the family (a core of mutual reliance, hyperethics with hyperphysics and metamathethicology, survives both). The map from open items to the repositories that would close them is not built.
 
 ## Family
@@ -64,4 +80,4 @@ Written down in [DESIGN.md](DESIGN.md) §11 and, one by one with what would reso
 
 ## Files
 
-[DESIGN.md](DESIGN.md) the theory and the spec map · [DECISIONS.md](DECISIONS.md) the ledger (generated) · [VALIDATION.md](VALIDATION.md) the receipt · [PROVENANCE.md](PROVENANCE.md) what was said and by whom · [L0_viability.hm](L0_viability.hm) the spec in the family's language · [TECHNICAL_DEBT.md](TECHNICAL_DEBT.md) the register · [LICENSE](LICENSE) Apache-2.0.
+[DESIGN.md](DESIGN.md) the theory and the spec map · [DECISIONS.md](DECISIONS.md) the ledger (generated) · [VALIDATION.md](VALIDATION.md) the receipt · [PROVENANCE.md](PROVENANCE.md) what was said and by whom · [L0_viability.hm](L0_viability.hm) and [L1_exchange.hm](L1_exchange.hm) the specs in the family's language · [TECHNICAL_DEBT.md](TECHNICAL_DEBT.md) the register · [LICENSE](LICENSE) Apache-2.0.

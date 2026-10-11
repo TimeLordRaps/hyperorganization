@@ -32,7 +32,20 @@ from dataclasses import dataclass
 from fractions import Fraction
 from importlib import resources
 
-from . import entrenchment, family, loop, ordinal, quorum, renewal, surprisal, viability
+from . import (
+    comprehension,
+    deals,
+    entangled,
+    entrenchment,
+    family,
+    knowledge,
+    loop,
+    ordinal,
+    quorum,
+    renewal,
+    surprisal,
+    viability,
+)
 from .ground import OMEGA, Status, Tag, Verdict, rank_key
 
 Check = Callable[[], Verdict]
@@ -774,6 +787,388 @@ def _d23() -> Verdict:
                         "'optimistic' is not read as optimization"])
 
 
+def _territorial(rng: random.Random, leak: float) -> tuple[viability.Game, dict[str, str]]:
+    """Six states, three to each of two parties; every move stays in its own territory except that, with
+    probability `leak`, its outcome is any state at all."""
+    states = [f"s{i}" for i in range(6)]
+    owner = {s: "AB"[i // 3] for i, s in enumerate(states)}
+    own = {p: [s for s in states if owner[s] == p] for p in "AB"}
+    step = {(s, a, b): rng.choice(states) if rng.random() < leak else rng.choice(own[owner[s]])
+            for s in states for a in ("x", "y") for b in ("n0", "n1")}
+    safe = [s for s in states if rng.random() < 0.8] or states[:1]
+    return viability.Game(states, ("x", "y"), ("n0", "n1"), step, safe=safe), owner
+
+
+def _hamlets() -> viability.Game:
+    return viability.Game.from_table(nature=("calm", "storm"),
+                                     table={"a": {"hold": ("a", "b")}, "b": {"hold": ("b", "a")}})
+
+
+def _d24() -> Verdict:
+    problems: list[str] = []
+    games = admissible = varied = 0
+    for seed in range(40):
+        rng = random.Random(13000 + seed)
+        game = viability.random_game(rng, n=3, na=2, home=True)
+        greatest = viability.greatest_law(game, corrigible=True)
+        if not greatest:
+            continue
+        start = [sorted(greatest)[0]]
+        before = {s: frozenset(a for a in sorted(game.allowed(s)) if rng.random() < 0.3) & greatest.get(s, frozenset())
+                  for s in game.states}
+        best = deals.opening_value(game, before, greatest, start)
+        if not deals.admissible(best):
+            problems.append(f"seed {seed}: the greatest corrigible law is not a coherent opening")
+        values = [v for v in (deals.opening_value(game, before, after, start) for after in viability.all_laws(game))
+                  if deals.admissible(v)]
+        beaten = [v for v in values if not deals.at_least(best, v)]
+        if beaten:
+            problems.append(f"seed {seed}: a coherent opening beats the greatest corrigible law somewhere: {beaten[0]}")
+        games += 1
+        admissible += len(values)
+        varied += len(set(values)) > 1
+
+    game, base, menu, grouping = deals.three_doors()
+    values = [deals.opening_value(game, base, after, ["hub"], dimension=grouping) for after in menu]
+    dims = deals.dimensions(*values)
+    vectors = [deals.vector(v, dims) for v in values]
+    expected = [(11, 0, 10, 10, 1, 1, 1, 1), (0, 11, 10, 10, 1, 1, 1, 1), (5, 4, 4, 8, 1, 1, 1, 1)]
+    if vectors != expected or deals.efficient(vectors) != [0, 1, 2]:
+        problems.append(f"the three doors are not three coherent and mutually incomparable options: {vectors}")
+    hidden = deals.price_invisible(vectors)
+    if hidden != [2]:
+        problems.append(f"the balanced door is not the one option no price will choose: {hidden}")
+    chosen = [(wx, wy) for wx in range(1, 20) for wy in range(1, 20)
+              if 2 in deals.select_by_price(vectors, (wx, wy) + (1,) * 6)]
+    if chosen:
+        problems.append(f"a price chose the balanced door: {chosen[0]}")
+
+    cases = beaten_efficient = 0
+    for seed in range(20):
+        rng = random.Random(17000 + seed)
+        for width in (2, 3):
+            points = list(dict.fromkeys(tuple(rng.randint(0, 6) for _ in range(width))
+                                        for _ in range(rng.randint(2, 6))))
+            front = deals.efficient(points)
+            for i, point in enumerate(points):
+                weights = deals.supporting_weights(points, i)
+                blend = deals.dominating_combination(points, i)
+                cases += 1
+                if (weights is None) == (blend is None):
+                    problems.append(f"{points} option {i}: a supporting price and a dominating blend both exist or neither does")
+                elif weights is not None:
+                    top = sum(w * x for w, x in zip(weights, point))
+                    if any(w <= 0 for w in weights) or any(sum(w * x for w, x in zip(weights, q)) > top for q in points):
+                        problems.append(f"{points} option {i}: the supporting price does not rate it highest")
+                else:
+                    mixed = [sum(w * q[k] for w, q in zip(blend, points)) for k in range(width)]
+                    if sum(blend) != 1 or any(w < 0 for w in blend) or any(m < x for m, x in zip(mixed, point)) \
+                            or mixed == list(point):
+                        problems.append(f"{points} option {i}: the blend does not strictly dominate it")
+                    beaten_efficient += i in front
+
+    sizes = []
+    for price in (1, 5, 40):
+        smallest = None
+        for rooms in range(1, 30):
+            trap_game = deals.trap_game(rooms)
+            trap = deals.opening_value(trap_game, {"hub": {"stay"}}, deals.trap_opening(rooms), ["hub"])
+            safe = deals.opening_value(trap_game, {"hub": {"stay"}}, {"hub": {"stay", "pause"}}, ["hub"])
+            if deals.admissible(trap):
+                problems.append(f"the trap of {rooms} rooms is a coherent opening")
+            dimensions = deals.dimensions(trap, safe)
+            weights = (1,) * len(dimensions) + (1, 1) + (price,) * 4
+            if smallest is None and deals.priced(deals.vector(trap, dimensions), weights) \
+                    > deals.priced(deals.vector(safe, dimensions), weights):
+                smallest = rooms
+        if smallest != (3 * price - 1) // 7 + 1:
+            problems.append(f"with {price} on each coherence dimension the trap first outscores the safe opening at "
+                            f"{smallest} rooms, not {(3 * price - 1) // 7 + 1}")
+        sizes.append(smallest)
+
+    menus = multiple = unseen = 0
+    for seed in range(80):
+        rng = random.Random(18000 + seed)
+        random_world = viability.random_game(rng, n=5, na=3, home=False)
+        people = {f"p{i}": frozenset(s for s in random_world.states if rng.random() < 0.5) for i in range(5)}
+        options = []
+        for size in (1, 2):
+            for group in itertools.combinations(sorted(people), size):
+                law = viability.greatest_law_within(random_world, frozenset().union(*(people[p] for p in group)),
+                                                    corrigible=False)
+                options.append(tuple(sum(1 for permitted in law.values() if a in permitted)
+                                     for a in random_world.actions))
+        points = list(dict.fromkeys(options))
+        if len(points) < 3:
+            continue
+        menus += 1
+        front = deals.efficient(points)
+        lost = deals.price_invisible(points)
+        multiple += len(front) > 1
+        unseen += bool(lost)
+        if lost and (len(front) < 3 or not set(lost) <= set(front)):
+            problems.append(f"seed {seed}: an option hidden from every price is not one of at least three efficient options")
+
+    hamlets, owner = _hamlets(), {"a": "A", "b": "B"}
+    if not deals.win_win(hamlets, {}, {"a": {"hold"}, "b": {"hold"}}, ["a", "b"], owner):
+        problems.append("the joint opening of the two hamlets is not a win for both")
+    for single in ({"a": {"hold"}}, {"b": {"hold"}}):
+        if deals.admissible(deals.opening_value(hamlets, {}, single, ["a", "b"])):
+            problems.append(f"one hamlet opening alone ({sorted(single)}) is coherent")
+    return _verdict("a deal is a vector of freedoms; within lawful existence nothing competes, and where options "
+                    "do compete a price is blind to the balanced one", problems, [
+                        f"{games} random games with a corrigible kernel, every law of each: {admissible} coherent "
+                        f"openings, none better than the greatest corrigible law in any coordinate, and in {varied} "
+                        "games they differ from one another, so there is a lattice to be best in",
+                        f"three doors (x: {vectors[0][0]}, y: {vectors[1][1]}, balanced: {vectors[2][0]} and "
+                        f"{vectors[2][1]}) are all coherent and incomparable; the balanced one is below the half-and-half "
+                        "blend of the other two, so no strictly positive price chooses it",
+                        f"{cases} options in random point sets: each has a supporting price or a dominating blend, "
+                        f"never both (exact linear programs, certificates checked); {beaten_efficient} of them were "
+                        "efficient and still strictly beaten by a blend",
+                        f"a trap whose size scales freely: at {', '.join(map(str, (1, 5, 40)))} on each coherence "
+                        f"dimension it first outscores a safe opening at {', '.join(map(str, sizes))} rooms (3p-1)//7+1",
+                        f"base rate: among {menus} random menus of what coalitions of one or two people can certify, "
+                        f"{multiple} offer more than one efficient option and {unseen} hide one from every price",
+                        "the two hamlets: neither can open its own move alone, together both gain"])
+
+
+def _d25() -> Verdict:
+    problems: list[str] = []
+    views = pairs = closed = strict = parts = 0
+    for corrigible in (False, True):
+        for seed in range(12):
+            game = viability.random_game(random.Random(31000 + seed), n=4, home=True)
+            kernel = viability.kernel(game, corrigible=corrigible)
+            everything = list(_subsets(game.states))
+            inside = {known: viability.kernel_within(game, known, corrigible=corrigible) for known in everything}
+            for known in everything:
+                views += 1
+                if not inside[known] <= kernel:
+                    problems.append(f"seed {seed}: a view of {sorted(known)} certifies {sorted(inside[known] - kernel)}, "
+                                    "outside the kernel")
+                supporting = frozenset().union(*(y for y in _subsets(known)
+                                                  if viability.maintains(game, y, corrigible=corrigible)))
+                if inside[known] != supporting:
+                    problems.append(f"seed {seed}: a view of {sorted(known)} certifies {sorted(inside[known])}, not the "
+                                    f"union of the sets it holds that support themselves, {sorted(supporting)}")
+                if all(game.target(s, a, b) in known for s in known for a in game.allowed(s) for b in game.nature):
+                    closed += 1
+                    if inside[known] != kernel & known:
+                        problems.append(f"seed {seed}: a view of {sorted(known)} closed under its own moves does not "
+                                        "certify exactly what is in the kernel")
+            for small, large in itertools.product(everything, repeat=2):
+                if small <= large:
+                    pairs += 1
+                    if not inside[small] <= inside[large]:
+                        problems.append(f"seed {seed}: knowing {sorted(large)} certified less than knowing {sorted(small)}")
+            for left in everything:
+                for right in everything:
+                    if left & right:
+                        continue
+                    both = knowledge.pooled(game, {"x": left, "y": right}, corrigible=corrigible)
+                    one = knowledge.certified(game, left, corrigible=corrigible)
+                    other = knowledge.certified(game, right, corrigible=corrigible)
+                    parts += 1
+                    if not one | other <= both:
+                        problems.append(f"seed {seed}: pooling {sorted(left)} with {sorted(right)} certified less than the parts")
+                    strict += one | other != both
+    sealed = leaky = gained = 0
+    for seed in range(20):
+        for leak in (0.0, 1 / 12):
+            world, owner = _territorial(random.Random(seed), leak)
+            territory = {p: {s for s in world.states if owner[s] == p} for p in "AB"}
+            result = knowledge.surplus(world, territory, owner)
+            crossing = bool(knowledge.crossings(world, owner))
+            sealed += not crossing
+            leaky += crossing
+            if any(result.gains.values()):
+                gained += 1
+                if not crossing:
+                    problems.append(f"seed {seed}: territories with no crossing gained from pooling")
+    hamlets, owner = _hamlets(), {"a": "A", "b": "B"}
+    result = knowledge.surplus(hamlets, {"A": {"a"}, "B": {"b"}}, owner)
+    if knowledge.certified(hamlets, {"a"}) or knowledge.certified(hamlets, {"b"}) or not result.mutual \
+            or knowledge.minimal_knowledge(hamlets, ("a", "hold")) != frozenset({"a", "b"}):
+        problems.append("the two hamlets do not need each other: neither should certify its own move alone, "
+                        "together both should")
+    refuge = viability.Game.from_table(nature=("calm", "storm"),
+                                       table={"a": {"hold": ("a", "b")}, "b": {"hold": ("b", "b")}})
+    gift = knowledge.surplus(refuge, {"A": {"a"}, "B": {"b"}}, owner)
+    if gift.mutual or gift.gains["A"] != frozenset({("a", "hold")}) or gift.gains["B"]:
+        problems.append("the refuge is not a one-sided gift: only the hamlet that shelters should gain")
+    return _verdict("what a coalition can certify is what its pooled knowledge supports itself on", problems, [
+        f"{views} views (every subset of {2 * 12} random games on 4 states, with and without corrigibility): "
+        "each certifies only what is in the kernel, exactly the union of the sets it holds that support themselves",
+        f"{closed} views closed under their own moves certify exactly; knowing more never certified less in "
+        f"{pairs} nested pairs",
+        f"{parts} pairs of disjoint views: pooling never certified less than the parts, and certified strictly "
+        f"more in {strict} of them",
+        f"territories: {sealed} sealed (no allowed move crosses) and {leaky} with a crossing; {gained} gained from "
+        "pooling, all with a crossing",
+        "two hamlets that shelter in each other in a storm: alone neither certifies its move, together both do, and "
+        "each needs the other's knowledge; if only one shelters the gain is one-sided"])
+
+
+def _d26() -> Verdict:
+    problems: list[str] = []
+    makeable = instances = 0
+    for seed in range(120):
+        rng = random.Random(3000 + seed)
+        names = [f"e{i}" for i in range(rng.randint(1, 6))]
+        density = rng.choice([0.3, 0.5, 0.7])
+        know = {f"p{i}": [n for n in names if rng.random() < density] for i in range(rng.randint(1, 6))}
+        nodes = rng.sample(names, rng.randint(1, len(names)))
+        people = sorted(know)
+        held = {p: set(know[p]) for p in people}
+        groups = [g for r in range(len(people) + 1) for g in itertools.combinations(people, r)
+                  if set(nodes) <= set().union(set(), *(held[p] for p in g))]
+        instances += 1
+        if not groups:
+            if comprehension.cover_number(know, nodes) is not None or comprehension.robust_quorum(know, nodes) is not None:
+                problems.append(f"seed {seed}: a footprint nobody understands is said to have a cover or a quorum")
+            continue
+        makeable += 1
+        smallest = min(len(g) for g in groups)
+        if comprehension.cover_number(know, nodes) != smallest:
+            problems.append(f"seed {seed}: the cover number is not the size of the smallest group that understands "
+                            f"the footprint ({smallest})")
+        everyone_at = {q: all(set(nodes) <= set().union(set(), *(held[p] for p in g))
+                              for g in itertools.combinations(people, q)) for q in range(len(people) + 1)}
+        threshold = min(q for q, ok in everyone_at.items() if ok)
+        if comprehension.robust_quorum(know, nodes) != threshold or not all(everyone_at[q] for q in range(threshold, len(people) + 1)):
+            problems.append(f"seed {seed}: the robust quorum is not the attendance at which whoever comes understands "
+                            f"the footprint ({threshold})")
+        if comprehension.necessary_voices(know, nodes) != frozenset(set.intersection(*(set(g) for g in groups))):
+            problems.append(f"seed {seed}: the people no decision can be made without are not the sole witnesses")
+    steps = [Fraction(k, 6) for k in range(7)]
+    flips = 0
+    for seed in range(60):
+        rng = random.Random(7000 + seed)
+        names = [f"e{i}" for i in range(rng.randint(2, 6))]
+        know = {f"p{i}": [n for n in names if rng.random() < 0.5] for i in range(rng.randint(2, 6))}
+        nodes = rng.sample(names, rng.randint(2, len(names)))
+        rows = comprehension.sweep(know, nodes, steps)
+        for lower, higher in zip(rows, rows[1:]):
+            flips += lower.makeable and not higher.makeable
+            if not set(higher.pool) <= set(lower.pool) or (not lower.makeable and higher.makeable) \
+                    or (lower.cover is not None and higher.cover is not None and higher.cover < lower.cover):
+                problems.append(f"seed {seed}: raising the barrier from {lower.barrier} to {higher.barrier} grew the "
+                                "pool, lowered the cover or made an unmakeable decision makeable")
+    touching = 0
+    for seed in range(80):
+        rng = random.Random(2000 + seed)
+        names = [f"n{i}" for i in range(rng.randint(3, 7))]
+        graph = {n: [m for m in names if m != n and rng.random() < 0.25] for n in names}
+        for target in graph:
+            nodes = comprehension.footprint(graph, [target]).nodes
+            for group in entrenchment.cores(graph):
+                if set(group) & nodes:
+                    touching += 1
+                    if not set(group) <= nodes:
+                        problems.append(f"seed {seed}: the footprint of {target} holds part of the core {group} and not all")
+    for x in (Fraction(1, 10), Fraction(1, 4), Fraction(2, 5)):
+        prices = [surprisal.council_bits(m, (m + 1) // 2, x) for m in range(1, 22, 2)]
+        if not all(a < b for a, b in zip(prices, prices[1:])):
+            problems.append(f"at x = {x} a body with more seats is not dearer to capture")
+    loads = comprehension.loads(family.depends_on("formal"))
+    core = {"hyperethics", "hyperphysics", "metamathethicology"}
+    sizes = sorted(len(fp.nodes) for fp in loads.values())
+    if sizes[0] != 1 or sizes[-1] != 8 or any(not core <= loads[n].nodes or len(loads[n].nodes) != 8 for n in core):
+        problems.append(f"the family's footprints in the formal view are not as recorded: sizes {sizes}")
+    return _verdict("a decision is makeable only if its footprint is understood, which sets the quorum and the "
+                    "barrier, and the barrier is paid for in capture resistance", problems, [
+                        f"{instances} random instances ({makeable} makeable): the cover number, the robust quorum "
+                        "(m - w + 1 for bus factor w) and the people no decision can be made without (the sole "
+                        "witnesses) agree with brute force over every group of people",
+                        f"60 random instances over 7 rising barriers: the pool never grew, the cover never fell, "
+                        f"an unmakeable decision never became makeable; {flips} decisions became unmakeable as the barrier rose",
+                        f"{touching} footprints that touch a core hold it whole, on 80 random graphs",
+                        "Condorcet in bits, exact: for seat probability 1/10, 1/4 and 2/5 each pair of seats added to a "
+                        "majority body (1 to 21 seats) makes it strictly dearer to capture, so every seat the barrier "
+                        "removes costs capture resistance",
+                        f"the family's repositories under the formal view: footprints of {sizes[0]} to {sizes[-1]} "
+                        f"repositories, hyperethics, hyperphysics and metamathethicology 8 each (their core, the four "
+                        "repositories it rests on and hyperlogic, which rests on it), i.e. changing any of them asks 8 "
+                        "repositories' worth of understanding"])
+
+
+def _d27() -> Verdict:
+    problems: list[str] = []
+    ghz, magic, chsh = entangled.ghz_game(), entangled.magic_square_game(), entangled.chsh_game()
+    rational = entangled.chsh_strategy((1, 0), (0, 1), (Fraction(119, 169), Fraction(120, 169)),
+                                       (Fraction(119, 169), Fraction(-120, 169)))
+    witnesses = [(ghz, entangled.ghz_strategy(1, 1), Fraction(3, 4), Fraction(1)),
+                 (magic, entangled.magic_square_strategy(), Fraction(8, 9), Fraction(1)),
+                 (chsh, rational, Fraction(3, 4), Fraction(577, 676))]
+    tables = {}
+    for game, strategy, classical, quantum in witnesses:
+        found = entangled.classical_value(game)
+        if found != classical:
+            problems.append(f"the classical value of {game.name} is {found}, not {classical}")
+        tables[game.name] = entangled.table(game, strategy)
+        got = entangled.table_value(game, tables[game.name])
+        if got != quantum or got <= found:
+            problems.append(f"the entangled strategy wins {game.name} with {got}, not {quantum}, or does not beat {found}")
+    for a, b in [(1, 1), (3, 4), (5, 12), (1, 0), (1, 2), (4, 3)]:
+        degree = Fraction(2 * a * b, a * a + b * b)
+        value = entangled.quantum_value(ghz, entangled.ghz_strategy(a, b))
+        if value != Fraction(1, 2) + degree / 2 or (value > Fraction(3, 4)) != (degree > Fraction(1, 2)):
+            problems.append(f"the GHZ-type state ({a}, {b}) is worth {value}, not 1/2 + (degree {degree})/2, or its "
+                            "advantage does not begin at degree 1/2")
+    rng = random.Random(4)
+    product_best = Fraction(0)
+    for _ in range(8):
+        parts = [(entangled.Gauss(rng.randint(-3, 3), rng.randint(-3, 3)), entangled.Gauss(rng.randint(-3, 3), 1))
+                 for _ in range(3)]
+        base = entangled.ghz_strategy(1, 1)
+        value = entangled.quantum_value(ghz, entangled.Strategy(entangled.product_state(parts), base.measure, base.decode))
+        product_best = max(product_best, value)
+        if value > Fraction(3, 4):
+            problems.append(f"a product state beat the classical value of GHZ with {value}")
+    tsirelson = 0
+    for _ in range(10):
+        angles = []
+        for _k in range(4):
+            t = Fraction(rng.randint(-9, 9), rng.randint(1, 9))
+            angles.append(((1 - t * t) / (1 + t * t), 2 * t / (1 + t * t)))
+        value = entangled.quantum_value(chsh, entangled.chsh_strategy(*angles))
+        tsirelson += (8 * value - 4) ** 2 <= 8
+        if (8 * value - 4) ** 2 > 8:
+            problems.append(f"a sampled CHSH strategy exceeded Tsirelson's bound: S = {8 * value - 4}")
+    for game, _strategy, _classical, _quantum in witnesses:
+        if not entangled.is_no_signalling(game, tables[game.name]):
+            problems.append(f"in {game.name} one party's output distribution depends on another's input")
+    box = entangled.pr_box()
+    if not entangled.is_no_signalling(chsh, box) or entangled.table_value(chsh, box) != 1 \
+            or entangled.table_value(chsh, box) <= Fraction(577, 676):
+        problems.append("the PR box is not a no-signalling table that wins CHSH beyond every quantum strategy found")
+    ghz_strategy = entangled.ghz_strategy(1, 1)
+    after = entangled.collapse(ghz_strategy.state, [entangled.pauli("XII"), entangled.pauli("IXI"), entangled.pauli("IIX")],
+                               (1, 1, 1))
+    spent = entangled.quantum_value(ghz, entangled.Strategy(after, ghz_strategy.measure, ghz_strategy.decode))
+    if spent > Fraction(3, 4):
+        problems.append(f"after the measurements the state still wins GHZ with {spent}, above the classical value")
+    ledgers = entangled.magic_square_ledgers()
+    if ledgers:
+        problems.append(f"{ledgers} classical ledgers of nine signs satisfy every row and column")
+    return _verdict("entangled strategies beat classical ones in common-interest games, move no information, and "
+                    "are consumed by use", problems, [
+                        "GHZ (three parties): classical 3/4 by enumerating every deterministic strategy, entangled 1",
+                        "magic square (two parties): classical 8/9, entangled 1; none of the 512 classical ledgers of "
+                        "nine signs satisfies every row and column",
+                        "CHSH (two parties): classical 3/4, rational angles on a Bell pair 577/676 (the best quantum "
+                        "value (2+sqrt 2)/4 is irrational and recalled, not proved)",
+                        "a GHZ-type state cos t|000> + sin t|111> is worth exactly 1/2 + (sin 2t)/2: it beats 3/4 only "
+                        "beyond sin 2t = 1/2",
+                        f"a product state never beat the classical value (best of 8: {product_best}); {tsirelson} of 10 "
+                        "random CHSH strategies kept S squared within 8 (Tsirelson's bound, exact)",
+                        "no party's output distribution depends on another's input in any of the three strategies; a "
+                        f"PR box is no-signalling and wins CHSH with 1, beyond every quantum strategy; after one use the "
+                        f"GHZ state is worth {spent} in the GHZ game, below the classical 3/4"])
+
+
+
 # ---------------------------------------------------------------------------
 # The ledger.
 # ---------------------------------------------------------------------------
@@ -1260,6 +1655,213 @@ LEDGER: tuple[Decision, ...] = (
         "family.open_items, open_tally, TOPICS; data/golden_family_live.json; "
         "scripts/regenerate_golden_live.py; tests/test_family.py",
         _d23),
+    Decision(
+        "D24", "A deal is a vector of freedoms, not a price: within lawful existence nothing competes, and "
+        "where options do compete a price is blind to the balanced one", Tag.FRAME,
+        "Value an opening of the law (a law that permits more than the one before) by three kinds of "
+        "coordinate and no scalar: the freedom it allows, counted along each dimension of freedom (by "
+        "default the action); the freedom that freedom enables, which is the states it makes reachable "
+        "and the permissions the law grants there; and four yes-or-no dimensions of coherence with "
+        "lawful existence: the system survives for ever (exists), stays where an overseer can bring it "
+        "home (corrigible), permits nothing anywhere that the greatest corrigible law forbids (lawful), "
+        "and takes no permission from anyone (monotone). Compare by Pareto dominance, which is partial. "
+        "Treat coherence as a constraint, admitted only if every dimension holds, never as a weight.",
+        ("A scalar price: rejected twice over. A linear price never chooses an efficient option that "
+         "lies strictly inside the blend of others, and any finite price on lawfulness is outbid by a "
+         "large enough lawless opening.",
+         "A welfare for each participant: rejected, as in D16. Nothing here ranks outcomes for people, "
+         "and Arrow-type results would apply the moment it did.",
+         "A lexicographic order with coherence first: kept, as the admission rule. It is not a scalar "
+         "and it loses nothing the vector knew.",
+         "Count permissions only, in one dimension: rejected, because it cannot say that one opening "
+         "leads on to others."),
+        "Among coherent openings the greatest corrigible law is best in every coordinate at once, in "
+        "every sampled game with every law enumerated, so within lawful existence there is nothing to "
+        "price (the deal-language form of D05). A door opened onto a room that permits nothing is not "
+        "coherent, so an opening is closed under what it enables. Where options do compete, as in a menu of three "
+        "doors (all x, all y, a balanced mix), the balanced one is efficient and no strictly positive "
+        "price chooses it; and for every option in random point sets exactly one of a supporting price "
+        "and a dominating blend exists, each checkable without trusting the solver. For a price p on "
+        "each coherence dimension a trap of (3p-1)//7+1 rooms outscores the safe opening, for every p "
+        "tried. Competing options are rare among random menus (the check records the count).",
+        "A game in which a coherent opening is not dominated by the greatest corrigible law; or a menu "
+        "in which an option the exact test calls price-invisible is chosen by some strictly positive "
+        "price; or an option for which a supporting price and a dominating blend both exist, or neither "
+        "does; or a trap in which the lawless opening does not eventually outscore.",
+        "For a real body: deals priced in one currency should systematically omit the balanced options, "
+        "and parties who can add lawlessness to a deal should be able to buy it. The base rate here is "
+        "that competing options are rare, so the claim is about where scarcity enters and not about how "
+        "often. Needs data; none is held here.",
+        "deals.py; tests/test_deals.py",
+        _d24),
+    Decision(
+        "D25", "What a coalition can certify is what its pooled knowledge supports itself on, and "
+        "across a border asymmetry makes a deal necessary", Tag.FORM,
+        "Model a participant's view as the game with everything it cannot see treated as unsafe: "
+        "ignorance is pessimism. What it can certify as permitted is the greatest law of that view. "
+        "Exchange knowledge, not prices: pooled views certify at least what each did alone, and "
+        "strictly more where a freedom's safety depends on a state one party cannot see. Parties hold "
+        "territories (the states they act at); the surplus from pooling exists only where an allowed "
+        "move crosses from one territory into another.",
+        ("Probabilistic beliefs and expected value: rejected, because the question is whether a freedom "
+         "is lawful and not what it is worth, and beliefs need a prior this model has no basis for.",
+         "Trust in what the other party says: rejected, because a claim of safety nobody can check is "
+         "D19's determinacy without soundness.",
+         "A zero-knowledge or minimal-disclosure protocol: deferred. The smallest knowledge a permission "
+         "needs is a self-supporting set (D21), so disclosure can be limited to that set; hiding even "
+         "that needs cryptography this package does not carry."),
+        "In every sampled game, with and without corrigibility, every subset of the states as a view: it "
+        "certifies only what is in the kernel, exactly the union of the sets it holds that support "
+        "themselves (the certificate of D21); a view closed under its own moves certifies exactly; "
+        "knowing more never certifies less; pooling two disjoint views certifies at least the union of "
+        "the parts and often strictly more; territories with no crossing gain nothing from pooling, and "
+        "every gain sampled had a crossing. Two hamlets that each shelter in the other in a storm are "
+        "the smallest case: alone neither can certify its own move, together both can, and each needs "
+        "the other's knowledge. If only one shelters, the other gives knowledge and gains nothing.",
+        "A view that certifies something outside the kernel, or fails to certify a state it holds a "
+        "self-supporting set around; more knowledge certifying less; pooled views certifying less than "
+        "their parts; a gain from pooling between territories no allowed move crosses.",
+        "For real parties: a freedom's safety can be established by exhibiting a finite list of "
+        "situations with, for each, a move that stays inside the list, and the list can be checked by "
+        "someone who did not make it. Whether real parties hold such lists, or would disclose them, is "
+        "not shown. Knowledge is non-rival here, so a deal is weakly win-win by construction; the "
+        "strategic value of private information is outside the model (D30).",
+        "knowledge.py; viability.kernel_within, greatest_law_within; tests/test_knowledge.py",
+        _d25),
+    Decision(
+        "D26", "A decision is makeable only if its footprint is understood: the cover sets the quorum, "
+        "coverage sets the barrier, and the barrier is paid for in capture resistance", Tag.FRAME,
+        "The footprint of a decision is what its targets rest on, to any depth (the material), together "
+        "with what rests on its targets, to any depth (the impact), in a graph of reliance. People "
+        "understand parts of it. The decision is makeable only if the people in the pool between them "
+        "understand all of it. The quorum required is the larger of a strict majority of the pool (the "
+        "balanced quorum of D11) and the robust quorum m - w + 1, where w is the fewest people who "
+        "understand the least-understood part (the bus factor): the attendance at which whoever comes "
+        "understands everything. The barrier is the share of the footprint a person must understand to "
+        "take part; the highest barrier a decision can bear is the last at which the pool still "
+        "understands it.",
+        ("A quorum fixed apart from the decision: rejected, because it ignores the premise.",
+         "Decision rights for experts only: rejected as a default, because the barrier removes seats and "
+         "a smaller body is cheaper to capture (Condorcet), computed in bits, and because whoever "
+         "certifies understanding then holds the gate (D29).",
+         "Everyone affected decides, with no gate: kept as the barrier-0 limit.",
+         "The minimum cover alone as the quorum: rejected, because a cover exists but the people who "
+         "attend may not be it; the robust quorum is what makes any attendance enough."),
+        "On random instances, checked against every group of people: the cover number is the size of "
+        "the smallest group that understands the footprint; the robust quorum is exactly the attendance "
+        "at which any group understands it; the people no decision can be made without are exactly "
+        "those who alone understand some part, and the affected who alone know their own stake are "
+        "among them until someone else learns it; raising the barrier shrinks the pool, never lowers "
+        "the cover, and can make a decision unmakeable, never the reverse; a footprint holds whole "
+        "cores; each pair of seats added to a majority body makes it strictly dearer to capture. In the "
+        "family's recorded reliance (formal view) changing hyperethics, hyperphysics or "
+        "metamathethicology asks 8 repositories' worth of understanding: their core, the four "
+        "repositories it rests on and hyperlogic, which rests on it.",
+        "An instance in which the robust quorum is not the exact attendance threshold; a cover below "
+        "what brute force finds; a necessary person who is not a sole witness; a barrier raise that "
+        "lowers the cover or makes an unmakeable decision makeable; a footprint that holds part of a "
+        "core; a body that becomes cheaper to capture when seats are added.",
+        "Understanding is a set handed in here. A test of understanding that cannot be gamed does not "
+        "exist in this package (D29), and the family's reliance is a record of citations and not of "
+        "need (D22). For a real body: decisions should stall exactly where nobody understands part of "
+        "their footprint, and the quorum they ask for should track the bus factor. Needs data; none is "
+        "held here.",
+        "comprehension.py; entrenchment.reliance_closure; tests/test_comprehension.py",
+        _d26),
+    Decision(
+        "D27", "Entangled strategies beat classical ones in common-interest games, and they move no "
+        "information", Tag.FRAME,
+        "Read an entangled decision as parties who each hold part of a shared entangled state, each "
+        "choose a measurement by an input only they know, and give an output; read an exclusively "
+        "win-win deal as a game in which everyone wins or loses together. The value of the shared state "
+        "is how far the win probability exceeds the best classical strategy, shared randomness "
+        "included. All of it is computed in exact rationals over the Gaussian rationals.",
+        ("Games whose parties have opposed interests (the quantum prisoner's dilemma): rejected, because "
+         "the conclusion that entanglement dissolves the dilemma depends on the strategy set allowed "
+         "(recalled from the literature, not modelled), and a deal that is not common-interest is not "
+         "exclusively win-win.",
+         "A floating-point simulation: rejected, because exactness is this package's standard and these "
+         "values are exactly rational.",
+         "Entanglement as a channel: rejected, and checked, because in every strategy here a party's "
+         "output distribution depends only on its own input."),
+        "Three witnesses, exact: GHZ (three parties) is 3/4 classically and 1 with the GHZ state; the "
+        "Mermin-Peres magic square (two parties) is 8/9 classically and 1 with two entangled pairs, and "
+        "no classical ledger of nine signs satisfies every row and column; CHSH is 3/4 classically and "
+        "577/676 with rational angles on a Bell pair. For a GHZ-type state cos t |000> + sin t |111> the "
+        "value is exactly 1/2 + (sin 2t)/2, so it beats the classical 3/4 only beyond a threshold in its "
+        "degree of entanglement. A product state never beats the classical value. No output depends on "
+        "another party's input. A PR box is no-signalling and wins CHSH every time, which no quantum "
+        "strategy does. After one use the state is worth no more than a classical one.",
+        "A product state, or a classical strategy, that beats the classical value; a strategy in which "
+        "one party's output distribution depends on another's input; a sampled quantum strategy whose "
+        "CHSH sum exceeds Tsirelson's bound; a GHZ-type state whose value is not the formula.",
+        "A Bell-type experiment on the devices a protocol would use, with the locality loophole closed, "
+        "and a cost per use for making and distributing the entangled pairs. Nothing here has been run "
+        "on a physical system (D28).",
+        "entangled.py; tests/test_entangled.py",
+        _d27),
+    Decision(
+        "D28", "Institutional decisions can be entangled in the physical sense", Tag.HYPER,
+        "Propose that a governance protocol could give the devices that make its decisions (not the "
+        "people) a shared entangled resource, so that parties who cannot or will not communicate "
+        "coordinate the opening of a freedom with a probability no classical protocol reaches, in a "
+        "game where all of them win or lose together. The value would be the advantage of D27, spent "
+        "once per use.",
+        ("Classical correlation devices (shared random keys): their value is already inside the "
+         "classical value of D27.",
+         "Communication with a secure-computation protocol: reaches certainty, and needs the parties to "
+         "communicate; entanglement is for where they cannot or will not.",
+         "No such resource: the default, and the right one until a witness exists."),
+        "A witness would see a protocol in which separated devices, each choosing a measurement by its "
+        "party's private input, win a common-interest game above the classical value, certified by a "
+        "Bell-type test with the locality loophole closed, and a stated cost per use in energy, time "
+        "and hardware, since entanglement is consumed by measuring it and decoheres.",
+        "A Bell test on the deployed devices that does not violate the classical bound; or a cost per "
+        "use above what communicating would cost; or a protocol in which the advantage vanishes once "
+        "the devices are as noisy as the hardware makes them.",
+        "No witness. Nothing here has been run on a physical system, the cost of making and "
+        "distributing entangled pairs is not modelled, and the mapping from an institution's decisions "
+        "to measurements on a quantum state is a proposal.",
+        "entangled.py (the exact games only)",
+        None),
+    Decision(
+        "D29", "Understanding has no instrument here: the barrier is only as honest as the test", Tag.OPEN,
+        "Treat each person's understanding as a set handed in. Keep the barrier a parameter, with a "
+        "derived upper limit (the highest barrier the decision can bear), and claim nothing about how "
+        "understanding is measured.",
+        ("Credentials or reputation as a stand-in: rejected, because whoever grants them then holds the "
+         "gate, which is the capture the barrier was meant to prevent.",
+         "A prediction test, in which the examinee predicts the effects of a change on a model held back "
+         "from them and is checked against it: proposed, not built.",
+         "Sortition plus education: not modelled."),
+        "A test of understanding would be one that a person passes exactly when they understand the part "
+        "of the footprint it covers, that cannot be passed by memorizing its questions, and that is run "
+        "by someone with no stake in who passes.",
+        "An examinee who passes without understanding, or one who understands and fails, at a rate that "
+        "matters; or a certifier whose pass rate follows who it would like to admit.",
+        "Not done. No instrument exists in this package, so a witness cannot be produced here.",
+        "comprehension.py (the sets are inputs)",
+        None),
+    Decision(
+        "D30", "Win-win holds by construction until freedoms can be rival", Tag.OPEN,
+        "Model only permissions that are not rival: granting one leaves every other holder's permissions "
+        "as they were. Then a deal is weakly win-win by definition, 'win' means a permission nobody "
+        "could certify before, and information is non-rival too. Say so, and do not call it a discovery.",
+        ("Top trading cycles for rival freedoms: the standard answer to exchanging indivisible goods "
+         "without money (strategy-proof, Pareto-efficient and individually rational for strict "
+         "preferences; Shapley and Scarf, Roth; recalled, not checked here). Not built, and the first "
+         "thing to add.",
+         "A welfare for each participant: rejected, as in D16.",
+         "Money for the rival part: rejected by the owner's premise."),
+        "A witness would see, in a model with a rival freedom (a permission to use a unit of something "
+        "that runs out), that granting it to one party takes it from another, that win-win then fails for "
+        "some deals, and that an exchange without money (cycles of swaps) restores it for the deals that "
+        "are in some party's interest.",
+        "A model with rival freedoms in which the vector value of D24 still makes every coherent opening "
+        "a gain for everyone; or an exchange mechanism without money that is not individually rational.",
+        "Not done. The package has no rival freedom, so there is no witness here.",
+        "deals.py (non-rival permissions only)",
+        None),
 )
 
 _BY_ID = {d.id: d for d in LEDGER}

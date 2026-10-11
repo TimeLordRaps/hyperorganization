@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TOP = ("L0_viability.hm", "pyproject.toml", "DESIGN.md", "DECISIONS.md", "PROVENANCE.md")
+TOP = ("L0_viability.hm", "L1_exchange.hm", "pyproject.toml", "DESIGN.md", "DECISIONS.md", "PROVENANCE.md")
 MANIFEST = ROOT / "validation" / "source-manifest.json"
 
 

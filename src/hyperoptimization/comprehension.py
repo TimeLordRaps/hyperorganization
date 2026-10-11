@@ -196,8 +196,9 @@ def bus_factor(knowledge: Mapping[str, Iterable[str]], nodes: Footprint | Iterab
 
 def necessary_voices(knowledge: Mapping[str, Iterable[str]], nodes: Footprint | Iterable[str],
                      pool: Iterable[str] | None = None) -> frozenset[str]:
-    """The people who alone understand some part of the footprint: every group that understands the
-    whole contains them, and no one else is in every such group."""
+    """The people who alone understand some part of the footprint. When the decision is makeable, every
+    group that understands the whole contains them and no one else is in every such group. When some part
+    is not understood by anyone there is no such group, and this is the sole witnesses of the parts that are."""
     return frozenset().union(*(w for w in witnesses(knowledge, nodes, pool).values() if len(w) == 1))
 
 

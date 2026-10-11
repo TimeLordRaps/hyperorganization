@@ -12,9 +12,13 @@ import math
 from fractions import Fraction
 
 from . import (
+    comprehension,
+    deals,
     decisions,
+    entangled,
     entrenchment,
     family,
+    knowledge,
     loop,
     ordinal,
     quorum,
@@ -204,6 +208,68 @@ def _section_family() -> list[str]:
     return lines
 
 
+def _trap_outscores(rooms: int, *, price: int) -> bool:
+    """Whether a lawless trap of this many rooms outscores a lawful opening when each coherence dimension
+    is priced at `price` and everything else at 1."""
+    game = deals.trap_game(rooms)
+    trap = deals.opening_value(game, {"hub": {"stay"}}, deals.trap_opening(rooms), ["hub"])
+    safe = deals.opening_value(game, {"hub": {"stay"}}, {"hub": {"stay", "pause"}}, ["hub"])
+    dims = deals.dimensions(trap, safe)
+    weights = (1,) * len(dims) + (1, 1) + (price,) * 4
+    return deals.priced(deals.vector(trap, dims), weights) > deals.priced(deals.vector(safe, dims), weights)
+
+
+def _section_exchange() -> list[str]:
+    hamlets = viability.Game.from_table(nature=("calm", "storm"),
+                                        table={"a": {"hold": ("a", "b")}, "b": {"hold": ("b", "a")}})
+    held = {"A": {"a"}, "B": {"b"}}
+    result = knowledge.surplus(hamlets, held, {"a": "A", "b": "B"})
+    loads = comprehension.loads(family.depends_on("formal"))
+    sizes = sorted(len(fp.nodes) for fp in loads.values())
+    heavy = sorted(n for n, fp in loads.items() if len(fp.nodes) == sizes[-1])
+    know = {f"p{i}": ["a", "b", "c"] for i in range(3)} | {f"q{i}": ["a"] for i in range(4)}
+    open_door = comprehension.requirement(know, ["a", "b", "c"], 0)
+    raised = comprehension.requirement(know, ["a", "b", "c"], 1)
+    x = Fraction(1, 4)
+    game, base, menu, grouping = deals.three_doors()
+    values = [deals.opening_value(game, base, after, ["hub"], dimension=grouping) for after in menu]
+    dims = deals.dimensions(*values)
+    vectors = [deals.vector(v, dims) for v in values]
+    trap_rooms = next(rooms for rooms in range(1, 100) if _trap_outscores(rooms, price=40))
+    ghz, magic, chsh = entangled.ghz_game(), entangled.magic_square_game(), entangled.chsh_game()
+    rational = entangled.chsh_strategy((1, 0), (0, 1), (Fraction(119, 169), Fraction(120, 169)),
+                                       (Fraction(119, 169), Fraction(-120, 169)))
+    return [
+        "== exchange  (no money: what is exchanged, who may decide, how a deal is valued, what a shared "
+        "entangled state buys)",
+        f"   two hamlets that shelter in each other in a storm: alone they certify "
+        f"{len(result.alone['A'])} and {len(result.alone['B'])} permissions; together {len(result.together)}; "
+        "each needs the other's knowledge, and what is exchanged is a set of situations that supports itself, "
+        "which anyone can check",
+        f"   the footprint of a decision (what it rests on and what rests on it), in the family's formal view: "
+        f"{sizes.count(1)} of {len(sizes)} repositories have a footprint of 1; {len(heavy)} "
+        f"({', '.join(heavy)}) have {sizes[-1]}",
+        f"   seven people, three of whom understand all three parts: required quorum {open_door.required} of "
+        f"{len(open_door.pool)} (any four attendees could all be among the four who understand one part), "
+        f"capture costs {comprehension.capture_bits(open_door, x):.1f} bits at x = 1/4; raise the barrier to 1: "
+        f"{raised.required} of {len(raised.pool)}, {comprehension.capture_bits(raised, x):.1f} bits "
+        "(Condorcet: a smaller body is cheaper to capture)",
+        f"   three doors, all coherent: (x {vectors[0][0]}), (y {vectors[1][1]}), (x {vectors[2][0]}, y "
+        f"{vectors[2][1]}); none dominates another, and the balanced one (option "
+        f"{deals.price_invisible(vectors)[0]}) is chosen by no strictly positive price",
+        "   within lawful existence nothing competes: the greatest corrigible law is best in every coordinate; "
+        "and coherence is a constraint, since a price of 40 on each coherence dimension is outbid by a lawless "
+        f"trap of {trap_rooms} rooms",
+        "   entangled decisions, exact (win probability: best classical strategy to entangled strategy): "
+        f"GHZ (Greenberger-Horne-Zeilinger, three parties) {entangled.classical_value(ghz)} to "
+        f"{entangled.quantum_value(ghz, entangled.ghz_strategy(1, 1))}; Mermin-Peres magic square (two parties) "
+        f"{entangled.classical_value(magic)} to {entangled.quantum_value(magic, entangled.magic_square_strategy())}; "
+        f"CHSH (Clauser-Horne-Shimony-Holt, two parties) {entangled.classical_value(chsh)} to "
+        f"{entangled.quantum_value(chsh, rational)} (the limit (2 + sqrt 2)/4 is irrational); a GHZ-type state is "
+        "worth 1/2 + (sin 2t)/2; no output depends on another's input; one use consumes the state",
+    ]
+
+
 def _section_ledger() -> list[str]:
     results = decisions.run_all()
     total = len(results)
@@ -230,7 +296,10 @@ def _section_open() -> list[str]:
         "   NOT_ESTABLISHED  mean-field loops stand in for a real ring or graph of bodies; the "
         "thresholds are upper bounds when compromise is positively associated (D03)",
         "   NOT_IMPLEMENTED self-funding capture (reinvestment is positive feedback); a ring or graph "
-        "loop solved exactly; transfinite ranks for infinite games",
+        "loop solved exactly; transfinite ranks for infinite games; rival freedoms and an exchange of them "
+        "without money (D30)",
+        "   OPEN             an instrument for understanding (D29); NOT_ESTABLISHED that institutional decisions "
+        "can be entangled (D28)",
         "   UNKNOWN          CI on Windows and Python 3.10 in the hosted matrix has not run on this "
         "repository (3.10 and 3.13 pass locally)",
     ]
@@ -242,7 +311,7 @@ def build_report() -> str:
     sections = [
         [f"hyperoptimization {__version__}: existence, freedom, corrigibility and renewal, without money"],
         _section_quorum(), _section_loops(), _section_renewal(), _section_viability(),
-        _section_ordinal(), _section_entrenchment(), _section_family(), _section_ledger(),
-        _section_open(),
+        _section_ordinal(), _section_entrenchment(), _section_family(), _section_exchange(),
+        _section_ledger(), _section_open(),
     ]
     return "\n\n".join("\n".join(section) for section in sections) + "\n"

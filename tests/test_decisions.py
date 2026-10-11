@@ -30,8 +30,10 @@ from pathlib import Path
 
 import pytest
 
-from hyperoptimization import decisions as D
 from hyperoptimization import (
+    comprehension,
+    deals,
+    entangled,
     entrenchment,
     family,
     loop,
@@ -41,6 +43,7 @@ from hyperoptimization import (
     surprisal,
     viability,
 )
+from hyperoptimization import decisions as D
 from hyperoptimization.ground import Status, Tag, Verdict
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -152,6 +155,11 @@ SABOTAGE = {
             lambda game, corrigible=True: frozenset(game.states)),
     "D22": (family, "cores_of", lambda view="all", data=None: []),  # no circle anywhere
     "D23": (family, "topics_of", lambda text: set()),  # a table that finds nothing, so zero means nothing
+    "D24": (deals, "at_least", lambda a, b: False),  # no opening is ever at least as good as another
+    "D25": (viability, "kernel_within",  # a view that is certain of everything, seen or not
+            lambda game, known, corrigible=True: frozenset(game.states)),
+    "D26": (comprehension, "robust_quorum", lambda knowledge, nodes, pool=None: 1),  # one attendee always suffices
+    "D27": (entangled, "classical_value", lambda game: Fraction(1)),  # classical strategies always win
 }
 
 

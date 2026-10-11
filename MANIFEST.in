@@ -6,6 +6,7 @@ include PROVENANCE.md
 include DECISIONS.md
 include TECHNICAL_DEBT.md
 include L0_viability.hm
+include L1_exchange.hm
 recursive-include validation *.json
 recursive-include src/hyperoptimization/data *.json
 recursive-include tests *.py

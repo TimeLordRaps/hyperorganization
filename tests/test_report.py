@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 def test_the_report_names_each_part_of_the_package():
     text = report.build_report()
     for heading in ("quorum", "loops", "renewal", "viability", "ordinal", "entrenchment", "family",
-                    "ledger", "open"):
+                    "exchange", "ledger", "open"):
         assert f"== {heading}" in text.lower(), heading
 
 
@@ -133,3 +133,28 @@ def test_the_command_line(capsys):
     assert "usage" in capsys.readouterr().out
     assert main(["decisions", "extra"]) == 2
     capsys.readouterr()
+
+
+def test_the_exchange_section_shows_the_numbers_the_models_compute():
+    text = report.build_report()
+    # the hamlets worked by hand: alone neither certifies its move, together both are certified
+    assert "alone they certify 0 and 0 permissions; together 2" in text
+    # the family's formal view: thirteen of twenty-one repositories rest on nothing and nothing rests on them,
+    # and the three-repository core with the repository that relies on all of it have footprints of eight
+    assert "13 of 21 repositories have a footprint of 1; 4 (hyperethics, hyperlogic, hyperphysics, " \
+        "metamathethicology) have 8" in text
+    # seven people, three of whom understand everything: five must attend; a barrier at one leaves two of three
+    assert "required quorum 5 of 7" in text and "capture costs 6.3 bits" in text and "2 of 3, 2.7 bits" in text
+    # the three doors, and the balanced one that no price chooses
+    assert "(x 11), (y 11), (x 5, y 4)" in text and "is chosen by no strictly positive price" in text
+    assert "outbid by a lawless trap of 18 rooms" in text
+    # the three games, each exact
+    assert "(Greenberger-Horne-Zeilinger, three parties) 3/4 to 1; Mermin-Peres" in text
+    assert "Mermin-Peres magic square (two parties) 8/9 to 1; CHSH" in text
+    assert "(Clauser-Horne-Shimony-Holt, two parties) 3/4 to 577/676 (the limit" in text
+
+
+def test_the_open_obligations_name_what_the_exchange_layer_does_not_establish():
+    text = report.build_report()
+    assert "rival freedoms and an exchange of them without money (D30)" in text
+    assert "an instrument for understanding (D29)" in text and "institutional decisions can be entangled (D28)" in text

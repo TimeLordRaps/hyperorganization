@@ -184,6 +184,20 @@ def test_a_law_that_is_not_one_and_a_start_that_is_not_a_state_are_refused():
         deals.opening_value(game, {}, {"a": {"hold"}}, "a")
 
 
+def test_malformed_laws_options_and_traps_are_refused():
+    game = hamlets()
+    with pytest.raises(TypeError):
+        deals.opening_value(game, [("a", "hold")], {"a": {"hold"}}, ["a"])  # a law is a mapping, not a list of pairs
+    with pytest.raises(ValueError):
+        deals.dominating_combination([(1, 2), (2, 1)], 5)
+    with pytest.raises(ValueError):
+        deals.supporting_weights([(1, 2), (2, 1)], -1)
+    with pytest.raises(ValueError):
+        deals.trap_game(0)
+    with pytest.raises(ValueError):
+        deals.trap_game(True)  # a truth value is not a number of rooms
+
+
 # --- within lawful existence there is nothing to trade -----------------------------------------------------------------
 
 
@@ -422,10 +436,12 @@ def test_the_balanced_deal_is_efficient_and_coherent_and_no_price_will_ever_choo
     assert deals.supporting_weights(vectors, 2) is None and deals.supporting_weights(vectors, 0) is not None
 
 
-def test_in_random_games_a_menu_of_competing_options_is_the_exception_and_a_hidden_option_rarer_still():
-    # the honest base rate: coalitions of one or two people choosing among the freedoms they can certify
+def menu_counts(seeds=500):
+    """The honest base rate: coalitions of one or two people choosing among the freedoms they can certify, in
+    random games. Returns (menus of at least three distinct options, menus with more than one efficient option,
+    menus with an option hidden from every price)."""
     menus = multiple = hidden = 0
-    for seed in range(500):
+    for seed in range(seeds):
         rng = random.Random(18000 + seed)
         game = random_game(rng, n=5, na=3, home=False)
         people = {f"p{i}": frozenset(s for s in game.states if rng.random() < 0.5) for i in range(5)}
@@ -446,6 +462,11 @@ def test_in_random_games_a_menu_of_competing_options_is_the_exception_and_a_hidd
         assert set(lost) <= set(front)
         if lost:
             assert len(front) >= 3  # two efficient options cannot hide one another: a blend of one is itself
+    return menus, multiple, hidden
+
+
+def test_in_random_games_a_menu_of_competing_options_is_the_exception_and_a_hidden_option_rarer_still():
+    menus, multiple, hidden = menu_counts()
     assert menus > 150 and hidden <= multiple <= menus
 
 

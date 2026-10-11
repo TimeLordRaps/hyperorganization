@@ -61,6 +61,9 @@ def test_gaussian_rationals_are_a_field_with_i_squared_minus_one_and_a_conjugate
         Gauss(1) + 0.5  # nothing inexact is mixed in
     with pytest.raises(TypeError):
         Gauss(1) + True  # and a truth value is not a number here
+    with pytest.raises(TypeError):
+        Gauss(1) * "x"
+    assert repr(Gauss(1, -2)) == "(1-2i)" and repr(Gauss(Fraction(1, 2), 3)) == "(1/2+3i)"
     rng = random.Random(1)
     for _ in range(200):
         a, b, c = (Gauss(Fraction(rng.randint(-9, 9), rng.randint(1, 5)), Fraction(rng.randint(-9, 9), rng.randint(1, 5)))
@@ -132,6 +135,56 @@ def test_probabilities_over_all_outcomes_of_commuting_observables_sum_to_one():
         total = sum(E.probability(state, observables, outcomes)
                     for outcomes in itertools.product((1, -1), repeat=3))
         assert total == 1
+
+
+def test_the_walk_down_the_outcomes_gives_the_probability_of_every_outcome_and_only_those():
+    rng = random.Random(6)
+    checked = pruned = 0
+    for _ in range(80):
+        n = rng.randint(2, 4)
+        state = random_state(rng, n)
+        if all(a == 0 for a in state):
+            continue
+        observables = [E.pauli("".join(rng.choice("XYZ") if q == k else "I" for q in range(n)), sign=rng.choice((1, -1)))
+                       for k in range(n)]
+        walked = E.distribution(state, observables)
+        for outcomes in itertools.product((1, -1), repeat=len(observables)):
+            expected = E.probability(state, observables, outcomes)
+            assert walked.get(outcomes, Fraction(0)) == expected, outcomes
+            pruned += expected == 0
+        assert sum(walked.values()) == 1 and all(mass > 0 for mass in walked.values())
+        checked += 1
+    bell = [E.pauli("XX"), E.pauli("ZZ"), E.pauli("YY", sign=-1)]  # XX times ZZ is -YY: the third outcome is fixed by the first two
+    for _ in range(40):
+        state = random_state(rng, 2)
+        if all(a == 0 for a in state):
+            continue
+        walked = E.distribution(state, bell)
+        assert all(c == a * b for (a, b, c) in walked)  # only the outcomes the algebra allows are ever visited
+        for outcomes in itertools.product((1, -1), repeat=3):
+            expected = E.probability(state, bell, outcomes)
+            assert walked.get(outcomes, Fraction(0)) == expected
+            pruned += expected == 0
+        checked += 1
+    assert checked > 80 and pruned > 100  # and many outcomes really were impossible, so pruning was exercised
+    with pytest.raises(ValueError):
+        E.distribution((Gauss(0),) * 2, [E.pauli("X")])
+    with pytest.raises(ValueError):
+        E.distribution((Gauss(1), Gauss(0)), [E.pauli("X"), E.pauli("Y")])  # X and Y together: not commuting
+
+
+def test_the_walk_does_no_work_on_outcomes_the_state_cannot_give(monkeypatch):
+    # one profile of the magic square (row 0, column 0): six observables, 64 outcomes of which 8 are possible.
+    # Alice's first two cells are free and her third is fixed by the parity; Bob's first cell is the shared
+    # one, fixed by hers, his second is free and his third fixed. One operator is applied per node visited:
+    # 1 + 2 + 4 + 4 + 4 + 8 = 23. A walk that pruned nothing would visit 1 + 2 + 4 + 8 + 16 + 32 = 63.
+    strategy = E.magic_square_strategy()
+    observables = [*strategy.measure(0, 0), *strategy.measure(1, 0)]
+    calls = []
+    real = E.act
+    monkeypatch.setattr(E, "act", lambda observable, state: calls.append(1) or real(observable, state))
+    walked = E.distribution(strategy.state, observables)
+    assert len(walked) == 8 and sum(walked.values()) == 1 and len(calls) == 23
 
 
 def test_a_rotation_must_be_a_point_on_the_circle_and_an_empty_state_has_no_probabilities():
@@ -212,10 +265,13 @@ def test_the_ghz_state_wins_with_certainty_which_no_classical_strategy_can():
     assert E.quantum_value(game, E.ghz_strategy(1, 1)) == 1 > E.classical_value(game)
 
 
+GHZ_TYPE_STATES = [(1, 1), (3, 4), (5, 12), (8, 15), (1, 0), (0, 1), (7, 24), (1, 2), (2, 3), (4, 3)]  # (alpha, beta)
+
+
 def test_the_value_of_a_ghz_type_state_is_one_half_plus_its_degree_of_entanglement_halved():
     game = E.ghz_game()
     classical = E.classical_value(game)
-    for a, b in [(1, 1), (3, 4), (5, 12), (8, 15), (1, 0), (0, 1), (7, 24), (1, 2), (2, 3), (4, 3)]:
+    for a, b in GHZ_TYPE_STATES:
         degree = Fraction(2 * a * b, a * a + b * b)  # sin 2t for the state cos t |000> + sin t |111>
         value = E.quantum_value(game, E.ghz_strategy(a, b))
         assert value == Fraction(1, 2) + degree / 2, (a, b)
@@ -267,6 +323,7 @@ def test_there_is_no_classical_ledger_of_nine_entries_that_satisfies_every_row_a
         cols = all(grid[0][c] * grid[1][c] * grid[2][c] == -1 for c in range(3))
         solutions += rows and cols
     assert solutions == 0  # the product of all nine is +1 by rows and -1 by columns
+    assert E.magic_square_ledgers() == 0
 
 
 def test_magic_square_classical_value_is_eight_ninths_and_the_entangled_pair_wins_every_time():
@@ -298,6 +355,47 @@ def test_chsh_classical_value_is_three_quarters_and_a_rational_strategy_on_a_bel
     assert value == Fraction(577, 676) > Fraction(3, 4)
     assert abs(float(value) - (2 + 2**0.5) / 4) < 4e-6  # within a few millionths of the Tsirelson value (recalled, not proved here)
     assert value < 1
+
+
+def test_outcomes_that_decode_to_the_same_output_have_their_probabilities_added():
+    """A party may measure more than it reports. Here Alice also measures a spare qubit that is in an equal
+    superposition, and her output ignores that outcome: two outcomes decode to one output, and `table` must add
+    their probabilities. Every shipped strategy decodes one outcome to one output, so only this exercises it.
+    The table must equal the plain strategy's, with each profile's probabilities adding to one."""
+    angles = ((Fraction(1), Fraction(0)), (Fraction(0), Fraction(1)),
+              (Fraction(119, 169), Fraction(120, 169)), (Fraction(119, 169), Fraction(-120, 169)))
+    plain = E.chsh_strategy(*angles)
+    one, zero = Gauss(1), Gauss(0)
+    bell_and_spare = (one, one, zero, zero, zero, zero, one, one)  # qubits 0 and 1 a Bell pair, qubit 2 in |0> + |1>
+
+    def measure(p, x):
+        return [*plain.measure(p, x), E.pauli("Z", 2)] if p == 0 else plain.measure(p, x)
+
+    wider = E.Strategy(bell_and_spare, measure, plain.decode, players=2)
+    game = E.chsh_game()
+    expected, got = E.table(game, plain), E.table(game, wider)
+    assert got == expected
+    for profile, masses in got.items():
+        assert sum(masses.values()) == 1, profile
+    assert E.quantum_value(game, wider) == Fraction(577, 676)
+
+
+def test_the_commutation_caches_are_bounded_so_a_long_run_cannot_grow_without_limit():
+    """`_commute` and `_squares_to_one` remember an answer per observable. A cache with no bound keeps every
+    observable ever checked alive, which a process that tries many strategies would feel (audit 5)."""
+    for cached in (E._commute, E._squares_to_one):
+        size = cached.cache_info().maxsize
+        assert size is not None and 0 < size <= 1 << 16, size
+    limit = E._squares_to_one.cache_info().maxsize
+    E._squares_to_one.cache_clear()
+    for step in range(1, limit + 300):  # more distinct observables than the cache can hold
+        t = Fraction(step, 7)
+        observable = E.rotated(0, (1 - t * t) / (1 + t * t), 2 * t / (1 + t * t))
+        assert E._squares_to_one(observable, 1)
+    assert E._squares_to_one.cache_info().currsize == limit  # full, not growing
+    again = E.rotated(0, Fraction(3, 5), Fraction(4, 5))  # and still correct after the oldest entries were dropped
+    assert E._squares_to_one(again, 1) and E._squares_to_one(again, 1)
+    assert E._squares_to_one.cache_info().hits >= 1
 
 
 def test_the_engine_reproduces_the_analytic_chsh_value_and_no_sampled_strategy_exceeds_tsirelsons_bound():

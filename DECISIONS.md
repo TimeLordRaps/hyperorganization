@@ -29,6 +29,13 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 | D21 | Self-maintenance is a greatest fixed point: it has no inductive reading, and a set that supports itself is its certificate | FORM | HOLDS_IN_MODEL |
 | D22 | The family's reliance has a core with no foundation inside it, though what it imports is well founded | FRAME | HOLDS_IN_MODEL |
 | D23 | By their wording almost none of the family's declared open items is about optimization, viability or maintenance | FRAME | HOLDS_IN_MODEL |
+| D24 | A deal is a vector of freedoms, not a price: within lawful existence nothing competes, and where options do compete a price is blind to the balanced one | FRAME | HOLDS_IN_MODEL |
+| D25 | What a coalition can certify is what its pooled knowledge supports itself on, and across a border asymmetry makes a deal necessary | FORM | HOLDS_IN_MODEL |
+| D26 | A decision is makeable only if its footprint is understood: the cover sets the quorum, coverage sets the barrier, and the barrier is paid for in capture resistance | FRAME | HOLDS_IN_MODEL |
+| D27 | Entangled strategies beat classical ones in common-interest games, and they move no information | FRAME | HOLDS_IN_MODEL |
+| D28 | Institutional decisions can be entangled in the physical sense | HYPER | none (by design) |
+| D29 | Understanding has no instrument here: the barrier is only as honest as the test | OPEN | none (by design) |
+| D30 | Win-win holds by construction until freedoms can be rival | OPEN | none (by design) |
 
 ## D01. A price is the surprisal of a compromise
 
@@ -551,3 +558,168 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 - 106 of 122 (87%) mention none of them
 - persistence or maintenance is mentioned in hyperethics/L0_creation.hm, hyperphysics/docs/research/TIME_BUBBLE_SHEET.md
 - every topic pattern finds a sentence written to contain it, and the word 'optimistic' is not read as optimization
+
+## D24. A deal is a vector of freedoms, not a price: within lawful existence nothing competes, and where options do compete a price is blind to the balanced one
+
+**Tag:** FRAME
+
+**Choice.** Value an opening of the law (a law that permits more than the one before) by three kinds of coordinate and no scalar: the freedom it allows, counted along each dimension of freedom (by default the action); the freedom that freedom enables, which is the states it makes reachable and the permissions the law grants there; and four yes-or-no dimensions of coherence with lawful existence: the system survives for ever (exists), stays where an overseer can bring it home (corrigible), permits nothing anywhere that the greatest corrigible law forbids (lawful), and takes no permission from anyone (monotone). Compare by Pareto dominance, which is partial. Treat coherence as a constraint, admitted only if every dimension holds, never as a weight.
+
+**Not chosen.**
+- A scalar price: rejected twice over. A linear price never chooses an efficient option that lies strictly inside the blend of others, and any finite price on lawfulness is outbid by a large enough lawless opening.
+- A welfare for each participant: rejected, as in D16. Nothing here ranks outcomes for people, and Arrow-type results would apply the moment it did.
+- A lexicographic order with coherence first: kept, as the admission rule. It is not a scalar and it loses nothing the vector knew.
+- Count permissions only, in one dimension: rejected, because it cannot say that one opening leads on to others.
+
+**Expectation.** Among coherent openings the greatest corrigible law is best in every coordinate at once, in every sampled game with every law enumerated, so within lawful existence there is nothing to price (the deal-language form of D05). A door opened onto a room that permits nothing is not coherent, so an opening is closed under what it enables. Where options do compete, as in a menu of three doors (all x, all y, a balanced mix), the balanced one is efficient and no strictly positive price chooses it; and for every option in random point sets exactly one of a supporting price and a dominating blend exists, each checkable without trusting the solver. For a price p on each coherence dimension a trap of (3p-1)//7+1 rooms outscores the safe opening, for every p tried. Competing options are rare among random menus (the check records the count).
+
+**Refuter.** A game in which a coherent opening is not dominated by the greatest corrigible law; or a menu in which an option the exact test calls price-invisible is chosen by some strictly positive price; or an option for which a supporting price and a dominating blend both exist, or neither does; or a trap in which the lawless opening does not eventually outscore.
+
+**World witness.** For a real body: deals priced in one currency should systematically omit the balanced options, and parties who can add lawlessness to a deal should be able to buy it. The base rate here is that competing options are rare, so the claim is about where scarcity enters and not about how often. Needs data; none is held here.
+
+**Where.** deals.py; tests/test_deals.py
+
+**Model check:** HOLDS_IN_MODEL — a deal is a vector of freedoms; within lawful existence nothing competes, and where options do compete a price is blind to the balanced one
+- 19 random games with a corrigible kernel, every law of each: 123 coherent openings, none better than the greatest corrigible law in any coordinate, and in 14 games they differ from one another, so there is a lattice to be best in
+- three doors (x: 11, y: 11, balanced: 5 and 4) are all coherent and incomparable; the balanced one is below the half-and-half blend of the other two, so no strictly positive price chooses it
+- 150 options in random point sets: each has a supporting price or a dominating blend, never both (exact linear programs, certificates checked); 2 of them were efficient and still strictly beaten by a blend
+- a trap whose size scales freely: at 1, 5, 40 on each coherence dimension it first outscores a safe opening at 1, 3, 18 rooms (3p-1)//7+1
+- base rate: among 31 random menus of what coalitions of one or two people can certify, 0 offer more than one efficient option and 0 hide one from every price
+- the two hamlets: neither can open its own move alone, together both gain
+
+## D25. What a coalition can certify is what its pooled knowledge supports itself on, and across a border asymmetry makes a deal necessary
+
+**Tag:** FORM
+
+**Choice.** Model a participant's view as the game with everything it cannot see treated as unsafe: ignorance is pessimism. What it can certify as permitted is the greatest law of that view. Exchange knowledge, not prices: pooled views certify at least what each did alone, and strictly more where a freedom's safety depends on a state one party cannot see. Parties hold territories (the states they act at); the surplus from pooling exists only where an allowed move crosses from one territory into another.
+
+**Not chosen.**
+- Probabilistic beliefs and expected value: rejected, because the question is whether a freedom is lawful and not what it is worth, and beliefs need a prior this model has no basis for.
+- Trust in what the other party says: rejected, because a claim of safety nobody can check is D19's determinacy without soundness.
+- A zero-knowledge or minimal-disclosure protocol: deferred. The smallest knowledge a permission needs is a self-supporting set (D21), so disclosure can be limited to that set; hiding even that needs cryptography this package does not carry.
+
+**Expectation.** In every sampled game, with and without corrigibility, every subset of the states as a view: it certifies only what is in the kernel, exactly the union of the sets it holds that support themselves (the certificate of D21); a view closed under its own moves certifies exactly; knowing more never certifies less; pooling two disjoint views certifies at least the union of the parts and often strictly more; territories with no crossing gain nothing from pooling, and every gain sampled had a crossing. Two hamlets that each shelter in the other in a storm are the smallest case: alone neither can certify its own move, together both can, and each needs the other's knowledge. If only one shelters, the other gives knowledge and gains nothing.
+
+**Refuter.** A view that certifies something outside the kernel, or fails to certify a state it holds a self-supporting set around; more knowledge certifying less; pooled views certifying less than their parts; a gain from pooling between territories no allowed move crosses.
+
+**World witness.** For real parties: a freedom's safety can be established by exhibiting a finite list of situations with, for each, a move that stays inside the list, and the list can be checked by someone who did not make it. Whether real parties hold such lists, or would disclose them, is not shown. Knowledge is non-rival here, so a deal is weakly win-win by construction; the strategic value of private information is outside the model (D30).
+
+**Where.** knowledge.py; viability.kernel_within, greatest_law_within; tests/test_knowledge.py
+
+**Model check:** HOLDS_IN_MODEL — what a coalition can certify is what its pooled knowledge supports itself on
+- 384 views (every subset of 24 random games on 4 states, with and without corrigibility): each certifies only what is in the kernel, exactly the union of the sets it holds that support themselves
+- 60 views closed under their own moves certify exactly; knowing more never certified less in 1944 nested pairs
+- 1944 pairs of disjoint views: pooling never certified less than the parts, and certified strictly more in 142 of them
+- territories: 26 sealed (no allowed move crosses) and 14 with a crossing; 9 gained from pooling, all with a crossing
+- two hamlets that shelter in each other in a storm: alone neither certifies its move, together both do, and each needs the other's knowledge; if only one shelters the gain is one-sided
+
+## D26. A decision is makeable only if its footprint is understood: the cover sets the quorum, coverage sets the barrier, and the barrier is paid for in capture resistance
+
+**Tag:** FRAME
+
+**Choice.** The footprint of a decision is what its targets rest on, to any depth (the material), together with what rests on its targets, to any depth (the impact), in a graph of reliance. People understand parts of it. The decision is makeable only if the people in the pool between them understand all of it. The quorum required is the larger of a strict majority of the pool (the balanced quorum of D11) and the robust quorum m - w + 1, where w is the fewest people who understand the least-understood part (the bus factor): the attendance at which whoever comes understands everything. The barrier is the share of the footprint a person must understand to take part; the highest barrier a decision can bear is the last at which the pool still understands it.
+
+**Not chosen.**
+- A quorum fixed apart from the decision: rejected, because it ignores the premise.
+- Decision rights for experts only: rejected as a default, because the barrier removes seats and a smaller body is cheaper to capture (Condorcet), computed in bits, and because whoever certifies understanding then holds the gate (D29).
+- Everyone affected decides, with no gate: kept as the barrier-0 limit.
+- The minimum cover alone as the quorum: rejected, because a cover exists but the people who attend may not be it; the robust quorum is what makes any attendance enough.
+
+**Expectation.** On random instances, checked against every group of people: the cover number is the size of the smallest group that understands the footprint; the robust quorum is exactly the attendance at which any group understands it; the people no decision can be made without are exactly those who alone understand some part, and the affected who alone know their own stake are among them until someone else learns it; raising the barrier shrinks the pool, never lowers the cover, and can make a decision unmakeable, never the reverse; a footprint holds whole cores; each pair of seats added to a majority body makes it strictly dearer to capture. In the family's recorded reliance (formal view) changing hyperethics, hyperphysics or metamathethicology asks 8 repositories' worth of understanding: their core, the four repositories it rests on and hyperlogic, which rests on it.
+
+**Refuter.** An instance in which the robust quorum is not the exact attendance threshold; a cover below what brute force finds; a necessary person who is not a sole witness; a barrier raise that lowers the cover or makes an unmakeable decision makeable; a footprint that holds part of a core; a body that becomes cheaper to capture when seats are added.
+
+**World witness.** Understanding is a set handed in here. A test of understanding that cannot be gamed does not exist in this package (D29), and the family's reliance is a record of citations and not of need (D22). For a real body: decisions should stall exactly where nobody understands part of their footprint, and the quorum they ask for should track the bus factor. Needs data; none is held here.
+
+**Where.** comprehension.py; entrenchment.reliance_closure; tests/test_comprehension.py
+
+**Model check:** HOLDS_IN_MODEL — a decision is makeable only if its footprint is understood, which sets the quorum and the barrier, and the barrier is paid for in capture resistance
+- 120 random instances (81 makeable): the cover number, the robust quorum (m - w + 1 for bus factor w) and the people no decision can be made without (the sole witnesses) agree with brute force over every group of people
+- 60 random instances over 7 rising barriers: the pool never grew, the cover never fell, an unmakeable decision never became makeable; 22 decisions became unmakeable as the barrier rose
+- 215 footprints that touch a core hold it whole, on 80 random graphs
+- Condorcet in bits, exact: for seat probability 1/10, 1/4 and 2/5 each pair of seats added to a majority body (1 to 21 seats) makes it strictly dearer to capture, so every seat the barrier removes costs capture resistance
+- the family's repositories under the formal view: footprints of 1 to 8 repositories, hyperethics, hyperphysics and metamathethicology 8 each (their core, the four repositories it rests on and hyperlogic, which rests on it), i.e. changing any of them asks 8 repositories' worth of understanding
+
+## D27. Entangled strategies beat classical ones in common-interest games, and they move no information
+
+**Tag:** FRAME
+
+**Choice.** Read an entangled decision as parties who each hold part of a shared entangled state, each choose a measurement by an input only they know, and give an output; read an exclusively win-win deal as a game in which everyone wins or loses together. The value of the shared state is how far the win probability exceeds the best classical strategy, shared randomness included. All of it is computed in exact rationals over the Gaussian rationals.
+
+**Not chosen.**
+- Games whose parties have opposed interests (the quantum prisoner's dilemma): rejected, because the conclusion that entanglement dissolves the dilemma depends on the strategy set allowed (recalled from the literature, not modelled), and a deal that is not common-interest is not exclusively win-win.
+- A floating-point simulation: rejected, because exactness is this package's standard and these values are exactly rational.
+- Entanglement as a channel: rejected, and checked, because in every strategy here a party's output distribution depends only on its own input.
+
+**Expectation.** Three witnesses, exact: GHZ (three parties) is 3/4 classically and 1 with the GHZ state; the Mermin-Peres magic square (two parties) is 8/9 classically and 1 with two entangled pairs, and no classical ledger of nine signs satisfies every row and column; CHSH is 3/4 classically and 577/676 with rational angles on a Bell pair. For a GHZ-type state cos t |000> + sin t |111> the value is exactly 1/2 + (sin 2t)/2, so it beats the classical 3/4 only beyond a threshold in its degree of entanglement. A product state never beats the classical value. No output depends on another party's input. A PR box is no-signalling and wins CHSH every time, which no quantum strategy does. After one use the state is worth no more than a classical one.
+
+**Refuter.** A product state, or a classical strategy, that beats the classical value; a strategy in which one party's output distribution depends on another's input; a sampled quantum strategy whose CHSH sum exceeds Tsirelson's bound; a GHZ-type state whose value is not the formula.
+
+**World witness.** A Bell-type experiment on the devices a protocol would use, with the locality loophole closed, and a cost per use for making and distributing the entangled pairs. Nothing here has been run on a physical system (D28).
+
+**Where.** entangled.py; tests/test_entangled.py
+
+**Model check:** HOLDS_IN_MODEL — entangled strategies beat classical ones in common-interest games, move no information, and are consumed by use
+- GHZ (three parties): classical 3/4 by enumerating every deterministic strategy, entangled 1
+- magic square (two parties): classical 8/9, entangled 1; none of the 512 classical ledgers of nine signs satisfies every row and column
+- CHSH (two parties): classical 3/4, rational angles on a Bell pair 577/676 (the best quantum value (2+sqrt 2)/4 is irrational and recalled, not proved)
+- a GHZ-type state cos t|000> + sin t|111> is worth exactly 1/2 + (sin 2t)/2: it beats 3/4 only beyond sin 2t = 1/2
+- a product state never beat the classical value (best of 8: 191/322); 10 of 10 random CHSH strategies kept S squared within 8 (Tsirelson's bound, exact)
+- no party's output distribution depends on another's input in any of the three strategies; a PR box is no-signalling and wins CHSH with 1, beyond every quantum strategy; after one use the GHZ state is worth 5/8 in the GHZ game, below the classical 3/4
+
+## D28. Institutional decisions can be entangled in the physical sense
+
+**Tag:** HYPER
+
+**Choice.** Propose that a governance protocol could give the devices that make its decisions (not the people) a shared entangled resource, so that parties who cannot or will not communicate coordinate the opening of a freedom with a probability no classical protocol reaches, in a game where all of them win or lose together. The value would be the advantage of D27, spent once per use.
+
+**Not chosen.**
+- Classical correlation devices (shared random keys): their value is already inside the classical value of D27.
+- Communication with a secure-computation protocol: reaches certainty, and needs the parties to communicate; entanglement is for where they cannot or will not.
+- No such resource: the default, and the right one until a witness exists.
+
+**Expectation.** A witness would see a protocol in which separated devices, each choosing a measurement by its party's private input, win a common-interest game above the classical value, certified by a Bell-type test with the locality loophole closed, and a stated cost per use in energy, time and hardware, since entanglement is consumed by measuring it and decoheres.
+
+**Refuter.** A Bell test on the deployed devices that does not violate the classical bound; or a cost per use above what communicating would cost; or a protocol in which the advantage vanishes once the devices are as noisy as the hardware makes them.
+
+**World witness.** No witness. Nothing here has been run on a physical system, the cost of making and distributing entangled pairs is not modelled, and the mapping from an institution's decisions to measurements on a quantum state is a proposal.
+
+**Where.** entangled.py (the exact games only)
+
+## D29. Understanding has no instrument here: the barrier is only as honest as the test
+
+**Tag:** OPEN
+
+**Choice.** Treat each person's understanding as a set handed in. Keep the barrier a parameter, with a derived upper limit (the highest barrier the decision can bear), and claim nothing about how understanding is measured.
+
+**Not chosen.**
+- Credentials or reputation as a stand-in: rejected, because whoever grants them then holds the gate, which is the capture the barrier was meant to prevent.
+- A prediction test, in which the examinee predicts the effects of a change on a model held back from them and is checked against it: proposed, not built.
+- Sortition plus education: not modelled.
+
+**Expectation.** A test of understanding would be one that a person passes exactly when they understand the part of the footprint it covers, that cannot be passed by memorizing its questions, and that is run by someone with no stake in who passes.
+
+**Refuter.** An examinee who passes without understanding, or one who understands and fails, at a rate that matters; or a certifier whose pass rate follows who it would like to admit.
+
+**World witness.** Not done. No instrument exists in this package, so a witness cannot be produced here.
+
+**Where.** comprehension.py (the sets are inputs)
+
+## D30. Win-win holds by construction until freedoms can be rival
+
+**Tag:** OPEN
+
+**Choice.** Model only permissions that are not rival: granting one leaves every other holder's permissions as they were. Then a deal is weakly win-win by definition, 'win' means a permission nobody could certify before, and information is non-rival too. Say so, and do not call it a discovery.
+
+**Not chosen.**
+- Top trading cycles for rival freedoms: the standard answer to exchanging indivisible goods without money (strategy-proof, Pareto-efficient and individually rational for strict preferences; Shapley and Scarf, Roth; recalled, not checked here). Not built, and the first thing to add.
+- A welfare for each participant: rejected, as in D16.
+- Money for the rival part: rejected by the owner's premise.
+
+**Expectation.** A witness would see, in a model with a rival freedom (a permission to use a unit of something that runs out), that granting it to one party takes it from another, that win-win then fails for some deals, and that an exchange without money (cycles of swaps) restores it for the deals that are in some party's interest.
+
+**Refuter.** A model with rival freedoms in which the vector value of D24 still makes every coherent opening a gain for everyone; or an exchange mechanism without money that is not individually rational.
+
+**World witness.** Not done. The package has no rival freedom, so there is no witness here.
+
+**Where.** deals.py (non-rival permissions only)

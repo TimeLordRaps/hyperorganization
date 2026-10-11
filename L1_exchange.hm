@@ -1,0 +1,291 @@
+-- L1_exchange.hm
+-- Layer 1: Exchange without money
+-- hyperoptimization | knowledge, understanding, deals and entangled decisions
+--
+-- Imports: L0_viability (the game, the kernel, the greatest sustaining law, the quorum map and the
+--          bit as the only unit of price). Nothing else; no term of hyperethics, hyperlogic or
+--          ordinatics is imported.
+--
+-- USER-DECLARED (Tyler Roost, 2026-10-11), the starting point of this layer, verbatim:
+--   "subagents should always be haiku 5.5 just so you know, also for there to be no money we need
+--    information asymmetric deal making through informationally richer channels than single
+--    dimensional $. Also for a decision to be makable in the first place a comprehensive
+--    understanding of the material and its impacts is a necessity, this sets the quorum size, and
+--    also determines the barrier to entry for decision making, for deal making we should utilize
+--    quantum game theoretical optionality to determine entangled decisions which themselves by
+--    simply existing in an entangled state provide value for exclusively win win deals since we no
+--    longer use money and instead represent deals by value of freedom allowed and degree to which
+--    those freedoms allow other freedoms and the dimensions along which those freedoms all cohere
+--    with the overall systems lawful existence."
+-- Quoted exactly, spelling and spacing included. The first clause is a standing instruction about how
+-- the work is done (every subagent uses the smallest model tier); it is not part of the model and is recorded in
+-- PROVENANCE.md and in the handoff. Tyler's statements are authoritative for his own aims; they do not
+-- by themselves verify an external claim, and this file does not treat them as doing so.
+--
+-- WHAT THIS LAYER IS. L0 asks what law a system that wants to exist is under. L1 asks how parties who
+-- see only parts of the world make deals about that law without a number to settle them. Four answers,
+-- each a finite model with an exact oracle.
+--   KNOWLEDGE. What a party cannot see it must treat as unsafe, so what it can certify as permitted is a
+--   part of the greatest law and grows as it learns. What is exchanged is a certificate, a set of
+--   situations that supports itself, and not a price: a number cannot be checked for safety.
+--   UNDERSTANDING. A decision is makeable only if the people deciding between them understand what it
+--   rests on and what rests on it. That sets the quorum (the cover, and the attendance at which whoever
+--   comes understands) and the barrier (the share of the footprint a person must understand), and the
+--   barrier is paid for in capture resistance.
+--   DEALS. An opening of the law is valued by a vector: the freedom it allows, the freedom that enables,
+--   and the dimensions along which it coheres with lawful existence. Coherence is a constraint and not a
+--   currency; within lawful existence nothing competes; where options compete a price cannot see the
+--   balanced one.
+--   ENTANGLEMENT. Parties who cannot talk and win or lose together do better with a shared entangled
+--   state than any classical strategy can, by exact amounts, and the state carries no message.
+--
+-- WHAT IT IS NOT. Win-win holds by construction here, because the permissions are not rival and a
+-- gain is a permission nobody could certify (nd-win-win-by-construction). Understanding is a set
+-- handed in; nothing measures it (nd-understanding-is-measured). That human or institutional decisions
+-- can be entangled is a proposal with no witness (nd-institutions-are-entangled). Games whose parties
+-- have opposed interests are not modelled (nd-quantum-dilemma). Rival freedoms, and an exchange of
+-- them without money, are not built (nd-rival-freedoms).
+--
+-- Layer boundary: nothing here imports another package. Checks that need a record of the family read a
+-- golden file hyperstratum produced.
+--
+-- Status: FORM (the finite-game theorems of Section IV, checked exhaustively on random small games, by
+--               independent oracles, or in exact rationals);
+--         FRAME (the readings: ignorance as pessimism, understanding as a set, an opening as a vector,
+--               an entangled decision as measurements on a shared state);
+--         HYPER / OPEN residuals documented, NOT discharged: Section V.
+--
+-- Checked status: every derive in this file is executable against finite structures by the test suite
+-- and, with its evidence, by `python -m hyperoptimization decisions`. A passing check CONFIRMS nothing
+-- universally; one counterexample REFUTES.
+-- =============================================================================
+
+
+-- =============================================================================
+-- SECTION I: PRIMITIVES
+-- =============================================================================
+
+primitive Participant :: Type
+    -- Something that can see part of the world and take part in a decision or a deal.
+
+primitive Knowledge :: Type
+    -- The set of states (or nodes of a graph of reliance) a participant can see, or understands.
+
+primitive Opening :: Type
+    -- A pair of laws, one permitting no more than the other: a deal about what is permitted.
+
+primitive Dimension :: Type
+    -- A kind of freedom along which permissions are counted (by default the action).
+
+
+-- =============================================================================
+-- SECTION II: OPAQUE STRUCTURE
+-- =============================================================================
+
+opaque sees :: Participant -> State -> Norm
+    -- Whether a participant can see a state, so that it may reason about what happens there.
+
+opaque acts_at :: Participant -> State -> Norm
+    -- Whether a participant is the one who acts at a state: its territory.
+
+opaque relies_on :: State -> State -> Norm
+    -- Whether one state's future depends on another's: the graph in which a footprint is read.
+
+
+-- =============================================================================
+-- SECTION III: ADOPTED AXIOMS
+-- Each is an assumption of the model, adopted and not derived.
+-- =============================================================================
+
+axiom ax-ignorance-is-pessimism:
+    -- What a participant cannot see it treats as unsafe, because an unknown state may be the one that
+    -- ends everything. Its view of the game is the same game with the safe set cut down to what it sees.
+    -- Adopted: it is the weakest assumption that makes a certificate sound.
+
+axiom ax-understanding-is-a-set:
+    -- Each participant understands a set of nodes, given and not measured. Whether and how that could be
+    -- measured is not modelled (nd-understanding-is-measured).
+
+axiom ax-common-interest:
+    -- In a game of deals everyone wins or loses together, so a deal is exclusively win-win by definition
+    -- of the game. Games with opposed interests are not modelled (nd-quantum-dilemma).
+
+axiom ax-freedom-is-non-rival:
+    -- A permission granted to one party leaves every other party's permissions as they were, and
+    -- knowledge given away leaves the giver's view unchanged. Without this, win-win is not automatic
+    -- (nd-rival-freedoms).
+
+
+-- =============================================================================
+-- SECTION IV: DERIVES
+-- Each is executable: the test named in DESIGN.md's spec map checks it.
+-- =============================================================================
+
+derive d-view-is-sound:
+    -- What a view certifies lies inside the kernel and inside the greatest law; knowing more never
+    -- certifies less; a view closed under the moves it can make certifies exactly what is in the kernel
+    -- on the states it holds.
+    -- Status: FORM (every subset of every sampled game, with and without corrigibility).
+
+derive d-certificate-is-a-self-supporting-set:
+    -- A state is certified by a view exactly when the view holds a set that supports itself around it
+    -- (each state in it has an allowed move that sends every nature choice back into it). The smallest
+    -- knowledge a permission needs is therefore a smallest self-supporting set.
+    -- Status: FORM (every subset of every sampled game).
+
+derive d-pooling-needs-a-border:
+    -- Pooling the views of parties that each hold a territory certifies at least the union of what each
+    -- did, and sometimes strictly more; territories that no allowed move crosses gain nothing, and every
+    -- gain sampled had a crossing. Two hamlets that shelter in each other in a storm need each other's
+    -- knowledge; if only one shelters the gain is one-sided.
+    -- Status: FORM (random games, and the worked cases).
+
+derive d-footprint-holds-cores:
+    -- The footprint of a decision is what its targets rest on together with what rests on them, to any
+    -- depth, and it is a union of whole cores of mutual reliance.
+    -- Status: FORM (random graphs, against an independent closure).
+
+derive d-quorum-is-cover-and-attendance:
+    -- The fewest people who between them understand the footprint is the cover number; the fewest
+    -- attendees such that whoever attends understands it is m - w + 1 for m people and bus factor w. The
+    -- required quorum is the larger of a strict majority of the pool and that.
+    -- Status: FORM (brute force over every group of people on small instances).
+
+derive d-necessary-voices-are-sole-witnesses:
+    -- The people no decision can be made without are exactly those who alone understand some part of
+    -- the footprint; the affected who alone know their own stake are among them until someone else
+    -- learns it.
+    -- Status: FORM (brute force).
+
+derive d-barrier-is-monotone:
+    -- Raising the barrier shrinks the pool, never lowers the cover, and can make a decision unmakeable,
+    -- never the reverse. The highest barrier a decision can bear is the last at which the pool still
+    -- understands it.
+    -- Status: FORM.
+
+derive d-barrier-costs-capture-resistance:
+    -- Each pair of seats added to a majority body makes it strictly dearer to capture, in bits, for a
+    -- seat probability below one half (Condorcet's jury theorem, exact), so every seat the barrier
+    -- removes is paid for in capture resistance.
+    -- Status: FORM (exact rationals).
+
+derive d-opening-closure:
+    -- A permission whose consequence is a state where nothing is permitted is not coherent; a coherent
+    -- opening is closed under what it enables.
+    -- Status: FORM (the worked corridor, and a flag-by-flag comparison with independent checks).
+
+derive d-no-trade-off-within-lawful-existence:
+    -- Among coherent openings the greatest corrigible law is at least as good as every one of them in
+    -- every coordinate, so within lawful existence there is nothing for a price to settle.
+    -- Status: FORM (every law of every sampled small game).
+
+derive d-comprehension-certifies:
+    -- A coalition that understands the material of an opening can certify it exactly: the permission is
+    -- in the coalition's certified law exactly when it is in the greatest law.
+    -- Status: FORM (random games).
+
+derive d-price-blind-to-the-balanced-deal:
+    -- A price is a strictly positive linear weighting. An efficient option strictly inside the blend of
+    -- others is chosen by no price. Shown on a menu of three doors (all x, all y, a balanced mix).
+    -- Status: FORM (exact linear programs; the certificate is checked).
+
+derive d-alternative-of-prices-and-blends:
+    -- For every option exactly one holds: some strictly positive price rates it highest, or a blend of
+    -- the others strictly dominates it. Both are certificates a reader can check without trusting the
+    -- solver.
+    -- Status: FORM (random point sets in two to four dimensions; two dimensions also against an
+    -- independent interval argument).
+
+derive d-coherence-is-not-a-currency:
+    -- For any finite price on each coherence dimension there is a game in which the lawless opening
+    -- outscores the lawful one: a trap of (3p - 1)//7 + 1 rooms for price p.
+    -- Status: FORM (explicit family, exact).
+
+derive d-entangled-beats-classical:
+    -- In common-interest games with private inputs and no communication, entangled strategies win more
+    -- often than any classical strategy: GHZ 3/4 to 1, the magic square 8/9 to 1, CHSH 3/4 to 577/676.
+    -- Status: FORM (exact rationals over the Gaussian rationals; the classical value by enumerating every
+    -- deterministic strategy).
+
+derive d-value-of-a-state-is-its-degree:
+    -- For the state cos t |000> + sin t |111> and the standard GHZ measurements the value is exactly
+    -- 1/2 + (sin 2t)/2, so it exceeds the classical 3/4 only beyond a threshold; a product state never
+    -- beats the classical value.
+    -- Status: FORM.
+
+derive d-entanglement-moves-no-information:
+    -- In every strategy here each party's output distribution depends only on its own input.
+    -- Status: FORM (all input profiles, exact).
+
+derive d-entanglement-is-consumed:
+    -- After the measurements the state is a product state, and a second round on it is worth no more
+    -- than a classical one.
+    -- Status: FORM.
+
+derive d-no-signalling-is-not-quantum:
+    -- A PR box is no-signalling and wins CHSH with certainty, which no quantum strategy does: local
+    -- strategies, quantum strategies and no-signalling tables are three different sets.
+    -- Status: FORM.
+
+
+-- =============================================================================
+-- SECTION V: WHAT THIS LAYER DOES NOT CONTAIN
+-- =============================================================================
+
+non-derive nd-win-win-by-construction:
+    -- NOT DERIVED. That deals are win-win is a consequence of ax-freedom-is-non-rival and
+    -- ax-common-interest, not a discovery about exchange. With rival freedoms or opposed interests it
+    -- fails for some deals (decision D30).
+
+non-derive nd-understanding-is-measured:
+    -- NOT DERIVED. That understanding can be measured. The barrier is only as honest as the test, and
+    -- whoever certifies understanding holds the gate (decision D29).
+
+non-derive nd-institutions-are-entangled:
+    -- NOT DERIVED, NOT WITNESSED. That human or institutional decisions can be entangled in the
+    -- physical sense. What would count as a witness: separated devices winning a common-interest game
+    -- above the classical value in a Bell-type test with the locality loophole closed, at a stated cost
+    -- per use (decision D28).
+
+non-derive nd-quantum-dilemma:
+    -- NOT DERIVED, NOT MODELLED. That entanglement dissolves dilemmas between parties with opposed
+    -- interests. The literature's results depend on the strategy set allowed; a deal that is not
+    -- common-interest is not exclusively win-win (decision D27).
+
+open nd-rival-freedoms:
+    -- OPEN, NOT IMPLEMENTED. A permission to use something that runs out is rival: granting it to one
+    -- party takes it from another. An exchange of rival freedoms without money (top trading cycles is
+    -- the standard answer for indivisible goods) is not built (decision D30).
+
+open nd-comprehension-instrument:
+    -- OPEN. A test of understanding that a person passes exactly when they understand, that cannot be
+    -- passed by memorizing it, and is run by someone with no stake in who passes (decision D29).
+
+
+-- =============================================================================
+-- SECTION VI: GRADUATION CRITERION
+-- =============================================================================
+
+graduation:
+    -- GC-L1-0: the starting point is quoted exactly, and nothing in the file is attributed to Tyler Roost
+    --          that he did not say. DISCHARGED (tests/test_spec.py).
+    -- GC-L1-1: every derive is executable and checked against an oracle that shares no code with the
+    --          implementation. DISCHARGED (brute force over groups of people and over every law of small
+    --          games; a dense matrix oracle for the quantum engine; exact linear programs whose
+    --          certificates are checked).
+    -- GC-L1-2: no money and no scalar price. DISCHARGED in the sense that matters: a deal is a vector, a
+    --          price is shown to be blind to the balanced deal and unable to outweigh lawfulness, and the
+    --          only unit that remains is the bit (d-price-blind-to-the-balanced-deal,
+    --          d-coherence-is-not-a-currency).
+    -- GC-L1-3: every decision with an expectation states what would refute it, and its check can fail.
+    --          DISCHARGED (tests/test_decisions.py and tests/test_clauses.py break each check, and each
+    --          clause of it, on purpose).
+    -- GC-L1-4: understanding can be measured. NOT DISCHARGED: nd-understanding-is-measured.
+    -- GC-L1-5: institutional decisions can be entangled. NOT DISCHARGED: nd-institutions-are-entangled.
+    -- GC-L1-6: rival freedoms and an exchange of them without money. NOT DISCHARGED: nd-rival-freedoms.
+    --
+    -- Four of seven discharged.
+    --
+    -- This layer does not graduate as a theory of exchange, and no claim of one is made anywhere in this
+    -- file. It graduates, if at all, as a toolkit whose finite theorems are exact and whose reach into
+    -- institutions is stated as proposal.

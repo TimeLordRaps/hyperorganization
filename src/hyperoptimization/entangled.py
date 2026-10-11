@@ -47,6 +47,7 @@ import itertools
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from fractions import Fraction
+from functools import lru_cache
 from typing import Any
 
 
@@ -58,8 +59,8 @@ class Gauss:
     def __init__(self, re: int | Fraction = 0, im: int | Fraction = 0) -> None:
         if type(re) is float or type(im) is float:
             raise TypeError("a Gaussian rational is built from integers and fractions, not floats")
-        self.re = Fraction(re)
-        self.im = Fraction(im)
+        self.re = re if type(re) is Fraction else Fraction(re)
+        self.im = im if type(im) is Fraction else Fraction(im)
 
     @staticmethod
     def _of(other: object) -> Gauss | None:
@@ -221,6 +222,34 @@ def probability(state: State, observables: Sequence[Observable], outcomes: Seque
     return numerator.re / norm.re
 
 
+def distribution(state: State, observables: Sequence[Observable]) -> dict[tuple[int, ...], Fraction]:
+    """The probability of every outcome (a +1 or -1 for each observable) with positive probability, when the
+    commuting observables are measured together. Branches whose state vanishes are dropped as soon as they
+    do, so an outcome the state cannot give costs nothing: measuring two commuting cells of a row fixes the
+    third. The probabilities are those of `probability`, found by a walk down the outcomes."""
+    if not any(state):
+        raise ValueError("the zero vector is not a state")
+    _qubits(state)
+    norm = inner(state, state).re
+    found: dict[tuple[int, ...], Fraction] = {}
+
+    def walk(vector: State, outcomes: tuple[int, ...]) -> None:
+        if len(outcomes) == len(observables):
+            overlap = inner(state, vector)
+            if overlap.im != 0:
+                raise ValueError("the observables do not commute: the probability is not real")
+            found[outcomes] = overlap.re / norm
+            return
+        moved = act(observables[len(outcomes)], vector)
+        for outcome in (1, -1):
+            branch = tuple((v + outcome * m) * Fraction(1, 2) for v, m in zip(vector, moved))
+            if any(branch):
+                walk(branch, (*outcomes, outcome))
+
+    walk(tuple(state), ())
+    return found
+
+
 def product_state(parts: Sequence[tuple[int | Fraction | Gauss, int | Fraction | Gauss]]) -> State:
     """The tensor product of single-qubit states (a, b) = a|0> + b|1>, unnormalised."""
     out: State = (Gauss(1),)
@@ -295,6 +324,10 @@ class Strategy:
 Table = dict[tuple[Any, ...], dict[tuple[Any, ...], Fraction]]
 
 
+_CACHE = 4096  # answers kept per check: enough for every strategy in the tests and the ledger, bounded for a long run
+
+
+@lru_cache(maxsize=_CACHE)
 def _commute(a: Observable, b: Observable, n: int) -> bool:
     if {q for q, _ in a.factors}.isdisjoint({q for q, _ in b.factors}):
         return True
@@ -305,6 +338,7 @@ def _commute(a: Observable, b: Observable, n: int) -> bool:
     return True
 
 
+@lru_cache(maxsize=_CACHE)
 def _squares_to_one(a: Observable, n: int) -> bool:
     for index in range(2**n):
         basis = tuple(Gauss(int(i == index)) for i in range(2**n))
@@ -336,14 +370,12 @@ def table(game: CommonInterestGame, strategy: Strategy) -> Table:
         for a, b in itertools.combinations(observables, 2):
             if not _commute(a, b, n):
                 raise ValueError("observables measured together must commute")
-        distribution: dict[tuple[Any, ...], Fraction] = {}
-        for outcomes in itertools.product((1, -1), repeat=len(observables)):
-            mass = probability(strategy.state, observables, outcomes)
-            if mass:
-                outputs = tuple(strategy.decode(p, profile[p], outcomes[lo:hi])
-                                for p, (lo, hi) in enumerate(spans))
-                distribution[outputs] = distribution.get(outputs, Fraction(0)) + mass
-        result[profile] = distribution
+        outputs_mass: dict[tuple[Any, ...], Fraction] = {}
+        for outcomes, mass in distribution(strategy.state, observables).items():
+            outputs = tuple(strategy.decode(p, profile[p], outcomes[lo:hi])
+                            for p, (lo, hi) in enumerate(spans))
+            outputs_mass[outputs] = outputs_mass.get(outputs, Fraction(0)) + mass
+        result[profile] = outputs_mass
     return result
 
 
@@ -477,6 +509,16 @@ def magic_square_strategy() -> Strategy:
                     lambda p, x, outcomes: tuple(0 if o == 1 else 1 for o in outcomes), players=2)
 
 
+def magic_square_ledgers() -> int:
+    """How many ways there are to write a sign in each of the nine cells so that every row multiplies to +1
+    and every column to -1. None: the product of all nine would be +1 by rows and -1 by columns. This is why
+    the classical value of the magic square game falls short of 1."""
+    return sum(
+        all(cells[3 * r] * cells[3 * r + 1] * cells[3 * r + 2] == 1 for r in range(3))
+        and all(cells[c] * cells[3 + c] * cells[6 + c] == -1 for c in range(3))
+        for cells in itertools.product((1, -1), repeat=9))
+
+
 def pr_box() -> Table:
     """The Popescu-Rohrlich box: outputs that differ exactly when both inputs are one, each output alone
     uniform. No-signalling, and it wins CHSH every time, which no quantum strategy can."""
@@ -485,6 +527,7 @@ def pr_box() -> Table:
 
 __all__ = ["CommonInterestGame", "Gauss", "I2", "MAGIC_SQUARE", "Observable", "Strategy", "X", "Y", "Z",
            "act", "apply", "chsh_game", "chsh_strategy", "classical_value", "collapse", "ghz_game",
-           "ghz_strategy", "inner", "is_no_signalling", "magic_square_game", "magic_square_strategy",
+           "distribution", "ghz_strategy", "inner", "is_no_signalling", "magic_square_game", "magic_square_ledgers",
+           "magic_square_strategy",
            "pauli", "pr_box", "probability", "product_state", "quantum_value", "rotated", "shift", "table",
            "table_value"]

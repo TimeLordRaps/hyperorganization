@@ -22,7 +22,7 @@ closed and pooling adds nothing. Where it exists it can be mutual (two hamlets t
 the other in a storm: neither can certify its own safe move alone, together they certify both) or
 one-sided (one hamlet is safe on its own, the other shelters in it: the first gives knowledge,
 gains nothing and loses nothing). This is the sense in which information asymmetry makes a deal
-necessary and not merely possible, and in which what is exchanged is a certificate and not a price:
+necessary where it exists and not merely possible, and in which what is exchanged is a certificate and not a price:
 a number cannot be checked for safety, a self-supporting set can.
 
 What this does not show: that disclosure is free. Knowledge is non-rival here (giving it away leaves

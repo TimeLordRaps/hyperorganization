@@ -466,5 +466,13 @@ def test_the_inputs_are_checked():
     with pytest.raises(TypeError):
         comprehension.requirement({"p": ["a"]}, "a")  # nodes are a collection, not one string
     with pytest.raises(ValueError):
+        comprehension.coverage({"p": ["a"]}, "p", [1])  # node names are strings
+    with pytest.raises(ValueError):
+        comprehension.coverage({"p": ["a"]}, "p", [""])  # and not empty
+    with pytest.raises(ValueError):
+        comprehension.requirement({"": ["a"]}, ["a"])  # every person needs a name
+    with pytest.raises(ValueError):
+        comprehension.requirement({1: ["a"]}, ["a"])
+    with pytest.raises(ValueError):
         comprehension.sweep({"p": ["a"]}, ["a"], [Fraction(1, 2), Fraction(1, 4)])  # barriers rise
     assert len(comprehension.sweep({"p": ["a"]}, ["a"], [Fraction(1, 2), Fraction(1, 2)])) == 2  # and may repeat
