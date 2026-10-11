@@ -37,6 +37,7 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 | D29 | Understanding has no instrument here: the barrier is only as honest as the test | OPEN | none (by design) |
 | D30 | Win-win holds by construction until freedoms can be rival | OPEN | none (by design) |
 | D31 | With rival freedoms an exchange without money is individually rational, efficient and truthful, and the starting allocation decides the rest | FRAME | HOLDS_IN_MODEL |
+| D32 | From a given start an exchange without money moves exactly the loops of envy, a ladder made by wealth is frozen under it, and what thaws a ladder is a difference in the direction of what agents value | FRAME | HOLDS_IN_MODEL |
 
 ## D01. A price is the surprisal of a compromise
 
@@ -752,3 +753,30 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 - 145 audits of honest records pass, each from the agent's own ranking and the public record of cycles alone; of 864 records of three agents on 36 markets, the 52 that every agent accepts all describe the top trading cycles outcome
 - with identical rankings nothing moves under any of 150 starting allocations of three to five agents, so what an agent gets over all starting allocations runs from its first choice to its last (places 0 to 3 for four agents): the start decides
 - two goods of equal worth at the price (1, 1), (5, 1) and (1, 5), are swapped by two agents who weigh the coordinates differently, with no money; at any common price the goods held are worth the same after as before, so the gain is in the private weights only
+
+## D32. From a given start an exchange without money moves exactly the loops of envy, a ladder made by wealth is frozen under it, and what thaws a ladder is a difference in the direction of what agents value
+
+**Tag:** FRAME
+
+**Choice.** Read the present as a start (who holds what) with the agents' rankings, and read standing as envy: an agent envies another when it ranks the other's good above its own. Then top trading cycles moves someone exactly when envy has a loop, which is exactly when the start is not Pareto efficient; a start with no loop is a pecking order (each holds its favourite of what it and those after it hold), a ladder; and a start made by letting the wealthiest pick first is such a ladder, so abolishing money while keeping holdings freezes it wherever rankings agree. A dial from the rankings a common price induces to private rankings, computed exactly in rational arithmetic, shows what unfreezes it: nothing at the price alone, nothing with one coordinate, nothing when the weights lie along the price, and otherwise trade at exact rational settings that can open and close again. The start is an input, whoever made it.
+
+**Not chosen.**
+- A uniformly random start, from which top trading cycles gives the lottery of random serial dictatorship: WITHDRAWN by the owner on 2026-10-11 ("There is no possible uniform start"): no neutral party exists to draw it, and the start is what money built.
+- A transfer from the top of a ladder to its foot: not an exchange in which nobody loses, so it is outside this model; whether it is lawful turns on what optimality is over participants (D16), which the owner has not answered.
+- Status as tastes that depend on who else holds what: outside the model, and where the guarantees of top trading cycles fail or change (HO-028). The model keeps one thing about status, that agents rank by a common scale, and that is the dial's setting 0.
+- Making goods less rival, or rotating who picks first: the other ways to thaw a ladder without any change in tastes. Not built; they are `[HYPER]` here (HO-030).
+
+**Expectation.** A witness would see a real start with the agents' rankings in which envy has no loop and nobody can trade without a side payment, and the same agents, once what they value diverges in direction, trading with no money at the settings the dial predicts; or a start with a loop of envy that top trading cycles turns into a ladder in one exchange.
+
+**Refuter.** A market where trade is possible and envy has no loop, or the reverse; an efficient start with no pecking order; a start made by letting the wealthiest pick first that the exchange moves, or in which someone envies a poorer agent; or a dial in which agents rank apart at the price alone, with one coordinate or with weights along the price, or in which a ranking changes inside a stretch between breakpoints.
+
+**World witness.** None: nothing real has been exchanged. The wealthiest-first start is a stylisation (a market is not a serial dictatorship); the dial's linear mix is one path among many from a common ranking to private ones; and real status is a taste that depends on what others hold, which this model does not have. It shows what is stuck, not how to unstick a ladder by anything but a change in tastes (HO-030).
+
+**Where.** standing.py; tests/test_standing.py
+
+**Model check:** HOLDS_IN_MODEL — from a given start an exchange without money moves exactly the loops of envy, a ladder made by wealth is frozen under it, and what thaws a ladder is a difference in the direction of what agents value
+- 1304 markets of two and three agents (every start and every strict profile) and 48 seeded markets of four and five: envy has a loop in 745 of them, and in exactly those someone trades, the start is not Pareto efficient and no order of the agents is a pecking order; in the other 607 the start is a ladder; after one exchange envy has no loop in any
+- 216 profiles of three agents with the identity start: 98 ladders and 118 loops, the split into nobody and somebody trading; 1734 wealth starts (every wealth order of every profile of three agents, seeded ones of four to nine): each is a rearrangement of the goods, is Pareto efficient where that can be tried (up to six), is left where it is by top trading cycles, has the wealth order as a pecking order, and has envy pointing only toward the wealthier
+- the dial: at the price alone nobody trades in 40 instances; with one coordinate nobody ever trades, at any setting, in 30; with weights along the price none in 30; the outcome on every stretch between breakpoints agrees with direct evaluation at 325 settings, and nobody moves below the threshold
+- of 300 seeded instances with two or three coordinates 95 trade at some setting, and in 26 of those trade opens and closes again as the dial rises, so the dial is not a one-way door
+- two goods of equal worth at the price (1, 1) are swapped at any divergence at all (threshold 0, never attained); a gap of 1 in worth is closed exactly at 1/3, and the tie there is broken by the order the goods are listed in; one instance trades on the stretch above 1/3 up to and including 1/2 and nowhere else

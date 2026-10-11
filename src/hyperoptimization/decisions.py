@@ -44,6 +44,7 @@ from . import (
     quorum,
     renewal,
     rival,
+    standing,
     surprisal,
     viability,
 )
@@ -1264,6 +1265,207 @@ def _d31() -> Verdict:
 
 
 
+def _d32() -> Verdict:
+    problems: list[str] = []
+
+    def holds(endowment: dict, prefs: dict, order: tuple) -> bool:
+        """A pecking order, restated from its definition so that this check does not lean on the module it checks:
+        each agent's good is its favourite among the goods held by it and by every agent after it."""
+        return all(min((endowment[b] for b in order[k:]), key=prefs[a].index) == endowment[a]
+                   for k, a in enumerate(order))
+
+    markets: list[tuple[str, dict, dict]] = []
+    for n in (2, 3):  # every start and every strict profile
+        agents, goods = list(range(n)), [f"g{i}" for i in range(n)]
+        for held in itertools.permutations(goods):
+            for choice in itertools.product(itertools.permutations(goods), repeat=n):
+                markets.append((f"{n} agents, start {held}, rankings {choice}",
+                                dict(zip(agents, held)), dict(zip(agents, choice))))
+    exhaustive = len(markets)
+    rng = random.Random(32)
+    for n, count in ((4, 40), (5, 8)):
+        goods = [f"g{i}" for i in range(n)]
+        for k in range(count):
+            held = goods[:]
+            rng.shuffle(held)
+            markets.append((f"random market {k} of {n} agents", dict(zip(range(n), held)),
+                            {a: tuple(rng.sample(goods, n)) for a in range(n)}))
+    loops = identity_markets = identity_efficient = 0
+    for label, endowment, prefs in markets:
+        before = len(problems)
+        outcome = rival.top_trading_cycles(endowment, prefs)
+        loop = standing.envy_loop(endowment, prefs)
+        efficient = rival.pareto_efficient(endowment, prefs, endowment)
+        loops += loop is not None
+        if endowment == {0: "g0", 1: "g1", 2: "g2"}:  # the identity start of three agents, as in the survey
+            identity_markets += 1
+            identity_efficient += efficient
+        if not ((loop is not None) == bool(rival.movers(endowment, outcome)) == (not efficient)):
+            problems.append(f"{label}: envy has a loop, someone trades and the start is not Pareto efficient "
+                            "together or not at all, and here they disagree")
+        order = standing.pecking_order(endowment, prefs)
+        tried = any(holds(endowment, prefs, o) for o in itertools.permutations(endowment))
+        if (order is not None) != efficient or tried != efficient:
+            problems.append(f"{label}: a pecking order exists (found, and by trying every order) exactly when the "
+                            "start is Pareto efficient, and here it does not")
+        if order is not None and not holds(endowment, prefs, order):
+            problems.append(f"{label}: the pecking order found is not one")
+        if not standing.frozen(outcome, prefs):
+            problems.append(f"{label}: envy still has a loop after the exchange")
+        if len(problems) > before:
+            break
+
+    cases: list[tuple[dict, tuple]] = []  # (rankings, the agents from the wealthiest down)
+    for choice in itertools.product(itertools.permutations(["g0", "g1", "g2"]), repeat=3):
+        for ranked in itertools.permutations(range(3)):
+            cases.append((dict(zip(range(3), choice)), ranked))
+    exhaustive_wealth = len(cases)
+    left_alone = 0
+    for n, profiles, orders in ((4, 12, 24), (6, 6, 20), (9, 3, 10)):
+        goods = [f"g{i}" for i in range(n)]
+        for _ in range(profiles):
+            prefs = {a: tuple(rng.sample(goods, n)) for a in range(n)}
+            cases.extend((prefs, tuple(rng.sample(range(n), n))) for _ in range(orders))
+    for index, (prefs, ranked) in enumerate(cases):
+        before = len(problems)
+        n = len(ranked)
+        wealth = {a: n - place for place, a in enumerate(ranked)}
+        label = f"wealth start of {n} agents in the order {ranked}"
+        start = standing.wealth_start(wealth, prefs)
+        if sorted(start.values()) != sorted(prefs[0]):
+            problems.append(f"{label}: not a rearrangement of the goods")
+            break
+        moved = rival.top_trading_cycles(start, prefs) != start
+        left_alone += index < exhaustive_wealth and not moved
+        if (n <= 6 and not rival.pareto_efficient(start, prefs, start)) or moved:
+            problems.append(f"{label}: not Pareto efficient, or top trading cycles moves it")
+        if not holds(start, prefs, ranked):
+            problems.append(f"{label}: the wealth order is not a pecking order of it")
+        if any(wealth[t] <= wealth[a] for a, targets in standing.envy_graph(start, prefs).items() for t in targets):
+            problems.append(f"{label}: an agent envies one who is no wealthier")
+        if len(problems) > before:
+            break
+    try:
+        standing.wealth_start({0: 1, 1: 1}, {0: ("g0", "g1"), 1: ("g0", "g1")})
+    except ValueError:
+        pass
+    else:
+        problems.append("equal wealth was accepted, though it has no pick order")
+
+    def instance(n: int, d: int) -> tuple[dict, dict, tuple, dict]:
+        names = [f"g{k}" for k in range(n)]
+        goods = {g: tuple(rng.randint(0, 6) for _ in range(d)) for g in names}
+        price = tuple(rng.randint(1, 6) for _ in range(d))
+        weights = {a: tuple(rng.randint(1, 6) for _ in range(d)) for a in range(n)}
+        held = names[:]
+        rng.shuffle(held)
+        return dict(zip(range(n), held)), goods, price, weights
+
+    at_price = one = along = grid = 0
+    for _ in range(40):
+        endowment, goods, price, weights = instance(rng.choice((2, 3, 4, 5)), rng.choice((1, 2, 3)))
+        at_price += 1
+        if standing.thaw_outcome(endowment, goods, price, weights, 0) != endowment:
+            problems.append("at the price alone someone traded, though every agent then ranks alike")
+            break
+    for _ in range(30):
+        endowment, goods, price, weights = instance(rng.choice((3, 4, 5)), 1)
+        one += 1
+        if any(piece.movers for piece in standing.thaw_pieces(endowment, goods, price, weights)):
+            problems.append("with one coordinate someone traded at some setting, though one number ranks every "
+                            "agent alike")
+            break
+    for _ in range(30):
+        endowment, goods, price, _unused = instance(rng.choice((3, 4, 5)), rng.choice((2, 3)))
+        along += 1
+        strength = {a: rng.randint(1, 9) for a in endowment}  # one strength per agent, along the price
+        weights = {a: tuple(strength[a] * c for c in price) for a in endowment}
+        if any(piece.movers for piece in standing.thaw_pieces(endowment, goods, price, weights)):
+            problems.append("with weights that are positive multiples of the price someone traded at some setting")
+            break
+    for _ in range(25):
+        before = len(problems)
+        endowment, goods, price, weights = instance(rng.choice((3, 4, 5)), rng.choice((2, 3)))
+        pieces = standing.thaw_pieces(endowment, goods, price, weights)
+        found = standing.thaw_threshold(endowment, goods, price, weights)
+        for step in range(13):
+            lam = Fraction(step, 12)
+            direct = standing.thaw_outcome(endowment, goods, price, weights, lam)
+            stretch = next(p for p in pieces if p.low < lam < p.high or p.low == p.high == lam)
+            if direct != stretch.allocation:
+                problems.append(f"the outcome at {lam} differs from the outcome the dial gives for the stretch "
+                                "that holds it, so a ranking changed inside a stretch")
+                break
+            if (found is None or lam < found.lam) and rival.movers(endowment, direct):
+                problems.append(f"someone moved at {lam}, below the dial's threshold {found}")
+                break
+            grid += 1
+        if len(problems) > before:
+            break
+
+    third, half = Fraction(1, 3), Fraction(1, 2)
+    vectors = {"G1": (3, 1), "G2": (1, 2)}
+    swap = ({"A": "y", "B": "x"}, {"y": (1, 5), "x": (5, 1)}, (1, 1), {"A": (3, 1), "B": (1, 3)})
+    gap = ({"A": "G2", "B": "G1"}, vectors, (1, 1), {"A": (3, 1), "B": (1, 4)})
+    flipped = ({"A": "G2", "B": "G1"}, {"G2": (1, 2), "G1": (3, 1)}, (1, 1), {"A": (3, 1), "B": (1, 4)})
+    reversal = ({"A": "G2", "B": "G1"}, vectors, (1, 1), {"A": (1, 3), "B": (1, 4)})
+
+    def traded(lam: Fraction) -> bool:
+        return bool(rival.movers(reversal[0], standing.thaw_outcome(*reversal, lam)))
+
+    for name, got, expected in (
+            ("the swap at equal worth, threshold", standing.thaw_threshold(*swap), standing.Threshold(0, False)),
+            ("the swap does not reverse", standing.thaw_reverses(*swap), False),
+            ("a gap of 1 in worth, breakpoints", standing.thaw_breakpoints(*gap[1:]), (third,)),
+            ("a gap of 1 in worth, threshold", standing.thaw_threshold(*gap), standing.Threshold(third, False)),
+            ("the same gap with the other good listed first, threshold", standing.thaw_threshold(*flipped),
+             standing.Threshold(third, True)),
+            ("the reversal, breakpoints", standing.thaw_breakpoints(*reversal[1:]), (third, half)),
+            ("the reversal, threshold", standing.thaw_threshold(*reversal), standing.Threshold(third, False)),
+            ("the reversal reverses", standing.thaw_reverses(*reversal), True),
+            ("the reversal trades at 1/3, 1/2 and 3/5", (traded(third), traded(half), traded(Fraction(3, 5))),
+             (False, True, False))):
+        if got != expected:
+            problems.append(f"worked dial example ({name}): expected {expected}, got {got}")
+
+    expected = {"profiles": identity_markets, "ladders": identity_efficient,
+                "loops": identity_markets - identity_efficient, "wealth_starts": exhaustive_wealth,
+                "wealth_frozen": left_alone}
+    try:
+        counts = standing.survey(3)
+    except ValueError as error:
+        counts = expected
+        problems.append(f"the survey of three agents failed: {error}")
+    if counts != expected:
+        problems.append(f"the survey of three agents differs from the counts made here: {counts}, not {expected}")
+    sample = standing.dial_survey()
+    return _verdict("from a given start an exchange without money moves exactly the loops of envy, a ladder made by "
+                    "wealth is frozen under it, and what thaws a ladder is a difference in the direction of what "
+                    "agents value", problems, [
+                        f"{exhaustive} markets of two and three agents (every start and every strict profile) and "
+                        f"{len(markets) - exhaustive} seeded markets of four and five: envy has a loop in {loops} of "
+                        "them, and in exactly those someone trades, the start is not Pareto efficient and no order "
+                        "of the agents is a pecking order; in the other "
+                        f"{len(markets) - loops} the start is a ladder; after one exchange envy has no loop in any",
+                        f"{counts['profiles']} profiles of three agents with the identity start: {counts['ladders']} "
+                        f"ladders and {counts['loops']} loops, the split into nobody and somebody trading; "
+                        f"{len(cases)} wealth starts (every wealth order of every profile of three agents, seeded "
+                        "ones of four to nine): each is a rearrangement of the goods, is Pareto efficient where "
+                        "that can be tried (up to six), is left where it is by top trading cycles, has the wealth "
+                        "order as a pecking order, and has envy pointing only toward the wealthier",
+                        f"the dial: at the price alone nobody trades in {at_price} instances; with one coordinate "
+                        f"nobody ever trades, at any setting, in {one}; with weights along the price none in "
+                        f"{along}; the outcome on every stretch between breakpoints agrees with direct evaluation at "
+                        f"{grid} settings, and nobody moves below the threshold",
+                        f"of {sample['instances']} seeded instances with two or three coordinates {sample['trade']} "
+                        f"trade at some setting, and in {sample['reverse']} of those trade opens and closes again as "
+                        "the dial rises, so the dial is not a one-way door",
+                        "two goods of equal worth at the price (1, 1) are swapped at any divergence at all "
+                        "(threshold 0, never attained); a gap of 1 in worth is closed exactly at 1/3, and the tie "
+                        "there is broken by the order the goods are listed in; one instance trades on the stretch "
+                        "above 1/3 up to and including 1/2 and nowhere else"])
+
+
 # ---------------------------------------------------------------------------
 # The ledger.
 # ---------------------------------------------------------------------------
@@ -1990,6 +2192,44 @@ LEDGER: tuple[Decision, ...] = (
         "and the starting allocation is the contested question that money used to settle (B16).",
         "rival.py; tests/test_rival.py",
         _d31),
+    Decision(
+        "D32", "From a given start an exchange without money moves exactly the loops of envy, a ladder made by "
+        "wealth is frozen under it, and what thaws a ladder is a difference in the direction of what agents value",
+        Tag.FRAME,
+        "Read the present as a start (who holds what) with the agents' rankings, and read standing as envy: an "
+        "agent envies another when it ranks the other's good above its own. Then top trading cycles moves someone "
+        "exactly when envy has a loop, which is exactly when the start is not Pareto efficient; a start with no "
+        "loop is a pecking order (each holds its favourite of what it and those after it hold), a ladder; and a "
+        "start made by letting the wealthiest pick first is such a ladder, so abolishing money while keeping "
+        "holdings freezes it wherever rankings agree. A dial from the rankings a common price induces to private "
+        "rankings, computed exactly in rational arithmetic, shows what unfreezes it: nothing at the price alone, "
+        "nothing with one coordinate, nothing when the weights lie along the price, and otherwise trade at exact "
+        "rational settings that can open and close again. The start is an input, whoever made it.",
+        ("A uniformly random start, from which top trading cycles gives the lottery of random serial dictatorship: "
+         "WITHDRAWN by the owner on 2026-10-11 (\"There is no possible uniform start\"): no neutral party exists to "
+         "draw it, and the start is what money built.",
+         "A transfer from the top of a ladder to its foot: not an exchange in which nobody loses, so it is outside "
+         "this model; whether it is lawful turns on what optimality is over participants (D16), which the owner "
+         "has not answered.",
+         "Status as tastes that depend on who else holds what: outside the model, and where the guarantees of top "
+         "trading cycles fail or change (HO-028). The model keeps one thing about status, that agents rank by a "
+         "common scale, and that is the dial's setting 0.",
+         "Making goods less rival, or rotating who picks first: the other ways to thaw a ladder without any change "
+         "in tastes. Not built; they are `[HYPER]` here (HO-030)."),
+        "A witness would see a real start with the agents' rankings in which envy has no loop and nobody can trade "
+        "without a side payment, and the same agents, once what they value diverges in direction, trading with no "
+        "money at the settings the dial predicts; or a start with a loop of envy that top trading cycles turns "
+        "into a ladder in one exchange.",
+        "A market where trade is possible and envy has no loop, or the reverse; an efficient start with no pecking "
+        "order; a start made by letting the wealthiest pick first that the exchange moves, or in which someone "
+        "envies a poorer agent; or a dial in which agents rank apart at the price alone, with one coordinate or "
+        "with weights along the price, or in which a ranking changes inside a stretch between breakpoints.",
+        "None: nothing real has been exchanged. The wealthiest-first start is a stylisation (a market is not a "
+        "serial dictatorship); the dial's linear mix is one path among many from a common ranking to private ones; "
+        "and real status is a taste that depends on what others hold, which this model does not have. It shows "
+        "what is stuck, not how to unstick a ladder by anything but a change in tastes (HO-030).",
+        "standing.py; tests/test_standing.py",
+        _d32),
 )
 
 _BY_ID = {d.id: d for d in LEDGER}

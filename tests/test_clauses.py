@@ -32,6 +32,7 @@ from hyperoptimization import (
     ordinal,
     quorum,
     rival,
+    standing,
     surprisal,
     viability,
 )
@@ -102,6 +103,28 @@ def _nonmonotone_view(game, known, corrigible=True):
 
 def _constant_zero_box():
     return {(x, y): {(0, 0): Fraction(1)} for x in (0, 1) for y in (0, 1)}
+
+
+def _rotated_start(wealth, prefs):
+    """A rearrangement of the goods that follows no wealth order."""
+    ranking = list(next(iter(prefs.values())))
+    return dict(zip(prefs, ranking[1:] + ranking[:1]))
+
+
+def _poorest_first(wealth, prefs):
+    """The wrong way round: the least wealthy picks first."""
+    return standing.serial_dictatorship(sorted(prefs, key=lambda agent: wealth[agent]), prefs)
+
+
+def _private_only(goods, cost, own, lam):
+    """Ignores the price and the setting: every agent ranks by its own weights alone."""
+    return {agent: rival.rank_by_weights(goods, weights) for agent, weights in own.items()}
+
+
+def _opposed(goods, cost, own, lam):
+    """Ignores every weight: agents alternate between the listing order and its reverse."""
+    names = list(goods)
+    return {agent: tuple(names if k % 2 else reversed(names)) for k, agent in enumerate(own)}
 
 
 # (decision, object to break, attribute, what to put there, text the witness must contain)
@@ -260,6 +283,33 @@ CLAUSES = [
      "with identical rankings an agent's best and worst place"),
     ("D31", rival, "rank_by_weights", lambda goods, weights: tuple(goods),
      "agents who weigh the coordinates differently did not swap"),
+    ("D32", standing, "envy_loop", lambda endowment, prefs: None,
+     "envy has a loop, someone trades and the start is not Pareto efficient together or not at all"),
+    ("D32", standing, "pecking_order", lambda endowment, prefs: (),
+     "a pecking order exists (found, and by trying every order) exactly when the start is Pareto efficient"),
+    ("D32", standing, "pecking_order", lambda endowment, prefs: tuple(reversed(list(endowment))),
+     "the pecking order found is not one"),
+    ("D32", standing, "frozen", lambda endowment, prefs: False, "envy still has a loop after the exchange"),
+    ("D32", standing, "wealth_start", lambda wealth, prefs: {agent: "g0" for agent in prefs},
+     "not a rearrangement of the goods"),
+    ("D32", rival, "pareto_efficient", lambda endowment, prefs, allocation: False,
+     "not Pareto efficient, or top trading cycles moves it"),
+    ("D32", standing, "wealth_start", _poorest_first, "the wealth order is not a pecking order of it"),
+    ("D32", standing, "wealth_start", _poorest_first, "an agent envies one who is no wealthier"),
+    ("D32", standing, "wealth_start", _rotated_start, "equal wealth was accepted, though it has no pick order"),
+    ("D32", standing, "_rankings", _private_only, "at the price alone someone traded"),
+    ("D32", standing, "_rankings", _opposed, "with one coordinate someone traded at some setting"),
+    ("D32", standing, "_rankings", _opposed, "with weights that are positive multiples of the price someone traded"),
+    ("D32", standing, "thaw_outcome", lambda endowment, goods, price, weights, lam: dict(endowment),
+     "so a ranking changed inside a stretch"),
+    ("D32", standing, "thaw_threshold", lambda endowment, goods, price, weights: standing.Threshold(Fraction(1), True),
+     "below the dial's threshold"),
+    ("D32", standing, "thaw_reverses", lambda endowment, goods, price, weights: False, "worked dial example"),
+    ("D32", standing, "survey", lambda n=3: {"profiles": 216, "ladders": 1, "loops": 1, "wealth_starts": 1,
+                                            "wealth_frozen": 0},
+     "the survey of three agents differs from the counts made here"),
+    ("D32", standing, "wealth_start", lambda wealth, prefs: {agent: "g0" for agent in prefs},
+     "the survey of three agents failed"),
 ]
 
 _results: dict[object, tuple[Status, tuple[str, ...]]] = {}
