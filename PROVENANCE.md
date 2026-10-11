@@ -18,6 +18,16 @@ A fourth message, later the same day, after the first three had been answered. I
 
 > subagents should always be haiku 5.5 just so you know, also for there to be no money we need information asymmetric deal making through informationally richer channels than single dimensional $. Also for a decision to be makable in the first place a comprehensive understanding of the material and its impacts is a necessity, this sets the quorum size, and also determines the barrier to entry for decision making, for deal making we should utilize quantum game theoretical optionality to determine entangled decisions which themselves by simply existing in an entangled state provide value for exclusively win win deals since we no longer use money and instead represent deals by value of freedom allowed and degree to which those freedoms allow other freedoms and the dimensions along which those freedoms all cohere with the overall systems lawful existence.
 
+## The correction, 2026-10-11
+
+Two messages the same day, sent while the assistant was at work after the exchange layer and rival freedoms (section 14.5) had been reported. The first is a question and states no aim. The second is `USER-STATED`. The assistant had proposed, as the next check, a uniformly random starting allocation for rival freedoms (DESIGN section 13, item 13; HO-027).
+
+> And whats the rival freedom thing
+
+> There is no possible uniform start, the world currently has money, we need a way to extrapolate from current status games into a future with no money, the only utopic futures are ones with no money.
+
+Read as a requirement: the starting allocation is the world as it is, built by money, so the package has to start from it and say what can move, and what cannot, without money. The lottery candidate is withdrawn (HO-027). "The only utopic futures are ones with no money" is the owner's claim about what is good: it fixes the target of the extrapolation, and the package neither derives it nor tests it.
+
 ## The rule this builds on, 2026-10-11
 
 From the same day, recorded in hyperethics (`L2_governance.hm`): "Very important no power that is corrupting should be allowable in any formal governance system, this rule should allow us to formalize laws and things in hyperethics", with the reason "Otherwise the system is self-toppling either from inside with shadow control or from outside with explicit or implicit control".
@@ -46,6 +56,7 @@ From the same day, recorded in hyperethics (`L2_governance.hm`): "Very important
 | "a comprehensive understanding of the material and its impacts is a necessity, this sets the quorum size, and also determines the barrier to entry" | the footprint (what a decision rests on and what rests on it); the quorum is the larger of a balanced majority and the attendance at which whoever comes understands it; the barrier is the share of the footprint a person must understand (`comprehension`, §14.2, D26) |
 | "quantum game theoretical optionality to determine entangled decisions which themselves by simply existing in an entangled state provide value for exclusively win win deals" | common-interest games with private inputs and no communication; the value of the shared state is a formula in its degree of entanglement; it carries no message and is consumed by use (`entangled`, §14.4, D27); that institutions can be entangled is a proposal with no witness (D28) |
 | "represent deals by value of freedom allowed and degree to which those freedoms allow other freedoms and the dimensions along which those freedoms all cohere with the overall systems lawful existence" | the value vector of an opening of the law: permissions opened by dimension, states made reachable and permissions there, and four coherence dimensions (`deals.opening_value`, §14.3, D24) |
+| "There is no possible uniform start, the world currently has money, we need a way to extrapolate from current status games into a future with no money, the only utopic futures are ones with no money" | the random-start candidate is withdrawn (HO-027, DESIGN section 13 item 13); the starting allocation stays an input and is now the present world (B16); the extrapolation from it is the next layer, recorded as an open obligation (DESIGN section 13) |
 
 ## What was added by the assistant
 
@@ -59,4 +70,6 @@ Recalled, not re-fetched while writing; look each up before citing: Aubin on via
 
 ## The repository
 
-Created locally on 2026-10-11. At the time of writing the hosting platform's integration for this session refused to create a repository (HTTP 403, "Resource not accessible by integration"), and the `gh` command-line client in the session answered that sessions are bound to their configured repositories. The history here is the one the assistant wrote; no commit in it was authored by anyone else.
+Written locally on 2026-10-11, because the build session could not create a repository: the hosting platform's integration refused (HTTP 403, "Resource not accessible by integration"), and the `gh` command-line client answered, on the account-level path, that sessions are bound to their configured repositories (HTTP 403 again; repository-scoped paths worked). The owner then created `TimeLordRaps/hyperorganization`, whose Initial commit (`a58c56a`) is an Apache-2.0 LICENSE, and gave its address in a message the same day. The package history was merged into that commit and pushed as `8190793` (a merge of `a58c56a` and `dbd2bf2`, with the owner's LICENSE text kept verbatim). The history before the merge is the one the assistant wrote; `a58c56a` is the owner's.
+
+The repository's name differs from the field's. The owner's words (the second message under "The starting point") were "the hyperfield hyperoptimization ... I think you can make a new public repo for that, hyperoptimization", and the package, the documents and the specifications say hyperoptimization. Nothing was renamed; the question is the owner's (HO-029).

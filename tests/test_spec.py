@@ -24,6 +24,7 @@ BOTH = SPEC + "\n" + SPEC1
 DESIGN = (ROOT / "DESIGN.md").read_text(encoding="utf-8")
 PROVENANCE = (ROOT / "PROVENANCE.md").read_text(encoding="utf-8")
 README = (ROOT / "README.md").read_text(encoding="utf-8")
+DEBT = (ROOT / "TECHNICAL_DEBT.md").read_text(encoding="utf-8")
 
 MESSAGES = (
     "How does this come into play in an ordinal system of checks and balances? Where a system inside "
@@ -62,6 +63,14 @@ MESSAGES = (
     "with the overall systems lawful existence.",
 )
 WHERE = (SPEC, SPEC, SPEC, SPEC1)  # the spec each message is quoted in
+
+# Said later the same day, after the exchange layer had been reported (PROVENANCE.md, "The correction"): a
+# question, which states no aim, and the statement that withdrew the random-start candidate.
+LATER = (
+    "And whats the rival freedom thing",
+    "There is no possible uniform start, the world currently has money, we need a way to extrapolate "
+    "from current status games into a future with no money, the only utopic futures are ones with no money.",
+)
 
 
 def flat(text: str) -> str:
@@ -193,10 +202,27 @@ def test_the_doubled_space_in_the_third_message_survives_in_provenance():
 
 
 def test_nothing_is_attributed_to_the_owner_beyond_what_was_said():
-    # every blockquote in PROVENANCE is one of the four messages or the L2 rule it cites
+    # every blockquote in PROVENANCE is one of the four messages or the two later ones
     quoted = [" ".join(line[1:].split()) for line in PROVENANCE.splitlines() if line.startswith(">")]
-    allowed = [" ".join(m.split()) for m in MESSAGES]
+    allowed = [" ".join(m.split()) for m in MESSAGES + LATER]
     assert quoted and all(q in allowed for q in quoted)
+    assert all(" ".join(m.split()) in quoted for m in MESSAGES + LATER), "a recorded message is missing"
+
+
+def test_the_correction_is_where_it_changed_something_exactly_as_he_said_it():
+    # the statement is quoted in the provenance, where the roadmap item it withdrew stood, and in the debt row
+    statement = " ".join(LATER[1].split()).rstrip(".")
+    for name, text in (("PROVENANCE.md", PROVENANCE), ("DESIGN.md", DESIGN), ("TECHNICAL_DEBT.md", DEBT)):
+        assert statement in flat(text), f"the statement is missing or altered in {name}"
+
+
+def test_the_withdrawn_candidate_is_marked_withdrawn_and_nothing_still_proposes_it():
+    # the lottery is named only to say it is withdrawn: every sentence that mentions it also says so
+    for name, text in (("DESIGN.md", DESIGN), ("TECHNICAL_DEBT.md", DEBT), ("PROVENANCE.md", PROVENANCE)):
+        for sentence in re.split(r"(?<=[.;])\s+", flat(text)):
+            if re.search(r"uniformly random (starting allocation|start)|random serial dictatorship", sentence, re.I):
+                assert re.search(r"withdr[ae]w|no neutral party|never checked|proposed", sentence, re.I), (
+                    name, sentence)
 
 
 # --- the spec's honesty ----------------------------------------------------------------------------------------

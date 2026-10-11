@@ -1,10 +1,10 @@
 {
   "files": {
     "DECISIONS.md": "5641b3370fc64e47b7ba32e3e232b850c83d9d82c22bcfd51ec9ea32dfd794d0",
-    "DESIGN.md": "e2e09269b9d1e08727ef0d0a8269adbe642c966c8f137070ff38e5f048c15e29",
+    "DESIGN.md": "b6dc0c2872dc30db0dda92bf018bd1ab5653fa7563fe370d0699afc412a7272e",
     "L0_viability.hm": "4ed2492d7df5c666b617cbae65427bd88b33bfd5f2122e6363cb83fb3de25d39",
     "L1_exchange.hm": "651bd3c1f032a7a81f5a48981d80988f70aeadeaae89bc23fc3142246259b502",
-    "PROVENANCE.md": "e4e00c5d181ccf33c666b0ec71d4726485f4b94bdb4352709b389c89b052c8c2",
+    "PROVENANCE.md": "ce8dbc76c4a2128058ac8e860bf901f9f739eb56d564dedffa05a6705bd08cdd",
     "pyproject.toml": "183f2ba984c73e661f98a059385f520530a1ae411d2496a06dbeb8a67eda1d51",
     "scripts/check_rival_exhaustive.py": "afacfc0805077f7172f439d0b1892a13ab4d3bd66efefe31376a07358e012d51",
     "scripts/check_sdist.py": "7af9f38ffc1e6960c225052615663eb5acfc22b6450a75a6120d7306842b5e0b",
@@ -67,9 +67,9 @@
     "tests/test_renewal.py": "48b3881be83f6b310250ab775214fe7862a965fb26a18513f9b9fb2e978f5f22",
     "tests/test_report.py": "d780c469da1002e479c3d2b386657dc27a6facaf194df9c1ae4036ac25bd308f",
     "tests/test_rival.py": "f9c13ff3538a4d542e8a4d92115bc205eb3df1c9a432f71b06f57c7f2c1b0cfb",
-    "tests/test_spec.py": "c26043e987ef08a8e52f166baf40456224f4de4321eb831672d3bd9479d4bd25",
+    "tests/test_spec.py": "cc2d5c1da9bcc7cdc6cf1056786b33cffa8079b6a779a7c6d5e766eff3ec80a3",
     "tests/test_surprisal.py": "4c5f7419b853920ec72a34b6666471830844a8847a4b0a8c62a6cc184346a3ef",
     "tests/test_viability.py": "38b75b4c29a26bba6a23e19742a53d787fa9d7341b2a6305cfa55510866e8f31"
   },
-  "manifest_sha256": "ff224d6832ef3cf1a65df789e856a03731b3e2a9aa93ee8cc15b6373d560a6e7"
+  "manifest_sha256": "b059f12526b21c3f3bfd610b38ec208eb8032a072bc7c42fae4f19383a3154fd"
 }
