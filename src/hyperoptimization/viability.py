@@ -302,6 +302,25 @@ def kernel(game: Game, *, corrigible: bool = True) -> frozenset[str]:
     return _stages(game, _region(game, corrigible))[-1]
 
 
+def kernel_within(game: Game, known: Iterable[str], *, corrigible: bool = True) -> frozenset[str]:
+    """The states a participant who can see only `known` can be sure exist for ever.
+
+    Whatever it cannot see it must treat as unsafe, because an unknown state may be the one that
+    ends everything: ignorance is pessimism. So this is the kernel of the same game with the safe
+    set cut down to what is known. It lies inside the kernel (soundness), grows with what is
+    known (monotone), is the whole kernel when everything is known, and is the kernel restricted
+    to `known` when `known` is closed under the moves it can make (exactness). A state is in it
+    exactly when `known` holds a set that supports itself around that state (`maintains`): the
+    knowledge a certificate needs is the certificate.
+    """
+    if isinstance(known, str):
+        raise TypeError("known is a collection of state names, not one string")
+    seen = frozenset(known)
+    for state in seen:
+        _check_state(game, state)
+    return _stages(game, _region(game, corrigible) & seen)[-1]
+
+
 def maintains(game: Game, held: Iterable[str], *, corrigible: bool = True) -> bool:
     """Whether `held` supports itself: it lies in the region, and each of its states has an allowed
     action that sends every nature choice back into it.
@@ -388,6 +407,18 @@ def check_ranks(game: Game, claimed: Mapping[str, int | Omega], *, corrigible: b
 def greatest_law(game: Game, *, corrigible: bool = True) -> Law:
     """L*: at each kernel state, every allowed action that keeps all nature choices in the kernel."""
     inside = kernel(game, corrigible=corrigible)
+    return {
+        s: frozenset(a for a in game.allowed(s)
+                     if all(game.target(s, a, b) in inside for b in game.nature))
+        for s in sorted(inside)
+    }
+
+
+def greatest_law_within(game: Game, known: Iterable[str], *, corrigible: bool = True) -> Law:
+    """What a participant who can see only `known` can certify as permitted: at each state of
+    `kernel_within`, every allowed action whose every outcome lands back inside it. Never above the
+    greatest law, and equal to it, on the states known, when `known` is closed under the moves."""
+    inside = kernel_within(game, known, corrigible=corrigible)
     return {
         s: frozenset(a for a in game.allowed(s)
                      if all(game.target(s, a, b) in inside for b in game.nature))
@@ -662,7 +693,7 @@ def repair_game(m: int, q: int, *, attack: int, repair: int) -> Game:
 
 __all__ = [
     "Game", "Law", "OMEGA", "all_laws", "check_ranks", "forced_moves", "freedom", "greatest_law",
-    "inductive_kernel", "kernel", "maintains", "ranks",
+    "greatest_law_within", "inductive_kernel", "kernel", "kernel_within", "maintains", "ranks",
     "random_game", "random_law", "reach_home", "reachable", "repair_game", "restricted_kernel",
     "settle", "converge", "survival_probability", "sustaining",
 ]

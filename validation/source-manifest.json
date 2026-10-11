@@ -22,6 +22,7 @@
     "src/hyperoptimization/entrenchment.py": "4b3e08d5b75de402dac9fc9547c2b82499ced14e555f9ce2caed25d6c6c47e9d",
     "src/hyperoptimization/family.py": "041fa2e4a0aebbcf81ef7e2b2b150f26608d752fb31013d83ba480e463d203c9",
     "src/hyperoptimization/ground.py": "b51a2d47b4877244e133f3a9df51a69afd1a41d46ad9b554c5d1ce1c93138919",
+    "src/hyperoptimization/knowledge.py": "02c954bfdb8e28e55b8495c8edf23f75d1c973e1e40b64ed63d7461344e4baa5",
     "src/hyperoptimization/loop.py": "4bf93ac1a6813c2601f21c7f5225c5cc8660b4c43b321a463a8ae27b412c81cc",
     "src/hyperoptimization/ordinal.py": "7585bff7244edd532ffbfcd793e2ea20eb11a3a295d85d79e58f45b6d81809df",
     "src/hyperoptimization/poly.py": "fb70c1f748450320197d3c7b8e3e4b0dfe1c5c234bae6677b6d55de4d7c28e8d",
@@ -30,7 +31,7 @@
     "src/hyperoptimization/renewal.py": "e09a8d6d10d318365687c319f1519a7e6cd2feb2c70164947331894019598481",
     "src/hyperoptimization/report.py": "dd8e1ccb34025607ede6ac7b4c2d86c8ae9709d94c190aa3982113b53e553980",
     "src/hyperoptimization/surprisal.py": "32d7a2e4948e05be5a2db62a8f5bc70770d149d24c6678db2816cc6f8aab378e",
-    "src/hyperoptimization/viability.py": "9a19a46e34e91002caf3e35180b56e29d0840a96338643f518640264bfffc15d",
+    "src/hyperoptimization/viability.py": "a586e0e726b951473f440c7d8ad2d64dbebf5c7644b95e4ad5b8ceb475e5795f",
     "tests/randomgames.py": "d61667866692a952c75829dffafaaf5f01de9be623292b2714e62783d5d641e9",
     "tests/test_clauses.py": "bc4a968ec8c27cc0507811ac6df73d33c624fb6d7c41da11f888ebb39ce9caf4",
     "tests/test_decisions.py": "538428e6b3ebdaae4c6b668f5e48a416286a55c6a369e8cbaf38c023056292b1",
@@ -38,6 +39,7 @@
     "tests/test_entrenchment.py": "d820d7b7915ece97da31c4b697753745fbc6b3ee51f945a3b82c23c973318d3d",
     "tests/test_family.py": "a1cb88c0b312283d8318733214efb364258c03cc370b5ec1fe5b02054bb206fc",
     "tests/test_ground.py": "79119b296f19d35d1c583e17ec549a3daef03e5dd6d2b0315c63b9997f1b836b",
+    "tests/test_knowledge.py": "84887e1f204a7386b2fd8b3583119d8a9d2d35280cce99273816035e2ef035da",
     "tests/test_loop.py": "71fcad1817bb273f654b4dd4ee47a2dbfb07e9539a50e462805f122a14627cf3",
     "tests/test_maintenance.py": "0369628d1f59f5a0507a7671fd529c88d8fb3915d682a20a477a49765c059024",
     "tests/test_manifest.py": "1d5ae9f76297e5afe790a9efd4b103637f4a27ab3eadf0143cb0ff5f4c42249c",
@@ -51,5 +53,5 @@
     "tests/test_surprisal.py": "4c5f7419b853920ec72a34b6666471830844a8847a4b0a8c62a6cc184346a3ef",
     "tests/test_viability.py": "38b75b4c29a26bba6a23e19742a53d787fa9d7341b2a6305cfa55510866e8f31"
   },
-  "manifest_sha256": "639773b9c83cdac1b801d61f68696fe1abd5cb97c6a3133f6abf126dbfd69b50"
+  "manifest_sha256": "fbffa6db9b6a5da4d09717060b306a2eda932a17fec1a6a8e5eeb53e08fbdc09"
 }
