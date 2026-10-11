@@ -36,6 +36,7 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 | D28 | Institutional decisions can be entangled in the physical sense | HYPER | none (by design) |
 | D29 | Understanding has no instrument here: the barrier is only as honest as the test | OPEN | none (by design) |
 | D30 | Win-win holds by construction until freedoms can be rival | OPEN | none (by design) |
+| D31 | With rival freedoms an exchange without money is individually rational, efficient and truthful, and the starting allocation decides the rest | FRAME | HOLDS_IN_MODEL |
 
 ## D01. A price is the surprisal of a compromise
 
@@ -712,7 +713,7 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 **Choice.** Model only permissions that are not rival: granting one leaves every other holder's permissions as they were. Then a deal is weakly win-win by definition, 'win' means a permission nobody could certify before, and information is non-rival too. Say so, and do not call it a discovery.
 
 **Not chosen.**
-- Top trading cycles for rival freedoms: the standard answer to exchanging indivisible goods without money (strategy-proof, Pareto-efficient and individually rational for strict preferences; Shapley and Scarf, Roth; recalled, not checked here). Not built, and the first thing to add.
+- Top trading cycles for rival freedoms: the standard answer to exchanging indivisible goods without money (strategy-proof, Pareto-efficient and individually rational for strict preferences; Shapley and Scarf, Roth). Built, and checked from the definitions, in rival.py (D31).
 - A welfare for each participant: rejected, as in D16.
 - Money for the rival part: rejected by the owner's premise.
 
@@ -720,6 +721,34 @@ A **witness inside the framework** is what the family's checkers produce: a verd
 
 **Refuter.** A model with rival freedoms in which the vector value of D24 still makes every coherent opening a gain for everyone; or an exchange mechanism without money that is not individually rational.
 
-**World witness.** Not done. The package has no rival freedom, so there is no witness here.
+**World witness.** Partly done. D31 models rival freedoms as indivisible goods and checks an exchange of them. There is still no witness that a real freedom is of one kind or the other, and no market has been exchanged.
 
-**Where.** deals.py (non-rival permissions only)
+**Where.** deals.py (non-rival permissions); rival.py (indivisible goods, D31)
+
+## D31. With rival freedoms an exchange without money is individually rational, efficient and truthful, and the starting allocation decides the rest
+
+**Tag:** FRAME
+
+**Choice.** Model a rival freedom as an indivisible good that one party holds at a time (a slot, a seat, a unit that runs out). Give each party one and a strict private ranking of all of them (which can come from private weights on the coordinates of a good's vector, so no common price is needed). Exchange by top trading cycles: every party points at the owner of the good it likes best among those left, the cycles trade, repeat. No money, and no number that anyone else sees. Check the guarantees from their definitions on every profile of two and three parties and on sampled larger markets, not from the theorems.
+
+**Not chosen.**
+- The Boston mechanism, a common rule for assigning goods: rejected, and checked: a party can do better by misreporting, so the checker finds a lie in a fixed share of small markets.
+- Serial dictatorship or random priority: strategy-proof and efficient, but they ignore what each party holds, so a party can end below where it began; the guarantee wanted is that nobody loses by joining. Recalled, not built.
+- A numeraire for the difference between goods: rejected by the owner's premise.
+- Ties, several units per party, and tastes that depend on who else gets what: outside the model, and where the guarantees fail or change.
+
+**Expectation.** A witness would see parties each holding one rival freedom and ranking all of them in private; a published record of the cycles; every party's audit of that record, from its own ranking alone, passing; nobody ending below where it began; no party able to do better by misreporting; and, where the starting allocation was not efficient, someone strictly better off. It would also see that what each party ends with depends on what it held at the start.
+
+**Refuter.** A market where the outcome leaves a party below where it began, or leaves a group able to trade among themselves so that none loses and one gains, or where an audit passes on a record that is not the top trading cycles outcome, or where a party gains by misreporting; or a model with rival freedoms in which the guarantee fails without leaving the stated assumptions.
+
+**World witness.** None: no real market has been exchanged. The model has strict rankings, one good each and a starting allocation that nobody here derives. Real parties have ties, several units and tastes that depend on others, and the starting allocation is the contested question that money used to settle (B16).
+
+**Where.** rival.py; tests/test_rival.py
+
+**Model check:** HOLDS_IN_MODEL — with rival freedoms an exchange without money is individually rational, efficient, in the core and truthful, each party can audit it, and the starting allocation decides what is left
+- 220 strict ranking profiles of two and three agents, every one, and 35 seeded markets of four and five agents: the outcome is individually rational, Pareto efficient and in the strict core, it is the only allocation in the core, and no agent gains by misreporting
+- trade happens in 118 of the 216 profiles of three agents and in exactly those where the starting allocation is not Pareto efficient; the other 98 keep what they have; nobody ends below where they began
+- the Boston mechanism, a common rule, is gameable in 36 of the 216 profiles of three agents, and the same checker finds the lie
+- 145 audits of honest records pass, each from the agent's own ranking and the public record of cycles alone; of 864 records of three agents on 36 markets, the 52 that every agent accepts all describe the top trading cycles outcome
+- with identical rankings nothing moves under any of 150 starting allocations of three to five agents, so what an agent gets over all starting allocations runs from its first choice to its last (places 0 to 3 for four agents): the start decides
+- two goods of equal worth at the price (1, 1), (5, 1) and (1, 5), are swapped by two agents who weigh the coordinates differently, with no money; at any common price the goods held are worth the same after as before, so the gain is in the private weights only

@@ -51,9 +51,11 @@ From the same day, recorded in hyperethics (`L2_governance.hm`): "Very important
 
 All code, all proofs in DESIGN, every number in DECISIONS, and every choice recorded there. Where a modelling choice was made that you did not state (independence of seats, mean-field loops, a birth–death chain for repair, surprisal for price, full support for free will, the Löb ring as the logic of proof-checked approval), it is in the ledger as a decision with the observation that would refute it.
 
+Rival freedoms (`rival`, DESIGN section 14.5, D31) were not asked for. They extend your phrase "exclusively win win deals" to goods that cannot be shared, where it needs a rule: the earlier reading made win-win true by construction and said so (D30). Reading a rival freedom as an indivisible good, one to a party, ranked strictly and in private, and choosing top trading cycles for it, are my choices, recorded as a decision with what would refute it.
+
 ## Prior work this stands on, from memory
 
-Recalled, not re-fetched while writing; look each up before citing: Aubin on viability theory; Kelsen on the hierarchy of norms; Ross on self-reference in constitutional amendment; Goodstein (1944) and Kirby and Paris (1982); Löb (1955) and Gödel's second incompleteness theorem; Boolos on provability logic; de Jongh and Sambin on fixed points; Barasz and others on provability-logic agents; Cramér and Freidlin and Wentzell on large deviations; Condorcet on majorities; the early-warning literature on critical transitions (Scheffer and others).
+Recalled, not re-fetched while writing; look each up before citing: Aubin on viability theory; Kelsen on the hierarchy of norms; Ross on self-reference in constitutional amendment; Goodstein (1944) and Kirby and Paris (1982); Löb (1955) and Gödel's second incompleteness theorem; Boolos on provability logic; de Jongh and Sambin on fixed points; Barasz and others on provability-logic agents; Cramér and Freidlin and Wentzell on large deviations; Condorcet on majorities; the early-warning literature on critical transitions (Scheffer and others). For section 14.5: Shapley and Scarf (1974) on housing markets and Gale's top trading cycles as reported there, Roth and Postlewaite (1977) on the uniqueness of the strict core, Roth (1982) on strategy-proofness, and the literature on the Boston mechanism (Abdulkadiroglu and Sonmez among others); the properties are checked here from their definitions and the theorems are not re-proved.
 
 ## The repository
 

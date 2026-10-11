@@ -13,6 +13,7 @@ purpose and require this file to notice, so the comparison is known to be able t
 
 from __future__ import annotations
 
+import math
 import re
 from collections import Counter
 from fractions import Fraction
@@ -22,8 +23,9 @@ import pytest
 from test_deals import menu_counts
 from test_entangled import GHZ_TYPE_STATES
 from test_knowledge import split_counts
+from test_rival import LARGER_MARKETS, RECORD_MARKETS
 
-from hyperoptimization import comprehension, deals, decisions, entangled, family, surprisal
+from hyperoptimization import comprehension, deals, decisions, entangled, family, rival, surprisal
 
 ROOT = Path(__file__).resolve().parent.parent
 DESIGN = (ROOT / "DESIGN.md").read_text(encoding="utf-8")
@@ -203,3 +205,42 @@ def test_a_missing_sentence_and_a_changed_unit_are_noticed():
 
 def test_whitespace_in_the_source_lines_does_not_matter_only_the_words():
     quoted("the required quorum is 5 of 7", "x\n  the   required\nquorum is 5   of 7\n", "inline")
+
+
+# --- rival freedoms (14.5) ----------------------------------------------------------------------------------------------
+
+
+def test_the_quoted_rival_freedom_numbers_are_the_computed_ones():
+    two, three = rival.survey(2), rival.survey(3)
+    quoted(f"all {two['profiles']} profiles of two parties and all {three['profiles']} of three")
+    quoted(f"on all {math.factorial(4) ** 4:,} profiles of four by a long run outside the suite")
+    quoted(f"In {three['trade']} of the {three['profiles']} profiles of three parties someone moves")
+    quoted(f"in the other {three['still']} everybody keeps what they hold")
+    quoted(f"finds a profitable lie in {three['gameable_boston']} of the {three['profiles']} profiles of three parties")
+    assert three["gameable_ttc"] == 0 and two["gameable_boston"] == 0
+    sampled = sum(count for _n, count in LARGER_MARKETS)
+    found = ledger_line("D31", r"and (\d+) seeded markets of four and five agents")
+    quoted(f"on {sampled} seeded markets of four to six parties in the tests and {found.group(1)} in the ledger")
+    found = ledger_line("D31", r"of (\d+) records of three agents on (\d+) markets, the (\d+) that every agent accepts")
+    records, markets, accepted = found.groups()
+    quoted(f"Checked on every record of three parties on {markets} markets ({records} records, {accepted} of them accepted "
+           f"by every party, all describing the TTC outcome) and of up to four parties on {RECORD_MARKETS} random markets")
+
+
+def test_the_quoted_swap_a_price_cannot_see_is_the_computed_one():
+    vectors = {"x-rich": (5, 1), "y-rich": (1, 5)}
+    weights = {"A": (3, 1), "B": (1, 3)}
+    endowment = {"A": "y-rich", "B": "x-rich"}
+    outcome = rival.top_trading_cycles(endowment, {a: rival.rank_by_weights(vectors, w) for a, w in weights.items()})
+    worth = {(a, g): sum(w * x for w, x in zip(weights[a], vectors[g])) for a in weights for g in vectors}
+    before, after = worth["A", endowment["A"]], worth["A", outcome["A"]]
+    assert (before, after) == (8, 16) == (worth["B", endowment["B"]], worth["B", outcome["B"]])
+    quoted(f"Each doubles its worth by swapping ({before} to {after})")
+    quoted("Take two slots, (5, 1) and (1, 5) in freedom of x and of y")
+
+
+def test_the_quoted_agreement_with_the_exchange_reference_is_the_full_runs_count():
+    sizes = {key: pair[1] for key, pair in __import__("importlib").import_module("test_oracles").runner.SIZES["rival"].items()}
+    total = sizes["outcomes"] + sizes["allocations"] * 8 + sizes["cores"] + sizes["misreports"]
+    quoted(f"agrees on {total:,} comparisons in the full run ({sizes['outcomes']:,} outcomes, three checkers on "
+           f"{sizes['allocations'] * 8:,} allocations, {sizes['cores']} cores and {sizes['misreports']} sets of misreports)")

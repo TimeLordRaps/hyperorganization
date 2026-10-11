@@ -43,6 +43,7 @@ from . import (
     ordinal,
     quorum,
     renewal,
+    rival,
     surprisal,
     viability,
 )
@@ -1168,6 +1169,100 @@ def _d27() -> Verdict:
                         f"GHZ state is worth {spent} in the GHZ game, below the classical 3/4"])
 
 
+def _d31() -> Verdict:
+    problems: list[str] = []
+    markets: list[tuple[str, dict, dict]] = []  # (label, endowment, strict rankings)
+    for n in (2, 3):  # every profile of strict rankings; the identity endowment stands for every endowment up to names
+        agents, goods = list(range(n)), [f"g{i}" for i in range(n)]
+        for choice in itertools.product(itertools.permutations(goods), repeat=n):
+            markets.append((f"{n} agents, rankings {choice}", dict(zip(agents, goods)), dict(zip(agents, choice))))
+    exhaustive = len(markets)
+    rng = random.Random(31)
+    for n, count in ((4, 30), (5, 5)):
+        goods = [f"g{i}" for i in range(n)]
+        for k in range(count):
+            held = goods[:]
+            rng.shuffle(held)
+            markets.append((f"random market {k} of {n} agents", dict(zip(range(n), held)),
+                            {a: tuple(rng.sample(goods, n)) for a in range(n)}))
+    three = [m for m in markets[:exhaustive] if m[0].startswith("3 agents")]
+    for label, endowment, prefs in markets:
+        outcome = rival.top_trading_cycles(endowment, prefs)
+        if not rival.individually_rational(endowment, prefs, outcome):
+            problems.append(f"{label}: an agent ends below where it began")
+        if not rival.pareto_efficient(endowment, prefs, outcome):
+            problems.append(f"{label}: the outcome is not Pareto efficient")
+        if rival.core_allocations(endowment, prefs) != [outcome]:
+            problems.append(f"{label}: the strict core is not exactly the outcome")
+        if rival.profitable_misreports(endowment, prefs):
+            problems.append(f"{label}: an agent gains by misreporting its ranking")
+        if bool(rival.movers(endowment, outcome)) == rival.pareto_efficient(endowment, prefs, endowment):
+            problems.append(f"{label}: trade did not happen exactly when the starting allocation is inefficient")
+        if problems:
+            break
+    counts = rival.survey(3)
+    trades, gameable = counts["trade"], counts["gameable_boston"]
+    if gameable == 0:
+        problems.append("the checker finds no profitable misreport in the Boston mechanism, so it could not have "
+                        "found one in this one either")
+    audits = accepted = records = 0
+    for label, endowment, prefs in markets[exhaustive:]:
+        honest = rival.rounds(endowment, prefs)
+        for agent in endowment:
+            audits += 1
+            if not rival.audit(agent, prefs[agent], endowment, honest):
+                problems.append(f"{label}: agent {agent}'s audit of the honest record fails")
+    for label, endowment, prefs in three[::6]:
+        expected = rival.top_trading_cycles(endowment, prefs)
+        for record in rival.all_records(list(endowment)):
+            records += 1
+            if all(rival.audit(a, prefs[a], endowment, record) for a in endowment):
+                accepted += 1
+                described = rival.allocation_of(endowment, record)
+                if described != expected:
+                    problems.append(f"{label}: a record every agent accepts describes {described}, not the top "
+                                    "trading cycles outcome")
+    starts = 0
+    for n in (3, 4, 5):
+        goods = [f"g{i}" for i in range(n)]
+        same = {a: tuple(goods) for a in range(n)}
+        for held in itertools.permutations(goods):
+            starts += 1
+            if rival.top_trading_cycles(dict(zip(range(n), held)), same) != dict(zip(range(n), held)):
+                problems.append(f"with identical rankings the starting allocation {held} moved")
+    spread = rival.endowment_spread({a: tuple(f"g{i}" for i in range(4)) for a in range(4)})
+    if spread != {a: (0, 3) for a in range(4)}:
+        problems.append(f"with identical rankings an agent's best and worst place over all starting allocations is "
+                        f"{spread}, not the whole range 0 to 3")
+    vectors = {"x-rich": (5, 1), "y-rich": (1, 5)}
+    weights = {"A": (3, 1), "B": (1, 3)}
+    held = {"A": "y-rich", "B": "x-rich"}
+    swapped = rival.top_trading_cycles(held, {a: rival.rank_by_weights(vectors, w) for a, w in weights.items()})
+    if swapped != {"A": "x-rich", "B": "y-rich"}:
+        problems.append(f"agents who weigh the coordinates differently did not swap two goods of equal worth at the "
+                        f"price (1, 1): {swapped}")
+    return _verdict("with rival freedoms an exchange without money is individually rational, efficient, in the core and "
+                    "truthful, each party can audit it, and the starting allocation decides what is left", problems, [
+                        f"{exhaustive} strict ranking profiles of two and three agents, every one, and "
+                        f"{len(markets) - exhaustive} seeded markets of four and five agents: the outcome is "
+                        "individually rational, Pareto efficient and in the strict core, it is the only allocation in the "
+                        "core, and no agent gains by misreporting",
+                        f"trade happens in {trades} of the {counts['profiles']} profiles of three agents and in exactly "
+                        f"those where the starting allocation is not Pareto efficient; the other {counts['still']} keep "
+                        "what they have; nobody ends below where they began",
+                        f"the Boston mechanism, a common rule, is gameable in {gameable} of the {counts['profiles']} "
+                        "profiles of three agents, and the same checker finds the lie",
+                        f"{audits} audits of honest records pass, each from the agent's own ranking and the public record "
+                        f"of cycles alone; of {records} records of three agents on {len(three[::6])} markets, the "
+                        f"{accepted} that every agent accepts all describe the top trading cycles outcome",
+                        f"with identical rankings nothing moves under any of {starts} starting allocations of three to "
+                        "five agents, so what an agent gets over all starting allocations runs from its first choice to "
+                        "its last (places 0 to 3 for four agents): the start decides",
+                        "two goods of equal worth at the price (1, 1), (5, 1) and (1, 5), are swapped by two agents "
+                        "who weigh the coordinates differently, with no money; at any common price the goods held are "
+                        "worth the same after as before, so the gain is in the private weights only"])
+
+
 
 # ---------------------------------------------------------------------------
 # The ledger.
@@ -1849,8 +1944,8 @@ LEDGER: tuple[Decision, ...] = (
         "could certify before, and information is non-rival too. Say so, and do not call it a discovery.",
         ("Top trading cycles for rival freedoms: the standard answer to exchanging indivisible goods "
          "without money (strategy-proof, Pareto-efficient and individually rational for strict "
-         "preferences; Shapley and Scarf, Roth; recalled, not checked here). Not built, and the first "
-         "thing to add.",
+         "preferences; Shapley and Scarf, Roth). Built, and checked from the definitions, in rival.py "
+         "(D31).",
          "A welfare for each participant: rejected, as in D16.",
          "Money for the rival part: rejected by the owner's premise."),
         "A witness would see, in a model with a rival freedom (a permission to use a unit of something "
@@ -1859,9 +1954,42 @@ LEDGER: tuple[Decision, ...] = (
         "are in some party's interest.",
         "A model with rival freedoms in which the vector value of D24 still makes every coherent opening "
         "a gain for everyone; or an exchange mechanism without money that is not individually rational.",
-        "Not done. The package has no rival freedom, so there is no witness here.",
-        "deals.py (non-rival permissions only)",
+        "Partly done. D31 models rival freedoms as indivisible goods and checks an exchange of them. There is "
+        "still no witness that a real freedom is of one kind or the other, and no market has been exchanged.",
+        "deals.py (non-rival permissions); rival.py (indivisible goods, D31)",
         None),
+    Decision(
+        "D31", "With rival freedoms an exchange without money is individually rational, efficient and truthful, "
+        "and the starting allocation decides the rest", Tag.FRAME,
+        "Model a rival freedom as an indivisible good that one party holds at a time (a slot, a seat, a unit "
+        "that runs out). Give each party one and a strict private ranking of all of them (which can come from "
+        "private weights on the coordinates of a good's vector, so no common price is needed). Exchange by top "
+        "trading cycles: every party points at the owner of the good it likes best among those left, the cycles "
+        "trade, repeat. No money, and no number that anyone else sees. Check the guarantees from their "
+        "definitions on every profile of two and three parties and on sampled larger markets, not from the "
+        "theorems.",
+        ("The Boston mechanism, a common rule for assigning goods: rejected, and checked: a party can do better by "
+         "misreporting, so the checker finds a lie in a fixed share of small markets.",
+         "Serial dictatorship or random priority: strategy-proof and efficient, but they ignore what each party "
+         "holds, so a party can end below where it began; the guarantee wanted is that nobody loses by joining. "
+         "Recalled, not built.",
+         "A numeraire for the difference between goods: rejected by the owner's premise.",
+         "Ties, several units per party, and tastes that depend on who else gets what: outside the model, and "
+         "where the guarantees fail or change."),
+        "A witness would see parties each holding one rival freedom and ranking all of them in private; a published "
+        "record of the cycles; every party's audit of that record, from its own ranking alone, passing; nobody "
+        "ending below where it began; no party able to do better by misreporting; and, where the starting allocation "
+        "was not efficient, someone strictly better off. It would also see that what each party ends with depends on "
+        "what it held at the start.",
+        "A market where the outcome leaves a party below where it began, or leaves a group able to trade among "
+        "themselves so that none loses and one gains, or where an audit passes on a record that is not the top "
+        "trading cycles outcome, or where a party gains by misreporting; or a model with rival freedoms in which "
+        "the guarantee fails without leaving the stated assumptions.",
+        "None: no real market has been exchanged. The model has strict rankings, one good each and a starting "
+        "allocation that nobody here derives. Real parties have ties, several units and tastes that depend on others, "
+        "and the starting allocation is the contested question that money used to settle (B16).",
+        "rival.py; tests/test_rival.py",
+        _d31),
 )
 
 _BY_ID = {d.id: d for d in LEDGER}

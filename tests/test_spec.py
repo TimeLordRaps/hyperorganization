@@ -102,7 +102,7 @@ def test_the_spec_declares_the_axioms_derives_and_non_derives_the_design_maps():
         "ax-existence-as-viability", "ax-free-will-as-full-support",
         "ax-corrigibility-as-reachability", "ax-self-repair", "ax-independence",
         "ax-ignorance-is-pessimism", "ax-understanding-is-a-set", "ax-common-interest",
-        "ax-freedom-is-non-rival",
+        "ax-freedom-is-non-rival", "ax-rival-is-indivisible",
     ]
     assert declared("derive") == [
         "d-greatest-law", "d-exemption-is-fatal", "d-corrigible-kernel-inside", "d-rank-certificate",
@@ -119,6 +119,8 @@ def test_the_spec_declares_the_axioms_derives_and_non_derives_the_design_maps():
         "d-coherence-is-not-a-currency", "d-entangled-beats-classical",
         "d-value-of-a-state-is-its-degree", "d-entanglement-moves-no-information",
         "d-entanglement-is-consumed", "d-no-signalling-is-not-quantum",
+        "d-rival-exchange", "d-trade-iff-inefficient", "d-audit-is-local",
+        "d-a-common-price-cannot-see-a-swap",
     ]
     assert declared("non-derive") == [
         "nd-persistence-is-optimal", "nd-physical-adherence", "nd-determinacy-is-soundness",
@@ -129,7 +131,7 @@ def test_the_spec_declares_the_axioms_derives_and_non_derives_the_design_maps():
     ]
     assert declared("open") == [
         "nd-persistence-is-optimal", "nd-closing-catalyst", "nd-mean-field-adequacy",
-        "nd-self-funding", "nd-rival-freedoms", "nd-comprehension-instrument",
+        "nd-self-funding", "nd-rival-freedoms", "nd-endowment", "nd-comprehension-instrument",
     ]
 
 
@@ -216,7 +218,7 @@ def test_the_second_spec_is_honest_about_its_status():
         "Each is an assumption of the model, adopted and not derived",
         "A passing check CONFIRMS nothing universally",
         "This layer does not graduate as a theory of exchange",
-        "Four of seven discharged",
+        "Five of seven discharged",
         "Win-win holds by construction here",
         "That human or institutional decisions can be entangled is a proposal with no witness",
     ):

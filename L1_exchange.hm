@@ -23,7 +23,7 @@
 -- by themselves verify an external claim, and this file does not treat them as doing so.
 --
 -- WHAT THIS LAYER IS. L0 asks what law a system that wants to exist is under. L1 asks how parties who
--- see only parts of the world make deals about that law without a number to settle them. Four answers,
+-- see only parts of the world make deals about that law without a number to settle them. Five answers,
 -- each a finite model with an exact oracle.
 --   KNOWLEDGE. What a party cannot see it must treat as unsafe, so what it can certify as permitted is a
 --   part of the greatest law and grows as it learns. What is exchanged is a certificate, a set of
@@ -38,13 +38,21 @@
 --   balanced one.
 --   ENTANGLEMENT. Parties who cannot talk and win or lose together do better with a shared entangled
 --   state than any classical strategy can, by exact amounts, and the state carries no message.
+--   RIVAL FREEDOMS. A freedom that one party holds at a time cannot be given to another for nothing, so
+--   win-win needs a rule. For indivisible goods, one to each party, with strict private rankings, top
+--   trading cycles exchanges them with no money so that nobody ends below where they began, no group can
+--   do better among itself, and no party gains by misreporting; each party can audit the outcome from its
+--   own ranking and a public record; and what each party ends with is decided by the starting allocation,
+--   which nothing here derives.
 --
 -- WHAT IT IS NOT. Win-win holds by construction here, because the permissions are not rival and a
 -- gain is a permission nobody could certify (nd-win-win-by-construction). Understanding is a set
 -- handed in; nothing measures it (nd-understanding-is-measured). That human or institutional decisions
 -- can be entangled is a proposal with no witness (nd-institutions-are-entangled). Games whose parties
--- have opposed interests are not modelled (nd-quantum-dilemma). Rival freedoms, and an exchange of
--- them without money, are not built (nd-rival-freedoms).
+-- have opposed interests are not modelled (nd-quantum-dilemma). Rival freedoms are modelled only as
+-- indivisible goods held one to a party under strict private rankings (ax-rival-is-indivisible); ties,
+-- several units and tastes that depend on others are not (nd-rival-freedoms), and who holds what at the
+-- start is given and not derived (nd-endowment).
 --
 -- Layer boundary: nothing here imports another package. Checks that need a record of the family read a
 -- golden file hyperstratum produced.
@@ -113,7 +121,13 @@ axiom ax-common-interest:
 axiom ax-freedom-is-non-rival:
     -- A permission granted to one party leaves every other party's permissions as they were, and
     -- knowledge given away leaves the giver's view unchanged. Without this, win-win is not automatic
-    -- (nd-rival-freedoms).
+    -- (ax-rival-is-indivisible, nd-rival-freedoms).
+
+axiom ax-rival-is-indivisible:
+    -- A rival freedom (a slot, a seat, a unit that runs out) is an indivisible good that one party holds
+    -- at a time. Every party holds one and ranks all of them strictly, in private. Adopted: it is the
+    -- model in which an exchange without money has known guarantees. Ties, several units and tastes that
+    -- depend on who else gets what are outside it (nd-rival-freedoms).
 
 
 -- =============================================================================
@@ -227,6 +241,33 @@ derive d-no-signalling-is-not-quantum:
     -- strategies, quantum strategies and no-signalling tables are three different sets.
     -- Status: FORM.
 
+derive d-rival-exchange:
+    -- With indivisible goods, one to a party, and strict private rankings, top trading cycles gives an
+    -- outcome that is individually rational (nobody ends below where they began), Pareto efficient, in
+    -- the strict core and the only allocation there, and truthful (no party gains by misreporting). The
+    -- Boston mechanism, a common rule, is gameable, so the checker can fail.
+    -- Status: FORM (each property from its definition, on every profile of two and three parties, all
+    -- 331,776 of four by a long run outside the suite, and seeded markets of four to six; an independent
+    -- reference written from the specification agrees on 9,020 comparisons in its full run).
+
+derive d-trade-iff-inefficient:
+    -- Parties trade exactly when the starting allocation is not Pareto efficient, and then someone ends
+    -- strictly better off and nobody worse.
+    -- Status: FORM (every profile of three parties).
+
+derive d-audit-is-local:
+    -- Each party can check the outcome from its own ranking and the public record of cycles alone: in
+    -- the round it traded it received its favourite among the goods still on the market. If every party's
+    -- audit passes, the record describes the top trading cycles outcome and no other. The converse holds
+    -- for the honest record only.
+    -- Status: FORM (every record of up to four parties on random markets).
+
+derive d-a-common-price-cannot-see-a-swap:
+    -- Two goods of equal worth at a common price are swapped, with no money, by two parties who weigh
+    -- the coordinates of the goods' vectors differently. Under any common price the goods held are worth
+    -- the same after as before any exchange of them, so the gain is in the private weights only.
+    -- Status: FORM (exact, with the worked example and a grid of weights).
+
 
 -- =============================================================================
 -- SECTION V: WHAT THIS LAYER DOES NOT CONTAIN
@@ -235,7 +276,8 @@ derive d-no-signalling-is-not-quantum:
 non-derive nd-win-win-by-construction:
     -- NOT DERIVED. That deals are win-win is a consequence of ax-freedom-is-non-rival and
     -- ax-common-interest, not a discovery about exchange. With rival freedoms or opposed interests it
-    -- fails for some deals (decision D30).
+    -- fails for some deals (decision D30); for indivisible goods the weak form that survives is that
+    -- nobody ends below where they began (d-rival-exchange, decision D31).
 
 non-derive nd-understanding-is-measured:
     -- NOT DERIVED. That understanding can be measured. The barrier is only as honest as the test, and
@@ -253,9 +295,15 @@ non-derive nd-quantum-dilemma:
     -- common-interest is not exclusively win-win (decision D27).
 
 open nd-rival-freedoms:
-    -- OPEN, NOT IMPLEMENTED. A permission to use something that runs out is rival: granting it to one
-    -- party takes it from another. An exchange of rival freedoms without money (top trading cycles is
-    -- the standard answer for indivisible goods) is not built (decision D30).
+    -- OPEN. Top trading cycles covers strict rankings over indivisible goods held one to a party. Ties in
+    -- the rankings, parties who want several goods, tastes that depend on who else gets what, groups who
+    -- misreport together, parties who arrive over time and a publisher of the record who might lie are
+    -- not modelled, and the guarantees fail or change there (decision D31).
+
+open nd-endowment:
+    -- OPEN. Who holds which rival freedom at the start is given, not derived. The exchange leaves nobody
+    -- below their start, so it cannot be fairer than the start; with identical rankings nothing moves at
+    -- all. This layer derives a greatest sustaining law and no starting allocation (decision D31).
 
 open nd-comprehension-instrument:
     -- OPEN. A test of understanding that a person passes exactly when they understand, that cannot be
@@ -282,9 +330,11 @@ graduation:
     --          clause of it, on purpose).
     -- GC-L1-4: understanding can be measured. NOT DISCHARGED: nd-understanding-is-measured.
     -- GC-L1-5: institutional decisions can be entangled. NOT DISCHARGED: nd-institutions-are-entangled.
-    -- GC-L1-6: rival freedoms and an exchange of them without money. NOT DISCHARGED: nd-rival-freedoms.
+    -- GC-L1-6: rival freedoms and an exchange of them without money. DISCHARGED for indivisible goods
+    --          held one to a party under strict private rankings (d-rival-exchange); NOT DISCHARGED beyond
+    --          that: nd-rival-freedoms, nd-endowment.
     --
-    -- Four of seven discharged.
+    -- Five of seven discharged.
     --
     -- This layer does not graduate as a theory of exchange, and no claim of one is made anywhere in this
     -- file. It graduates, if at all, as a toolkit whose finite theorems are exact and whose reach into

@@ -23,6 +23,7 @@ from . import (
     ordinal,
     quorum,
     renewal,
+    rival,
     surprisal,
     viability,
 )
@@ -239,6 +240,7 @@ def _section_exchange() -> list[str]:
     ghz, magic, chsh = entangled.ghz_game(), entangled.magic_square_game(), entangled.chsh_game()
     rational = entangled.chsh_strategy((1, 0), (0, 1), (Fraction(119, 169), Fraction(120, 169)),
                                        (Fraction(119, 169), Fraction(-120, 169)))
+    counts = rival.survey(3)
     return [
         "== exchange  (no money: what is exchanged, who may decide, how a deal is valued, what a shared "
         "entangled state buys)",
@@ -267,6 +269,11 @@ def _section_exchange() -> list[str]:
         f"CHSH (Clauser-Horne-Shimony-Holt, two parties) {entangled.classical_value(chsh)} to "
         f"{entangled.quantum_value(chsh, rational)} (the limit (2 + sqrt 2)/4 is irrational); a GHZ-type state is "
         "worth 1/2 + (sin 2t)/2; no output depends on another's input; one use consumes the state",
+        f"   rival freedoms (indivisible goods, one each, strict private rankings), top trading cycles: of the "
+        f"{counts['profiles']} rankings of three agents trade happens in {counts['trade']}, exactly where the start is "
+        f"not Pareto efficient; nobody ends below where they began, no agent gains by misreporting "
+        f"({counts['gameable_ttc']} do) and the Boston mechanism, a common rule, can be gamed in "
+        f"{counts['gameable_boston']}; with identical rankings nothing moves, so the starting allocation decides",
     ]
 
 
@@ -296,8 +303,9 @@ def _section_open() -> list[str]:
         "   NOT_ESTABLISHED  mean-field loops stand in for a real ring or graph of bodies; the "
         "thresholds are upper bounds when compromise is positively associated (D03)",
         "   NOT_IMPLEMENTED self-funding capture (reinvestment is positive feedback); a ring or graph "
-        "loop solved exactly; transfinite ranks for infinite games; rival freedoms and an exchange of them "
-        "without money (D30)",
+        "loop solved exactly; transfinite ranks for infinite games; rival freedoms beyond one indivisible good each "
+        "and strict rankings (ties, several units, tastes that depend on others, a starting allocation that is "
+        "derived and not given; D31)",
         "   OPEN             an instrument for understanding (D29); NOT_ESTABLISHED that institutional decisions "
         "can be entangled (D28)",
         "   UNKNOWN          CI on Windows and Python 3.10 in the hosted matrix has not run on this "

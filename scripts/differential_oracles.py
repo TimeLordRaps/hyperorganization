@@ -1,17 +1,19 @@
-"""Compare the package with three independent reference oracles, instance by instance.
+"""Compare the package with four independent reference oracles, instance by instance.
 
-The oracles (`oracle_comprehension.py`, `oracle_quantum.py`, `oracle_price.py`) were written by a
+The oracles (`oracle_comprehension.py`, `oracle_quantum.py`, `oracle_price.py`, `oracle_ttc.py`) were written by a
 subagent from a written specification alone, without sight of the package. Each computes the same quantities
 by a different route: comprehension by enumerating every group of people; the quantum values from explicit
 projectors on state vectors in exact `sympy` arithmetic; the price test by Fourier-Motzkin elimination on
-fractions where the package enumerates the vertices of the polytope itself. A disagreement is a slip in one of
-the two, found by running both on the same instances. Agreement shows that implementation slips of that kind
-are caught. It does not show that the definitions are right: both were written from the same specification.
-Only the quantum stage needs `sympy`; the other two use the standard library.
+fractions where the package enumerates the vertices of the polytope itself; top trading cycles by executing one
+cycle at a time where the package executes a round together, with the core, efficiency and misreport checks by
+their own enumerations. A disagreement is a slip in one of the two, found by running both on the same instances.
+Agreement shows that implementation slips of that kind are caught. It does not show that the definitions are
+right: both were written from the same specification. Only the quantum stage needs `sympy`; the others use the
+standard library.
 
-    python scripts/differential_oracles.py                  # all three stages, the quick sample
+    python scripts/differential_oracles.py                  # all four stages, the quick sample
     python scripts/differential_oracles.py --full           # the sample sizes quoted in VALIDATION.md
-    python scripts/differential_oracles.py --stage quantum  # one stage: comprehension, quantum or price
+    python scripts/differential_oracles.py --stage quantum  # one stage: comprehension, quantum, price or rival
 
 Exit status 0: every instance agrees. 1: at least one disagreement (printed). 2: a stage could not be run
 (UNKNOWN: `sympy` missing, or the stage passed its deadline); no disagreement was found in what did run.
@@ -39,14 +41,16 @@ SRC = HERE.parent / "src"
 if SRC.is_dir() and str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from hyperoptimization import comprehension, deals, entangled  # noqa: E402  (after the path is set)
+from hyperoptimization import comprehension, deals, entangled, rival  # noqa: E402
 
 SIZES = {  # stage -> sample sizes (quick, full)
     "comprehension": {"instances": (1500, 1500), "graphs": (800, 800)},
     "quantum": {"ghz": (12, 12), "chsh": (8, 25)},
     "price": {"small": (120, 1000), "large": (12, 200)},
+    "rival": {"outcomes": (1000, 3000), "allocations": (200, 700), "cores": (100, 300), "misreports": (40, 120)},
 }
-DEADLINES = {"comprehension": (60, 120), "quantum": (120, 300), "price": (300, 900)}  # seconds (quick, full)
+DEADLINES = {"comprehension": (60, 120), "quantum": (120, 300), "price": (300, 900),
+             "rival": (120, 300)}  # seconds (quick, full)
 Report = Callable[[str], None]
 
 # Option sets whose answers were derived by hand (the specification the oracle was written from).
@@ -254,7 +258,81 @@ def compare_price(small: int = 120, large: int = 12, report: Report = print) -> 
     return result
 
 
-STAGES = {"comprehension": compare_comprehension, "quantum": compare_quantum, "price": compare_price}
+# --- rival freedoms --------------------------------------------------------------------------------------------------
+
+
+def housing_market(rng: random.Random, n: int) -> tuple[dict, dict]:
+    """n agents, n goods, a random endowment and a random strict ranking for each agent."""
+    goods = [f"g{i}" for i in range(n)]
+    held = goods[:]
+    rng.shuffle(held)
+    return dict(zip(range(n), held)), {a: rng.sample(goods, n) for a in range(n)}
+
+
+def compare_rival(outcomes: int = 3000, allocations: int = 700, cores: int = 300, misreports: int = 120,
+                  report: Report = print) -> Result:
+    """Top trading cycles against the reference, and the checkers against theirs. The outcomes: random markets of up to
+    eight agents. The checkers (individual rationality, Pareto efficiency, the strict core): the verdicts on arbitrary
+    allocations, the outcome and the endowment included, so that both verdicts occur (on outcomes alone every checker
+    says yes). The strict core as a set, and the profitable misreports (none, by theorem, for the reference)."""
+    ref = reference("ttc")
+    result = Result("rival")
+    start = time.perf_counter()
+    for seed in range(outcomes):
+        rng = random.Random(seed)
+        endowment, prefs = housing_market(rng, rng.randint(1, 8))
+        result.checked += 1
+        if rival.top_trading_cycles(endowment, prefs) != ref.ttc(endowment, prefs):
+            result.mismatches.append(("outcome", seed, endowment, prefs))
+    seen = {name: [0, 0] for name in ("rational", "efficient", "core")}
+    for seed in range(allocations):
+        rng = random.Random(10_000 + seed)
+        endowment, prefs = housing_market(rng, rng.randint(2, 5))
+        goods, agents = list(endowment.values()), list(endowment)
+        candidates = [rival.top_trading_cycles(endowment, prefs), dict(endowment)]
+        for _ in range(6):
+            shuffled = goods[:]
+            rng.shuffle(shuffled)
+            candidates.append(dict(zip(agents, shuffled)))
+        for allocation in candidates:
+            mine = (rival.individually_rational(endowment, prefs, allocation),
+                    rival.pareto_efficient(endowment, prefs, allocation), rival.in_core(endowment, prefs, allocation))
+            theirs = (ref.individually_rational(endowment, prefs, allocation), ref.pareto_efficient(prefs, allocation),
+                      ref.in_core(endowment, prefs, allocation))
+            result.checked += 1
+            for name, verdict in zip(seen, theirs):
+                seen[name][verdict] += 1
+            if mine != theirs:
+                result.mismatches.append(("checkers", seed, endowment, prefs, allocation, mine, theirs))
+    for seed in range(cores):
+        rng = random.Random(20_000 + seed)
+        endowment, prefs = housing_market(rng, rng.randint(2, 5))
+        mine = {frozenset(a.items()) for a in rival.core_allocations(endowment, prefs)}
+        theirs = {frozenset(a.items()) for a in ref.core_allocations(endowment, prefs)}
+        result.checked += 1
+        if mine != theirs or len(theirs) != 1:
+            result.mismatches.append(("core", seed, endowment, prefs, mine, theirs))
+    for seed in range(misreports):
+        rng = random.Random(30_000 + seed)
+        endowment, prefs = housing_market(rng, rng.randint(2, 4))
+        mine = {(a, tuple(lie)) for a, lie, _got in rival.profitable_misreports(endowment, prefs)}
+        theirs = {(a, tuple(lie)) for a, lie in ref.strategy_proof(endowment, prefs)}
+        result.checked += 1
+        if mine != theirs:
+            result.mismatches.append(("misreports", seed, endowment, prefs, mine, theirs))
+    result.seconds = time.perf_counter() - start
+    result.facts = {"outcomes": outcomes, "allocations": allocations * 8, "cores": cores, "misreports": misreports,
+                    **{f"{name}_{'yes' if v else 'no'}": count[v] for name, count in seen.items() for v in (0, 1)}}
+    result.note = (f"{outcomes} outcomes, {allocations * 8} allocations through three checkers (rational "
+                   f"{seen['rational'][0]} no / {seen['rational'][1]} yes, efficient {seen['efficient'][0]} / "
+                   f"{seen['efficient'][1]}, core {seen['core'][0]} / {seen['core'][1]}), {cores} cores, {misreports} "
+                   "misreport sets")
+    report(f"  rival: {result.checked} comparisons ({result.note}) in {result.seconds:.1f}s")
+    return result
+
+
+STAGES = {"comprehension": compare_comprehension, "quantum": compare_quantum, "price": compare_price,
+          "rival": compare_rival}
 
 
 def run_stage(name: str, full: bool, report: Report = print) -> Result:

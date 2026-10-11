@@ -152,9 +152,15 @@ def test_the_exchange_section_shows_the_numbers_the_models_compute():
     assert "(Greenberger-Horne-Zeilinger, three parties) 3/4 to 1; Mermin-Peres" in text
     assert "Mermin-Peres magic square (two parties) 8/9 to 1; CHSH" in text
     assert "(Clauser-Horne-Shimony-Holt, two parties) 3/4 to 577/676 (the limit" in text
+    # rival freedoms: every ranking profile of three agents, counted
+    assert "of the 216 rankings of three agents trade happens in 118, exactly where the start is not Pareto efficient" in text
+    assert "no agent gains by misreporting (0 do) and the Boston mechanism, a common rule, can be gamed in 36" in text
+    assert "with identical rankings nothing moves, so the starting allocation decides" in text
 
 
 def test_the_open_obligations_name_what_the_exchange_layer_does_not_establish():
     text = report.build_report()
-    assert "rival freedoms and an exchange of them without money (D30)" in text
+    assert "rival freedoms beyond one indivisible good each and strict rankings (ties, several units, tastes that" in text
+    assert "a starting allocation that is derived and not given; D31)" in text
+    assert "exchange of them without money" not in text  # no longer unbuilt: D31
     assert "an instrument for understanding (D29)" in text and "institutional decisions can be entangled (D28)" in text

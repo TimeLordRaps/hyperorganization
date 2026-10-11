@@ -31,6 +31,7 @@ from hyperoptimization import (
     loop,
     ordinal,
     quorum,
+    rival,
     surprisal,
     viability,
 )
@@ -242,6 +243,23 @@ CLAUSES = [
     ("D27", entangled, "pr_box", _constant_zero_box, "the PR box is not a no-signalling table"),
     ("D27", entangled, "collapse", lambda state, observables, outcomes: state, "after the measurements the state still wins GHZ"),
     ("D27", entangled, "magic_square_ledgers", lambda: 3, "classical ledgers of nine signs satisfy every row and column"),
+    ("D31", rival, "individually_rational", lambda endowment, prefs, allocation: False, "an agent ends below where it began"),
+    ("D31", rival, "pareto_efficient", lambda endowment, prefs, allocation: False, "the outcome is not Pareto efficient"),
+    ("D31", rival, "core_allocations", lambda endowment, prefs: [], "the strict core is not exactly the outcome"),
+    ("D31", rival, "profitable_misreports", lambda endowment, prefs, **kw: [("x", (), None)],
+     "an agent gains by misreporting its ranking"),
+    ("D31", rival, "movers", lambda endowment, allocation: (),
+     "trade did not happen exactly when the starting allocation is inefficient"),
+    ("D31", rival, "profitable_misreports", lambda endowment, prefs, **kw: [],
+     "the checker finds no profitable misreport in the Boston mechanism"),
+    ("D31", rival, "audit", lambda agent, ranking, endowment, record: False, "audit of the honest record fails"),
+    ("D31", rival, "allocation_of", lambda endowment, record: dict(endowment), "a record every agent accepts describes"),
+    ("D31", rival, "top_trading_cycles", lambda endowment, prefs: dict(zip(endowment, [*endowment.values()][1:] + [*endowment.values()][:1])),
+     "with identical rankings the starting allocation"),
+    ("D31", rival, "endowment_spread", lambda prefs: {agent: (0, 0) for agent in prefs},
+     "with identical rankings an agent's best and worst place"),
+    ("D31", rival, "rank_by_weights", lambda goods, weights: tuple(goods),
+     "agents who weigh the coordinates differently did not swap"),
 ]
 
 _results: dict[object, tuple[Status, tuple[str, ...]]] = {}

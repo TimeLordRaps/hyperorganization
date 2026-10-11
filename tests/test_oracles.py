@@ -28,7 +28,7 @@ from pathlib import Path
 
 import pytest
 
-from hyperoptimization import comprehension, deals, entangled
+from hyperoptimization import comprehension, deals, entangled, rival
 
 SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
 
@@ -62,7 +62,7 @@ def need_sympy() -> None:
 # --- the oracles reproduce their own worked examples ------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("name", ["comprehension", "quantum", "price"])
+@pytest.mark.parametrize("name", ["comprehension", "quantum", "price", "ttc"])
 def test_each_oracle_passes_the_worked_examples_it_was_written_against(name, capsys):
     if name == "quantum":
         need_sympy()
@@ -86,6 +86,15 @@ def test_the_package_agrees_with_the_price_oracle_on_every_sampled_option_set():
     assert result.facts["worked"] == 6 and result.facts["efficient"] > 300
     assert result.facts["invisible"] > 40  # options no price can choose are reached, not left to chance
     assert result.checked == 6 + 120 + 12
+
+
+def test_the_package_agrees_with_the_top_trading_cycles_oracle_and_its_checkers_on_both_verdicts():
+    result = runner.compare_rival(report=quiet)
+    assert result.agrees, result.mismatches[:3]
+    f = result.facts
+    assert result.checked == f["outcomes"] + f["allocations"] + f["cores"] + f["misreports"]
+    for name in ("rational", "efficient", "core"):  # a checker that always says yes would also agree on outcomes
+        assert f[f"{name}_no"] > 300 and f[f"{name}_yes"] > 300, (name, f)
 
 
 def test_the_package_agrees_with_the_quantum_oracle_on_every_sampled_strategy():
@@ -178,6 +187,35 @@ def test_the_price_oracle_answers_the_same_under_every_hash_seed_and_does_not_ha
         assert done.returncode == 0, done.stderr
         seen.add(done.stdout.strip())
     assert len(seen) == 1 and len(next(iter(seen))) == hashlib.sha256().digest_size * 2
+
+
+def test_a_slip_in_the_package_exchange_is_caught_on_each_property(monkeypatch):
+    real = rival.top_trading_cycles
+    monkeypatch.setattr(rival, "top_trading_cycles", lambda endowment, prefs: dict(endowment))  # nobody trades
+    assert any(m[0] == "outcome" for m in runner.compare_rival(60, 0, 0, 0, quiet).mismatches)
+    monkeypatch.setattr(rival, "top_trading_cycles", real)
+    for name, slip in (("individually_rational", lambda e, p, a: True), ("pareto_efficient", lambda e, p, a: True),
+                       ("in_core", lambda e, p, a: True)):
+        monkeypatch.setattr(rival, name, slip)  # a checker that always says yes
+        assert any(m[0] == "checkers" for m in runner.compare_rival(0, 40, 0, 0, quiet).mismatches), name
+        monkeypatch.undo()
+    monkeypatch.setattr(rival, "core_allocations", lambda e, p: [dict(e)])  # the endowment is always the core
+    assert any(m[0] == "core" for m in runner.compare_rival(0, 0, 40, 0, quiet).mismatches)
+    monkeypatch.undo()
+    monkeypatch.setattr(rival, "profitable_misreports", lambda e, p, **k: [(next(iter(e)), (), None)])
+    assert any(m[0] == "misreports" for m in runner.compare_rival(0, 0, 0, 20, quiet).mismatches)
+
+
+def test_a_slip_in_the_exchange_oracle_is_caught_just_as_well(monkeypatch):
+    real = runner.reference
+
+    def broken(name):
+        module = real(name)
+        module.ttc = lambda endowment, prefs: dict(endowment)  # an oracle in which nobody ever trades
+        return module
+
+    monkeypatch.setattr(runner, "reference", broken)
+    assert runner.compare_rival(60, 0, 0, 0, quiet).mismatches
 
 
 def test_a_slip_in_the_package_quantum_value_is_caught(monkeypatch):

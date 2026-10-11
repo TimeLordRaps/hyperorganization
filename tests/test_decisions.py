@@ -40,6 +40,7 @@ from hyperoptimization import (
     ordinal,
     quorum,
     renewal,
+    rival,
     surprisal,
     viability,
 )
@@ -160,6 +161,7 @@ SABOTAGE = {
             lambda game, known, corrigible=True: frozenset(game.states)),
     "D26": (comprehension, "robust_quorum", lambda knowledge, nodes, pool=None: 1),  # one attendee always suffices
     "D27": (entangled, "classical_value", lambda game: Fraction(1)),  # classical strategies always win
+    "D31": (rival, "top_trading_cycles", lambda endowment, prefs: dict(endowment)),  # nobody ever trades
 }
 
 
