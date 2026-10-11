@@ -21,7 +21,7 @@ dev = ["pytest>=8", "pytest-timeout>=2.3", "ruff>=0.11", "build>=1.2"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-hyperoptimization = ["py.typed"]
+hyperoptimization = ["py.typed", "data/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

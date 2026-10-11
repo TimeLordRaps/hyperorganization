@@ -39,8 +39,9 @@ import pytest
 from hyperoptimization import quorum as Q
 from hyperoptimization import surprisal as S
 
-GOLDEN = json.loads((Path(__file__).resolve().parent.parent / "validation" / "golden_l2_gate_bits.json")
-                    .read_text(encoding="utf-8"))
+GOLDEN = json.loads(
+    (Path(__file__).resolve().parent.parent / "src" / "hyperoptimization" / "data"
+     / "golden_l2_gate_bits.json").read_text(encoding="utf-8"))
 
 
 # --- bits ------------------------------------------------------------------------------------------

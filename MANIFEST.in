@@ -6,3 +6,4 @@ include PROVENANCE.md
 include DECISIONS.md
 include L0_viability.hm
 recursive-include validation *.json
+recursive-include src/hyperoptimization/data *.json

@@ -569,3 +569,139 @@ def test_game_inputs_are_checked_and_a_game_describes_itself():
     with pytest.raises(ValueError, match="one successor per nature choice"):
         V.Game.from_table(nature=("n1", "n2"), table={"a": {"x": ("a",)}})
     assert "4 states" in repr(cliff()) and cliff() != 3
+
+
+# --- the rank certificate: one pass, and nothing but the truth passes ---------------------------------------
+
+
+def test_the_true_ranks_pass_the_local_check_in_both_modes():
+    rng = random.Random(74)
+    for _ in range(300):
+        game = random_game(rng, home=rng.random() < 0.5)
+        for corrigible in (False, True):
+            ranks = V.ranks(game, corrigible=corrigible)
+            assert V.check_ranks(game, ranks, corrigible=corrigible).status is Status.HOLDS_IN_MODEL
+
+
+def test_a_hand_worked_ranking_passes_and_a_wrong_entry_is_named():
+    game = cliff()
+    assert V.check_ranks(game, {"x": 0, "c": 1, "b": 2, "a": OMEGA}, corrigible=False).status \
+        is Status.HOLDS_IN_MODEL
+    verdict = V.check_ranks(game, {"x": 0, "c": 1, "b": 3, "a": OMEGA}, corrigible=False)
+    assert verdict.status is Status.FAILS_IN_MODEL
+    assert any(line.startswith("b: claimed 3") for line in verdict.witness)
+
+
+def test_changing_any_single_rank_to_any_other_value_is_caught():
+    rng = random.Random(75)
+    tampered = 0
+    for _ in range(120):
+        game = random_game(rng)
+        truth = V.ranks(game, corrigible=False)
+        for state in game.states:
+            for value in [*range(len(game.states) + 3), OMEGA]:
+                if value == truth[state]:
+                    continue
+                claim = {**truth, state: value}
+                assert V.check_ranks(game, claim, corrigible=False).status is Status.FAILS_IN_MODEL, (
+                    game.states, state, value)
+                tampered += 1
+    assert tampered > 3000  # non-vacuity: 3,392 tampered rankings at this seed
+
+
+def test_changing_many_ranks_at_once_is_caught_too():
+    rng = random.Random(76)
+    for _ in range(200):
+        game = random_game(rng)
+        truth = V.ranks(game, corrigible=False)
+        claim = dict(truth)
+        for state in rng.sample(game.states, rng.randint(2, len(game.states))):
+            claim[state] = rng.choice([*range(len(game.states) + 2), OMEGA])
+        if claim == truth:
+            continue
+        assert V.check_ranks(game, claim, corrigible=False).status is Status.FAILS_IN_MODEL
+
+
+def test_a_claimed_ranking_must_be_a_ranking_of_this_game():
+    game = cliff()
+    with pytest.raises(ValueError, match="every state"):
+        V.check_ranks(game, {"a": OMEGA})
+    with pytest.raises(TypeError):
+        V.check_ranks(game, {"x": 0, "c": 1, "b": 2, "a": -1})
+    with pytest.raises(TypeError):
+        V.check_ranks(game, {"x": 0, "c": 1, "b": 2.0, "a": OMEGA})
+
+
+# --- reproducibility, found by the coverage audit's review of the test infrastructure --------------------------
+
+
+def test_random_games_are_the_same_game_in_every_process():
+    """The generator once drew transitions in frozenset order, so the same seed gave a different
+    game under a different PYTHONHASHSEED, and a failing property test could not be rerun."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    src = str(Path(__file__).resolve().parent.parent / "src")
+    code = (
+        "import random\n"
+        "from hyperoptimization import viability as V\n"
+        "out = []\n"
+        "for seed in (61, 62, 63):\n"
+        "    g = V.random_game(random.Random(seed), home=seed % 2 == 0)\n"
+        "    out.append((g.states, tuple(sorted(g.safe)),\n"
+        "                tuple((s, a, b, g.target(s, a, b)) for s in g.states\n"
+        "                      for a in sorted(g.allowed(s)) for b in g.nature)))\n"
+        "print(out)\n"
+    )
+    seen = set()
+    for hash_seed in ("0", "1", "2", "3", "12345"):
+        env = {**os.environ, "PYTHONHASHSEED": hash_seed, "PYTHONPATH": src}
+        done = subprocess.run([sys.executable, "-c", code], env=env, capture_output=True, text=True,
+                              timeout=60, check=True)
+        seen.add(done.stdout)
+    assert len(seen) == 1
+
+
+# --- relabeling ----------------------------------------------------------------------------------------------------
+
+
+def random_renaming(rng, names, prefix):
+    shuffled = rng.sample(list(names), len(names))
+    forward = {old: f"{prefix}{i}" for i, old in enumerate(shuffled)}
+    return forward, {new: old for old, new in forward.items()}
+
+
+def test_relabeling_and_relabeling_back_returns_the_same_game():
+    rng = random.Random(77)
+    for _ in range(100):
+        game = random_game(rng, home=rng.random() < 0.5)
+        fs, bs = random_renaming(rng, game.states, "S")
+        fa, ba = random_renaming(rng, game.actions, "A")
+        fn, bn = random_renaming(rng, game.nature, "N")
+        there = game.relabel(states=fs, actions=fa, nature=fn)
+        assert there != game or (fs, fa, fn) == ({s: s for s in game.states},) * 3
+        assert there.relabel(states=bs, actions=ba, nature=bn) == game
+
+
+def test_a_relabeled_game_has_the_relabeled_ranks_kernel_and_law():
+    rng = random.Random(78)
+    for _ in range(100):
+        game = random_game(rng, home=rng.random() < 0.5)
+        fs, _ = random_renaming(rng, game.states, "S")
+        fa, _ = random_renaming(rng, game.actions, "A")
+        there = game.relabel(states=fs, actions=fa)
+        assert V.ranks(there) == {fs[s]: r for s, r in V.ranks(game).items()}
+        assert V.kernel(there) == frozenset(fs[s] for s in V.kernel(game))
+        assert V.greatest_law(there) == {
+            fs[s]: frozenset(fa[a] for a in permitted) for s, permitted in V.greatest_law(game).items()}
+
+
+def test_a_renaming_must_cover_exactly_and_must_not_merge():
+    game = cliff()
+    with pytest.raises(ValueError, match="cover exactly"):
+        game.relabel(states={"a": "A"})
+    with pytest.raises(ValueError, match="must not merge"):
+        game.relabel(states={"a": "z", "b": "z", "c": "c", "x": "x"})
+    assert game.relabel() == game

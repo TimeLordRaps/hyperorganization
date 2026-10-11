@@ -1,40 +1,20 @@
-"""Random finite games for property tests of `viability`, and the oracles that check them.
+"""The oracles that check `viability`, and the generator they are run on.
 
-Nothing here is imported by the package. The oracles are written from the definitions with
-no reference to the module under test, so a test that compares the two is comparing two
+`random_game` lives in the package (and is re-exported here) so that a user can test their own
+claims on the same games. The oracles do not: they are written from the definitions with no
+reference to the module under test, so a test that compares the two is comparing two
 implementations, not one implementation with itself:
 
     own_reach          breadth-first reachability under a law, against every nature choice
     exit_times         the minimax time to leave the safe set, by value iteration on
                        integers (the module computes the same thing as a descending chain of
                        sets; these two share no code)
-    all_laws           every assignment of a subset of its allowed actions to every state
 """
 
 from __future__ import annotations
 
-import itertools
-import random
-
 from hyperoptimization import viability as V
-
-
-def random_game(rng: random.Random, *, n=None, na=None, nb=None, safe_rate=0.75, home=False):
-    n = n or rng.choice([3, 4, 4, 5])
-    na = na or rng.choice([2, 2, 3])
-    nb = nb or rng.choice([1, 2, 2, 3])
-    states = tuple(f"s{i}" for i in range(n))
-    actions = tuple(f"a{i}" for i in range(na))
-    nature = tuple(f"n{i}" for i in range(nb))
-    allowed = {s: frozenset(a for a in actions if rng.random() < 0.85) or frozenset({actions[0]})
-               for s in states}
-    step = {(s, a, b): rng.choice(states) for s in states for a in allowed[s] for b in nature}
-    safe = frozenset(s for s in states if rng.random() < safe_rate) or frozenset({states[0]})
-    kwargs = {}
-    if home:
-        kwargs["home"] = frozenset(rng.sample(sorted(safe), rng.randint(1, len(safe))))
-        kwargs["correct"] = frozenset((rng.choice(states), rng.choice(states)) for _ in range(n))
-    return V.Game(states, actions, nature, step, allowed=allowed, safe=safe, **kwargs)
+from hyperoptimization.viability import all_laws, random_game  # noqa: F401  (re-exported)
 
 
 def own_reach(game, law, start):
@@ -82,14 +62,3 @@ def exit_times(game, region):
             for s in game.states
         }
     return {s: (V.OMEGA if w[s] >= n + 1 else w[s]) for s in game.states}
-
-
-def all_laws(game):
-    """Every assignment of a subset of the allowed actions to every state."""
-    per_state = []
-    for s in game.states:
-        acts = sorted(game.allowed(s))
-        per_state.append([frozenset(c) for r in range(len(acts) + 1)
-                          for c in itertools.combinations(acts, r)])
-    for choice in itertools.product(*per_state):
-        yield {s: choice[i] for i, s in enumerate(game.states)}

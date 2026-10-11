@@ -17,6 +17,15 @@ Ranks: the ordinal phase of a state
     (On an infinite game the ranks run through the countable ordinals; nothing here needs
     that, and `ordinal` is where it lives.)
 
+A rank is a certificate you can check in one pass
+    The ranks are the unique solution of a LOCAL equation: a state outside the region has rank
+    0, and a state inside has rank 1 + max over actions of (min over nature choices of the
+    successor's rank), with 1 + omega = omega. (Proof: by induction on j, {s : rank(s) > j} is
+    the j-th stage of the descent, because "rank > j + 1" unfolds to "in the region and some
+    action sends every nature choice to rank > j".) So `check_ranks` verifies a claimed ranking
+    without recomputing the fixed point, and any single wrong entry is caught. The verifier
+    never needs to trust the prover.
+
 The greatest sustaining law (FORM, finite games; brute-force checked in the tests)
     A LAW assigns every state a set of permitted actions. Call it SUSTAINING from s if, however
     the permitted actions are chosen and whatever nature does, the system never leaves the safe
@@ -73,10 +82,12 @@ What is not here
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Mapping
+import itertools
+import random
+from collections.abc import Iterable, Iterator, Mapping
 from fractions import Fraction
 
-from .ground import OMEGA, Omega, Status, Verdict
+from .ground import OMEGA, Omega, Status, Verdict, rank_key
 
 Law = dict[str, frozenset[str]]
 
@@ -191,6 +202,32 @@ class Game:
         return cls(tuple(table), tuple(actions), choices, step, allowed=allowed, safe=safe,
                    home=home, correct=correct)
 
+    def relabel(self, *, states: Mapping[str, str] | None = None,
+                actions: Mapping[str, str] | None = None,
+                nature: Mapping[str, str] | None = None) -> Game:
+        """The same game under new names. Each mapping that is given must rename every name, once."""
+
+        def table(old: tuple[str, ...], given: Mapping[str, str] | None, label: str) -> dict[str, str]:
+            if given is None:
+                return {name: name for name in old}
+            if set(given) != set(old):
+                raise ValueError(f"the {label} renaming must cover exactly the {label}")
+            if len(set(given.values())) != len(given):
+                raise ValueError(f"the {label} renaming must not merge two names")
+            return dict(given)
+
+        ns, na, nn = (table(self.states, states, "states"), table(self.actions, actions, "actions"),
+                      table(self.nature, nature, "nature"))
+        return Game(
+            tuple(ns[s] for s in self.states), tuple(na[a] for a in self.actions),
+            tuple(nn[b] for b in self.nature),
+            {(ns[s], na[a], nn[b]): ns[t] for (s, a, b), t in self._step.items()},
+            allowed={ns[s]: frozenset(na[a] for a in acts) for s, acts in self._allowed.items()},
+            safe={ns[s] for s in self.safe},
+            home=None if self.home is None else {ns[s] for s in self.home},
+            correct={(ns[s], ns[t]) for s, t in self.correct},
+        )
+
     def allowed(self, state: str) -> frozenset[str]:
         return self._allowed[state]
 
@@ -266,6 +303,36 @@ def ranks(game: Game, *, corrigible: bool = True) -> dict[str, int | Omega]:
                 break
         out[s] = rank
     return out
+
+
+def check_ranks(game: Game, claimed: Mapping[str, int | Omega], *, corrigible: bool = True) -> Verdict:
+    """Whether `claimed` satisfies the local rank equations, which only the true ranks do.
+
+    Fails with one line per state whose claimed rank differs from what the equation gives at
+    that state. A claimed rank must be a natural number or OMEGA for every state of the game.
+    """
+    if set(claimed) != set(game.states):
+        raise ValueError("a claimed ranking must name every state of the game, and only those")
+    for rank in claimed.values():
+        rank_key(rank)  # refuses a negative number, a float, a bool
+    region = _region(game, corrigible)
+    problems = []
+    for s in game.states:
+        if s not in region:
+            expected: int | Omega = 0
+        else:
+            best = max(
+                (min((claimed[game.target(s, a, b)] for b in game.nature), key=rank_key)
+                 for a in game.allowed(s)),
+                key=rank_key,
+            )
+            expected = OMEGA if best is OMEGA else best + 1
+        if claimed[s] != expected:
+            problems.append(f"{s}: claimed {claimed[s]}, the equation gives {expected}")
+    claim = "the claimed ranks satisfy the local rank equations"
+    if problems:
+        return Verdict(claim, Status.FAILS_IN_MODEL, tuple(problems))
+    return Verdict(claim, Status.HOLDS_IN_MODEL, evidence=(f"{len(game.states)} states checked",))
 
 
 # ---------------------------------------------------------------------------
@@ -409,6 +476,57 @@ def survival_probability(game: Game, law: Mapping[str, frozenset[str]], start: s
 
 
 # ---------------------------------------------------------------------------
+# Brute force over every law.
+# ---------------------------------------------------------------------------
+
+
+def all_laws(game: Game) -> Iterator[Law]:
+    """Every law on the game: each state is given every subset of its allowed actions.
+
+    There are the product over states of 2**(number allowed) of them, so this is for games of a
+    handful of states, where it lets a claim about ALL laws be checked rather than sampled.
+    """
+    options = []
+    for s in game.states:
+        acts = sorted(game.allowed(s))
+        options.append([frozenset(c) for r in range(len(acts) + 1)
+                        for c in itertools.combinations(acts, r)])
+    for choice in itertools.product(*options):
+        yield {s: choice[i] for i, s in enumerate(game.states)}
+
+
+# ---------------------------------------------------------------------------
+# Random games, for property tests.
+# ---------------------------------------------------------------------------
+
+
+def random_game(rng: random.Random, *, n: int | None = None, na: int | None = None,
+                nb: int | None = None, safe_rate: float = 0.75, home: bool = False) -> Game:
+    """A random finite game, reproducible from the generator's seed alone.
+
+    Nothing here iterates a set in an order that depends on the string-hash seed: an earlier
+    version drew its transitions in `frozenset` order and so produced different games, from the
+    same seed, in different processes. That made a failing property test impossible to rerun.
+    """
+    n = n or rng.choice([3, 4, 4, 5])
+    na = na or rng.choice([2, 2, 3])
+    nb = nb or rng.choice([1, 2, 2, 3])
+    states = tuple(f"s{i}" for i in range(n))
+    actions = tuple(f"a{i}" for i in range(na))
+    nature = tuple(f"n{i}" for i in range(nb))
+    allowed = {s: frozenset(a for a in actions if rng.random() < 0.85) or frozenset({actions[0]})
+               for s in states}
+    step = {(s, a, b): rng.choice(states)
+            for s in states for a in sorted(allowed[s]) for b in nature}
+    safe = frozenset(s for s in states if rng.random() < safe_rate) or frozenset({states[0]})
+    kwargs: dict = {}
+    if home:
+        kwargs["home"] = frozenset(rng.sample(sorted(safe), rng.randint(1, len(safe))))
+        kwargs["correct"] = frozenset((rng.choice(states), rng.choice(states)) for _ in range(n))
+    return Game(states, actions, nature, step, allowed=allowed, safe=safe, **kwargs)
+
+
+# ---------------------------------------------------------------------------
 # Repair as a game: the worst-case counterpart of the renewal chain.
 # ---------------------------------------------------------------------------
 
@@ -438,6 +556,6 @@ def repair_game(m: int, q: int, *, attack: int, repair: int) -> Game:
 
 
 __all__ = [
-    "Game", "Law", "OMEGA", "forced_moves", "freedom", "greatest_law", "kernel", "ranks",
-    "reach_home", "reachable", "repair_game", "survival_probability", "sustaining",
+    "Game", "Law", "OMEGA", "all_laws", "check_ranks", "forced_moves", "freedom", "greatest_law", "kernel", "ranks",
+    "random_game", "reach_home", "reachable", "repair_game", "survival_probability", "sustaining",
 ]

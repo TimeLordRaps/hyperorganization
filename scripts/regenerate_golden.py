@@ -1,4 +1,4 @@
-"""Regenerate `validation/golden_l2_gate_bits.json` from a hyperethics checkout.
+"""Regenerate `src/hyperoptimization/data/golden_l2_gate_bits.json` from a hyperethics checkout.
 
 The golden file records what `hyperethics.capture.gate_cost` says for a handful of the
 governance systems hyperethics ships, with each party's price read as bits of surprisal
@@ -59,7 +59,8 @@ def main(checkout: str) -> None:
         "command": "PYTHONPATH=<hyperethics>/src python scripts/regenerate_golden.py <hyperethics>",
         "systems": [record(getattr(constitutions, name)()) for name in SYSTEMS],
     }
-    out = Path(__file__).resolve().parent.parent / "validation" / "golden_l2_gate_bits.json"
+    out = (Path(__file__).resolve().parent.parent / "src" / "hyperoptimization" / "data"
+           / "golden_l2_gate_bits.json")
     out.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"wrote {out} from hyperethics {commit[:12]}: {len(data['systems'])} systems")
 
