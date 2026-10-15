@@ -111,7 +111,8 @@ def test_the_spec_declares_the_axioms_derives_and_non_derives_the_design_maps():
         "ax-existence-as-viability", "ax-free-will-as-full-support",
         "ax-corrigibility-as-reachability", "ax-self-repair", "ax-independence",
         "ax-ignorance-is-pessimism", "ax-understanding-is-a-set", "ax-common-interest",
-        "ax-freedom-is-non-rival", "ax-rival-is-indivisible",
+        "ax-freedom-is-non-rival", "ax-rival-is-indivisible", "ax-standing-is-envy", "ax-wealth-picks-first",
+        "ax-the-dial-is-a-straight-mix",
     ]
     assert declared("derive") == [
         "d-greatest-law", "d-exemption-is-fatal", "d-corrigible-kernel-inside", "d-rank-certificate",
@@ -130,6 +131,8 @@ def test_the_spec_declares_the_axioms_derives_and_non_derives_the_design_maps():
         "d-entanglement-is-consumed", "d-no-signalling-is-not-quantum",
         "d-rival-exchange", "d-trade-iff-inefficient", "d-audit-is-local",
         "d-a-common-price-cannot-see-a-swap",
+        "d-trade-iff-envy-loop", "d-efficient-iff-pecking-order", "d-a-wealth-start-is-frozen",
+        "d-the-thaw-is-direction-not-strength",
     ]
     assert declared("non-derive") == [
         "nd-persistence-is-optimal", "nd-physical-adherence", "nd-determinacy-is-soundness",
@@ -140,7 +143,8 @@ def test_the_spec_declares_the_axioms_derives_and_non_derives_the_design_maps():
     ]
     assert declared("open") == [
         "nd-persistence-is-optimal", "nd-closing-catalyst", "nd-mean-field-adequacy",
-        "nd-self-funding", "nd-rival-freedoms", "nd-endowment", "nd-comprehension-instrument",
+        "nd-self-funding", "nd-rival-freedoms", "nd-endowment", "nd-ladder-dissolution",
+        "nd-status-is-envy", "nd-comprehension-instrument",
     ]
 
 
@@ -212,7 +216,8 @@ def test_nothing_is_attributed_to_the_owner_beyond_what_was_said():
 def test_the_correction_is_where_it_changed_something_exactly_as_he_said_it():
     # the statement is quoted in the provenance, where the roadmap item it withdrew stood, and in the debt row
     statement = " ".join(LATER[1].split()).rstrip(".")
-    for name, text in (("PROVENANCE.md", PROVENANCE), ("DESIGN.md", DESIGN), ("TECHNICAL_DEBT.md", DEBT)):
+    for name, text in (("PROVENANCE.md", PROVENANCE), ("DESIGN.md", DESIGN), ("TECHNICAL_DEBT.md", DEBT),
+                       ("L1_exchange.hm", SPEC1)):
         assert statement in flat(text), f"the statement is missing or altered in {name}"
 
 
@@ -233,7 +238,7 @@ def test_the_spec_grades_every_graduation_criterion(gc):
     assert re.search(rf"{gc}: ", SPEC)
 
 
-@pytest.mark.parametrize("gc", [f"GC-L1-{n}" for n in range(7)])
+@pytest.mark.parametrize("gc", [f"GC-L1-{n}" for n in range(8)])
 def test_the_second_spec_grades_every_graduation_criterion(gc):
     assert re.search(rf"{gc}: ", SPEC1)
 
@@ -244,7 +249,7 @@ def test_the_second_spec_is_honest_about_its_status():
         "Each is an assumption of the model, adopted and not derived",
         "A passing check CONFIRMS nothing universally",
         "This layer does not graduate as a theory of exchange",
-        "Five of seven discharged",
+        "Five of eight discharged",
         "Win-win holds by construction here",
         "That human or institutional decisions can be entangled is a proposal with no witness",
     ):

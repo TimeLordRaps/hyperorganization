@@ -39,8 +39,10 @@ pair, each with its top trading cycles outcome. What it shows, and the tests che
 
   * at t = 0 every agent ranks alike, so nothing moves from any start (a price is one ranking for everybody);
   * with ONE coordinate nothing ever moves, at any setting: a single number cannot rank two agents apart;
-  * weights that are positive multiples of the price never move anything either: trade without money needs a
-    difference in the DIRECTION of what agents value, not in how strongly they value it;
+  * weights that are positive multiples of the price never move anything either, nor do weights that are all
+    equal; and that is all: SOME goods and SOME start trade at SOME setting exactly when the weights are neither
+    all equal nor all along the price (`can_thaw`, with a constructive `thaw_witness`). Trade without money needs
+    a difference in the DIRECTION of what agents value, not in how strongly they value it;
   * the setting at which anyone first moves is an exact rational (`thaw_threshold`), attained or not, and it can
     be 0 (two goods of equal worth at the price can be swapped by any divergence at all);
   * the dial is NOT a one-way door: trade can open and close again as t rises (`thaw_reverses`), because one
@@ -52,12 +54,21 @@ price + t * own is a choice, one path among many from a common ranking to privat
 to be frozen; how to unfreeze one by anything other than the divergence of tastes (making goods less rival,
 rotating who picks first) is not modelled, and a transfer from the top of a ladder is not an exchange in which
 nobody loses (HO-030).
+
+What it refuses. Numbers are checked, because a float would give a wrong answer quietly: coordinates, wealth and the
+dial are integers or fractions (a float or a bool is a TypeError), the price and the weights are strictly positive,
+vectors are as long as the price, the dial lies in [0, 1], and the goods and agents of a market match (a ValueError).
+Containers are not checked: a non-mapping where a mapping goes raises an exception (AttributeError, TypeError or
+ValueError, as `rival` does) and never gives an answer. `tests/test_standing.py` checks both boundaries: the numbers
+against a rule written from these requirements, and the containers by putting a non-mapping in every slot.
 """
 
 from __future__ import annotations
 
+import functools
 import heapq
 import itertools
+import math
 import random
 from collections.abc import Hashable, Mapping, Sequence
 from fractions import Fraction
@@ -66,9 +77,10 @@ from typing import NamedTuple
 from . import rival
 
 __all__ = [
-    "Piece", "Threshold", "dial_survey", "envy_graph", "envy_loop", "frozen", "is_pecking_order",
-    "pecking_order", "serial_dictatorship", "survey", "thaw_breakpoints", "thaw_outcome", "thaw_pieces",
-    "thaw_rankings", "thaw_reverses", "thaw_threshold", "thaw_weights", "wealth_start",
+    "Piece", "Threshold", "Witness", "can_thaw", "dial_survey", "envy_graph", "envy_loop", "frozen",
+    "is_pecking_order", "pecking_order", "serial_dictatorship", "survey", "thaw_breakpoints", "thaw_outcome",
+    "thaw_pieces", "thaw_rankings", "thaw_reverses", "thaw_threshold", "thaw_weights", "thaw_witness",
+    "wealth_start",
 ]
 
 Agent = Hashable
@@ -84,6 +96,16 @@ class Piece(NamedTuple):
     high: Fraction
     allocation: dict
     movers: tuple
+
+
+class Witness(NamedTuple):
+    """A market of two agents, two goods and a setting of the dial at which each strictly prefers the other's good,
+    so that top trading cycles swaps them (`thaw_witness`)."""
+
+    lam: Fraction
+    agents: tuple
+    endowment: dict
+    goods: dict
 
 
 class Threshold(NamedTuple):
@@ -321,7 +343,11 @@ def thaw_pieces(endowment: Mapping[Agent, Good], goods: Mapping[Good, Sequence[N
                 price: Sequence[Number], weights: Mapping[Agent, Sequence[Number]]) -> list[Piece]:
     """The whole dial, exactly: 0, each breakpoint and 1 as single settings, and the open stretch between each
     neighbouring pair, in increasing order, each with the top trading cycles outcome on it and the agents it moves.
-    No agent's ranking changes inside an open stretch, so one outcome stands for all of it."""
+    No agent's ranking changes inside an open stretch, so one outcome stands for all of it.
+
+    Cost: at most n * n(n - 1) / 2 breakpoints for n agents and, between them, one top trading cycles run per piece;
+    most pairs of goods cross nowhere between 0 and 1, so there are far fewer in practice (20 agents with three
+    coordinates, 117 breakpoints, 237 pieces, about a second and a half). It is meant for models of a few dozen agents."""
     _linked(endowment, goods, weights)
     vectors, cost, own = _dial(goods, price, weights)
     edges = [Fraction(0), *thaw_breakpoints(goods, price, weights), Fraction(1)]
@@ -363,6 +389,55 @@ def thaw_reverses(endowment: Mapping[Agent, Good], goods: Mapping[Good, Sequence
     return False
 
 
+def _along(a: Sequence[Fraction], b: Sequence[Fraction]) -> bool:
+    """Whether two strictly positive vectors point the same way: one is a positive multiple of the other."""
+    return all(a[k] * b[m] == a[m] * b[k] for k in range(len(a)) for m in range(k + 1, len(a)))
+
+
+def can_thaw(price: Sequence[Number], weights: Mapping[Agent, Sequence[Number]]) -> bool:
+    """Whether SOME goods and SOME start trade at SOME setting of the dial: exactly when the agents' weights are
+    neither all equal nor all positive multiples of the price. If they are all equal, or all along the price, every
+    agent's effective weights point the same way at every setting, so every agent ranks alike and top trading cycles
+    moves nobody, whatever the goods and the start (with one coordinate every weight is along the price). Otherwise two
+    agents' effective weights point different ways at some setting, and `thaw_witness` builds goods that each of them
+    ranks the other's above its own. A single agent, or none, has no one to trade with."""
+    _goods, cost, own = _dial({}, price, weights)
+    held = list(own.values())  # with none, or one, both tests below hold of every agent: the answer is no
+    return not (all(w == held[0] for w in held) or all(_along(w, cost) for w in held))
+
+
+def thaw_witness(price: Sequence[Number], weights: Mapping[Agent, Sequence[Number]]) -> Witness | None:
+    """Two agents, two goods and a setting at which they swap, whenever `can_thaw` says some goods and some start trade;
+    None otherwise. Take two agents whose effective weights e and f point different ways at the setting (setting 1 if
+    their own weights do; setting 1/2 if their weights are parallel but unequal and not along the price). The
+    vectors e and f are positive, so e.f > 0, and by the strict Cauchy-Schwarz inequality the interval from
+    (e.f)/(f.f) to (e.e)/(e.f) is not empty; for t in it, u = e - t f has e.u > 0 and f.u < 0. Let the first agent hold
+    the goods' negative part of u and the second the positive part: each ranks the other's good strictly higher. The
+    vectors are scaled to coprime integers (a ranking does not change under scaling)."""
+    _goods, cost, own = _dial({}, price, weights)
+    for first, second in itertools.combinations(own, 2):
+        one, other = own[first], own[second]
+        if not _along(one, other):
+            lam = Fraction(1)
+        elif one != other and not _along(one, cost):
+            lam = Fraction(1, 2)
+        else:
+            continue
+        e = tuple((1 - lam) * c + lam * x for c, x in zip(cost, one))
+        f = tuple((1 - lam) * c + lam * x for c, x in zip(cost, other))
+        dot = sum(a * b for a, b in zip(e, f))
+        low, high = dot / sum(b * b for b in f), sum(a * a for a in e) / dot
+        t = (low + high) / 2
+        u = [a - t * b for a, b in zip(e, f)]
+        scale = math.lcm(*(x.denominator for x in u))
+        whole = [int(x * scale) for x in u]
+        divisor = math.gcd(*whole)
+        whole = [x // divisor for x in whole]
+        wanted, given_up = tuple(max(x, 0) for x in whole), tuple(max(-x, 0) for x in whole)
+        return Witness(lam, (first, second), {first: "x", second: "y"}, {"x": given_up, "y": wanted})
+    return None
+
+
 # --- counts -------------------------------------------------------------------------------------------------------
 
 
@@ -394,7 +469,13 @@ def dial_survey(count: int = 300, seed: int = 77) -> dict[str, int]:
     """Counts over `count` seeded random instances of the dial (three or four agents, two or three coordinates,
     goods with coordinates 0 to 6, price and weights 1 to 6, a random start): how many trade at some setting
     (`trade`) and, of those, how many trade at one setting and not at a higher one (`reverse`). These are
-    samples of an arbitrary distribution, not a rate in any population."""
+    samples of an arbitrary distribution, not a rate in any population. The counts are a pure function of the
+    arguments, so the last few are remembered (the report asks for the same ones many times)."""
+    return dict(_dial_counts(count, seed))
+
+
+@functools.lru_cache(maxsize=8)
+def _dial_counts(count: int, seed: int) -> tuple[tuple[str, int], ...]:
     rng = random.Random(seed)
     counts = {"instances": 0, "trade": 0, "reverse": 0}
     for _ in range(count):
@@ -409,4 +490,4 @@ def dial_survey(count: int = 300, seed: int = 77) -> dict[str, int]:
         counts["instances"] += 1
         counts["trade"] += any(moved)
         counts["reverse"] += any(moved) and not all(moved[moved.index(True):])
-    return counts
+    return tuple(counts.items())

@@ -39,7 +39,7 @@ def test_every_listed_file_hashes_to_the_value_recorded_for_it():
 
 def test_every_spec_document_source_data_test_and_script_file_is_listed():
     expected = {"L0_viability.hm", "L1_exchange.hm", "pyproject.toml", "DESIGN.md", "DECISIONS.md", "PROVENANCE.md",
-                "src/hyperoptimization/py.typed"}
+                "validation/oracle-standing-specification.md", "src/hyperoptimization/py.typed"}
     expected |= {f"src/hyperoptimization/{p.name}" for p in PACKAGE.iterdir() if p.suffix == ".py"}
     expected |= {f"src/hyperoptimization/data/{p.name}" for p in (PACKAGE / "data").iterdir()
                  if p.suffix == ".json"}

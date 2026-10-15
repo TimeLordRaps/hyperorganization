@@ -22,8 +22,17 @@
 -- PROVENANCE.md and in the handoff. Tyler's statements are authoritative for his own aims; they do not
 -- by themselves verify an external claim, and this file does not treat them as doing so.
 --
+-- USER-DECLARED (Tyler Roost, 2026-10-11, later the same day, after the exchange layer had been
+-- reported), verbatim:
+--   "There is no possible uniform start, the world currently has money, we need a way to extrapolate
+--    from current status games into a future with no money, the only utopic futures are ones with no
+--    money."
+-- Quoted exactly. It withdrew the candidate this layer had named for the starting allocation, a
+-- uniformly random one, and set the task of STANDING below. "The only utopic futures are ones with no
+-- money" is the owner's claim about what is good; this file neither derives nor tests it.
+--
 -- WHAT THIS LAYER IS. L0 asks what law a system that wants to exist is under. L1 asks how parties who
--- see only parts of the world make deals about that law without a number to settle them. Five answers,
+-- see only parts of the world make deals about that law without a number to settle them. Six answers,
 -- each a finite model with an exact oracle.
 --   KNOWLEDGE. What a party cannot see it must treat as unsafe, so what it can certify as permitted is a
 --   part of the greatest law and grows as it learns. What is exchanged is a certificate, a set of
@@ -44,6 +53,11 @@
 --   do better among itself, and no party gains by misreporting; each party can audit the outcome from its
 --   own ranking and a public record; and what each party ends with is decided by the starting allocation,
 --   which nothing here derives.
+--   STANDING. Whatever the start is, an exchange by rankings alone can move only the loops of envy (an
+--   agent envies another whose good it ranks above its own); what is left is a ladder, a pecking order in
+--   which each holds its favourite of what those before it left. A ladder made by wealth is frozen by
+--   abolishing money while keeping holdings, and what thaws a ladder is a difference in the direction of
+--   what agents value, not in its strength.
 --
 -- WHAT IT IS NOT. Win-win holds by construction here, because the permissions are not rival and a
 -- gain is a permission nobody could certify (nd-win-win-by-construction). Understanding is a set
@@ -52,7 +66,9 @@
 -- have opposed interests are not modelled (nd-quantum-dilemma). Rival freedoms are modelled only as
 -- indivisible goods held one to a party under strict private rankings (ax-rival-is-indivisible); ties,
 -- several units and tastes that depend on others are not (nd-rival-freedoms), and who holds what at the
--- start is given and not derived (nd-endowment).
+-- start is given and not derived (nd-endowment). Real status is a taste that depends on what others hold
+-- (nd-status-is-envy), and how to unfreeze a ladder other than by a change in tastes is not modelled
+-- (nd-ladder-dissolution).
 --
 -- Layer boundary: nothing here imports another package. Checks that need a record of the family read a
 -- golden file hyperstratum produced.
@@ -128,6 +144,22 @@ axiom ax-rival-is-indivisible:
     -- at a time. Every party holds one and ranks all of them strictly, in private. Adopted: it is the
     -- model in which an exchange without money has known guarantees. Ties, several units and tastes that
     -- depend on who else gets what are outside it (nd-rival-freedoms).
+
+axiom ax-standing-is-envy:
+    -- A party's standing, in an exchange by rankings alone, is read from whom it envies: it envies another
+    -- when it ranks that party's good above its own. A status game is a common ranking, everyone wanting
+    -- the same good. Adopted: it is the reading under which what an exchange can move from a start can be
+    -- said exactly. Tastes that depend on who else holds what are outside it (nd-status-is-envy).
+
+axiom ax-wealth-picks-first:
+    -- Holdings made by money are read as a start made by letting the wealthiest party pick first, then
+    -- the next wealthiest, and so on. Adopted: it is the most that "the wealthy choose first" can mean in
+    -- a model with rankings and no prices. A market is not a serial dictatorship.
+
+axiom ax-the-dial-is-a-straight-mix:
+    -- Between the ranking a common price induces and a party's own, the party scores a good by the
+    -- weights (1 - t) * price + t * its own. Adopted: one path among many, the one on which a ranking of
+    -- two goods can change at most once, which makes the dial exactly computable.
 
 
 -- =============================================================================
@@ -268,6 +300,40 @@ derive d-a-common-price-cannot-see-a-swap:
     -- the same after as before any exchange of them, so the gain is in the private weights only.
     -- Status: FORM (exact, with the worked example and a grid of weights).
 
+derive d-trade-iff-envy-loop:
+    -- From any start, top trading cycles moves someone exactly when envy has a loop (agents each of whom
+    -- ranks the next one's good above its own, the last ranking the first's above its own), which is
+    -- exactly when the start is not Pareto efficient. After one exchange envy has no loop.
+    -- Status: FORM (every start and every strict profile of two and three agents, seeded markets of four
+    -- and five, all 331,776 profiles of four in a long run outside the suite, an independent reference).
+
+derive d-efficient-iff-pecking-order:
+    -- A start has a pecking order, an ordering of the agents in which each holds its favourite among the
+    -- goods held by it and by every agent after it, exactly when it is Pareto efficient, which is exactly
+    -- when envy has no loop. It is a ladder: envy points up it and never down.
+    -- Status: FORM (the same markets, against every ordering of the agents).
+
+derive d-a-wealth-start-is-frozen:
+    -- The start that results when the wealthiest agent picks first, the next wealthiest second, and so on,
+    -- is a ladder whose pecking order is the wealth order, with envy pointing only toward the wealthier,
+    -- and top trading cycles leaves it where it is: abolishing money while keeping holdings freezes it
+    -- wherever the rankings agree.
+    -- Status: FORM for the equivalences (every wealth order of every profile of three agents, all of four
+    -- in a long run, seeded ones up to thirty agents); FRAME for the reading of holdings made by money as
+    -- a start made by letting the wealthiest pick first.
+
+derive d-the-thaw-is-direction-not-strength:
+    -- On a dial from the rankings a common price induces to private rankings (an agent scores a good by
+    -- (1 - t) * price + t * its own weights), some goods and some start trade at some setting exactly when
+    -- the agents' weights are neither all equal nor all positive multiples of the price: trade without
+    -- money needs a difference in the direction of what agents value, not in its strength. (At the price
+    -- alone, and with one coordinate, the weights are all along the price.) The setting at which anyone
+    -- first moves is an exact rational, attained or not, and trade can open and close again as the dial
+    -- rises.
+    -- Status: FORM (exact rational arithmetic, with a witness built from the strict Cauchy-Schwarz
+    -- inequality; dials derived by hand; seeded instances; an independent reference). FRAME for the dial
+    -- itself: a straight mix is one path among many.
+
 
 -- =============================================================================
 -- SECTION V: WHAT THIS LAYER DOES NOT CONTAIN
@@ -303,7 +369,22 @@ open nd-rival-freedoms:
 open nd-endowment:
     -- OPEN. Who holds which rival freedom at the start is given, not derived. The exchange leaves nobody
     -- below their start, so it cannot be fairer than the start; with identical rankings nothing moves at
-    -- all. This layer derives a greatest sustaining law and no starting allocation (decision D31).
+    -- all. The owner has said that no uniform start is possible and that a future without money has to be
+    -- extrapolated from the present world, so this layer takes the start as an input and says what can
+    -- move from it (d-trade-iff-envy-loop, d-a-wealth-start-is-frozen) and not what it should be. It
+    -- derives a greatest sustaining law and no starting allocation (decisions D31, D32).
+
+open nd-ladder-dissolution:
+    -- OPEN. How to unfreeze a ladder other than by a change in what agents value: making goods less
+    -- rival, rotating who picks first, a transfer from the top. None is built. A transfer is not an
+    -- exchange in which nobody loses, and whether it is lawful turns on what optimality is over
+    -- participants (decisions D16, D32).
+
+open nd-status-is-envy:
+    -- OPEN. Real status is a taste that depends on what others hold. This layer reads standing as envy of
+    -- a good and the common ranking a price induces as the dial's setting 0; tastes that depend on who
+    -- else gets what are outside the model and are where the guarantees of top trading cycles fail or
+    -- change (decision D32).
 
 open nd-comprehension-instrument:
     -- OPEN. A test of understanding that a person passes exactly when they understand, that cannot be
@@ -333,8 +414,12 @@ graduation:
     -- GC-L1-6: rival freedoms and an exchange of them without money. DISCHARGED for indivisible goods
     --          held one to a party under strict private rankings (d-rival-exchange); NOT DISCHARGED beyond
     --          that: nd-rival-freedoms, nd-endowment.
+    -- GC-L1-7: a way to extrapolate from the present start into a future without money. NOT DISCHARGED:
+    --          what is shown is what is stuck (d-a-wealth-start-is-frozen) and that a change in the
+    --          direction of what agents value thaws it (d-the-thaw-is-direction-not-strength);
+    --          nd-ladder-dissolution, nd-status-is-envy.
     --
-    -- Five of seven discharged.
+    -- Five of eight discharged.
     --
     -- This layer does not graduate as a theory of exchange, and no claim of one is made anywhere in this
     -- file. It graduates, if at all, as a toolkit whose finite theorems are exact and whose reach into

@@ -28,7 +28,7 @@ from pathlib import Path
 
 import pytest
 
-from hyperoptimization import comprehension, deals, entangled, rival
+from hyperoptimization import comprehension, deals, entangled, rival, standing
 
 SCRIPTS = Path(__file__).resolve().parent.parent / "scripts"
 
@@ -62,7 +62,7 @@ def need_sympy() -> None:
 # --- the oracles reproduce their own worked examples ------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("name", ["comprehension", "quantum", "price", "ttc"])
+@pytest.mark.parametrize("name", ["comprehension", "quantum", "price", "ttc", "standing"])
 def test_each_oracle_passes_the_worked_examples_it_was_written_against(name, capsys):
     if name == "quantum":
         need_sympy()
@@ -95,6 +95,23 @@ def test_the_package_agrees_with_the_top_trading_cycles_oracle_and_its_checkers_
     assert result.checked == f["outcomes"] + f["allocations"] + f["cores"] + f["misreports"]
     for name in ("rational", "efficient", "core"):  # a checker that always says yes would also agree on outcomes
         assert f[f"{name}_no"] > 300 and f[f"{name}_yes"] > 300, (name, f)
+
+
+def test_the_package_agrees_with_the_standing_oracle_on_envy_ladders_wealth_starts_and_the_dial():
+    result = runner.compare_standing(markets=500, dials=200, report=quiet)
+    assert result.agrees, result.mismatches[:3]
+    f = result.facts
+    assert f["loop_yes"] > 150 and f["loop_no"] > 150  # both kinds of start are reached, not left to chance
+    assert f["with_a_pecking_order"] == f["loop_no"]  # a start has a pecking order exactly when envy has no loop
+    assert f["orders_tried"] > 3000 and f["dials_that_trade"] > 25 and f["dials_that_reverse"] > 10
+    assert f["pieces"] > 1000 and f["worked"] == 4
+    assert f["witnessed"] > 40 and f["barren"] > 40 and f["witnessed"] + f["barren"] == f["weight_cases"]
+    # the delicate kinds the weight cases name are reached: weights parallel with different strengths (their witness
+    # sits at the middle of the dial) and unequal multiples of the price (no witness though the weights differ)
+    assert 5 < f["delicate"] <= f["witnessed"] and 5 < f["stretched"] <= f["barren"]
+    markets = f["markets"]
+    assert result.checked == (3 * markets + f["orders_tried"] + f["pieces"] + f["dials"] * (63 + 9 + 1) + f["worked"]
+                              + f["weight_cases"])
 
 
 def test_the_package_agrees_with_the_quantum_oracle_on_every_sampled_strategy():
@@ -216,6 +233,94 @@ def test_a_slip_in_the_exchange_oracle_is_caught_just_as_well(monkeypatch):
 
     monkeypatch.setattr(runner, "reference", broken)
     assert runner.compare_rival(60, 0, 0, 0, quiet).mismatches
+
+
+REAL_WITNESS = standing.thaw_witness
+
+STANDING_SLIPS = [  # (what is broken, how, the kind of mismatch it must produce)
+    ("envy_graph", lambda endowment, prefs: {agent: () for agent in endowment}, "market"),  # nobody envies
+    ("envy_loop", lambda endowment, prefs: None, "market"),  # envy never loops
+    ("frozen", lambda endowment, prefs: False, "market"),  # nothing is ever frozen
+    ("pecking_order", lambda endowment, prefs: tuple(reversed(list(endowment))), "market"),  # the wrong ladder
+    ("is_pecking_order", lambda endowment, prefs, order: True, "is_pecking_order"),  # every order will do
+    ("serial_dictatorship", lambda order, prefs: {a: prefs[a][-1] for a in order}, "serial_dictatorship"),
+    ("wealth_start", lambda wealth, prefs: standing.serial_dictatorship(sorted(prefs, key=wealth.get), prefs),
+     "wealth_start"),  # the poorest picks first
+    ("thaw_rankings", lambda goods, price, weights, lam: {a: tuple(goods) for a in weights}, "rankings"),
+    ("thaw_outcome", lambda endowment, goods, price, weights, lam: dict(endowment), "rankings"),  # nothing moves
+    ("thaw_breakpoints", lambda goods, price, weights: (), "stretch"),  # a ranking can change unseen
+    ("thaw_threshold", lambda endowment, goods, price, weights: None, "threshold"),
+    ("thaw_reverses", lambda endowment, goods, price, weights: False, "threshold"),
+    ("can_thaw", lambda price, weights: True, "characterisation"),  # every set of weights can trade
+    ("thaw_witness", lambda price, weights: None, "characterisation"),  # no set of weights has a witness
+    ("thaw_witness", lambda price, weights: (lambda w: w and w._replace(goods={"x": w.goods["y"], "y": w.goods["x"]}))(
+        REAL_WITNESS(price, weights)), "witness"),  # the two goods the wrong way round
+]
+
+
+@pytest.mark.parametrize(("name", "slip", "kind"), STANDING_SLIPS, ids=[slip[0] for slip in STANDING_SLIPS])
+def test_a_slip_in_the_package_standing_is_caught_on_the_property_it_breaks(monkeypatch, name, slip, kind):
+    monkeypatch.setattr(standing, name, slip)
+    assert any(m[0] == kind for m in runner.compare_standing(120, 120, 150, quiet).mismatches), name
+
+
+def test_a_slip_in_the_standing_oracle_is_caught_just_as_well(monkeypatch):
+    real = runner.reference
+    for name, slip, kind in (
+            ("has_envy_loop", lambda endowment, prefs: False, "market"),  # an oracle in which envy never loops
+            ("thaw_allocation", lambda endowment, goods, price, weights, lam: dict(endowment), "piece"),
+            ("thaw_ranking", lambda goods, price, weights, lam: tuple(goods), "witness")):  # everyone ranks alike
+
+        def broken(requested, name=name, slip=slip):
+            module = real(requested)
+            setattr(module, name, slip)
+            return module
+
+        monkeypatch.setattr(runner, "reference", broken)
+        assert any(m[0] == kind for m in runner.compare_standing(120, 120, 150, quiet).mismatches), name
+        monkeypatch.undo()
+
+
+def test_a_reference_that_trades_where_nobody_can_is_caught_by_the_weights_that_cannot_trade(monkeypatch):
+    """A reference that passes its goods on whenever every agent scores alike. The comparisons of the dial notice
+    this too, but only when a dial happens to have equal weights; this test requires the weight cases that cannot
+    trade to report it themselves (kind "barren"), which is the only place their reference answers are checked."""
+    real = runner.reference
+
+    def broken(requested):
+        module = real(requested)
+        honest = module.thaw_allocation
+
+        def rotating(endowment, goods, price, weights, lam):
+            out = honest(endowment, goods, price, weights, lam)
+            vectors = list(weights.values())
+            if len(vectors) >= 2 and all(v == vectors[0] for v in vectors):
+                agents = list(out)
+                held = [out[a] for a in agents]
+                return dict(zip(agents, held[1:] + held[:1]))  # everyone passes its good on
+            return out
+
+        module.thaw_allocation = rotating
+        return module
+
+    monkeypatch.setattr(runner, "reference", broken)
+    kinds = {m[0] for m in runner.compare_standing(120, 120, 150, quiet).mismatches}
+    assert "barren" in kinds
+    monkeypatch.undo()
+    assert not runner.compare_standing(120, 120, 150, quiet).mismatches  # and the honest reference passes
+
+
+def test_the_worked_dials_are_the_ones_the_tests_derive_by_hand():
+    import test_standing as derived
+
+    swap, gap, flipped, reversal = (instance for _name, instance, _moves in runner.worked_dials())
+    assert swap == derived.swap_instance()
+    assert gap == derived.gap_instance()
+    assert flipped == derived.gap_instance(("G2", "G1"))
+    assert reversal == derived.reversal_instance()
+    assert [moves for _n, _i, moves in runner.worked_dials()] == [
+        [False, True, True], [False, False, False, True, True], [False, False, True, True, True],
+        [False, False, False, True, True, False, False]]
 
 
 def test_a_slip_in_the_package_quantum_value_is_caught(monkeypatch):

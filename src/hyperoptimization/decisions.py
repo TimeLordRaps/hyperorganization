@@ -1428,6 +1428,42 @@ def _d32() -> Verdict:
         if got != expected:
             problems.append(f"worked dial example ({name}): expected {expected}, got {got}")
 
+    priced = witnessed = barren = delicate = stretched = 0
+    for _ in range(120):
+        before = len(problems)
+        d, n = rng.choice((1, 2, 3)), rng.choice((2, 3, 4))
+        price = tuple(rng.randint(1, 5) for _ in range(d))
+        mode, base = rng.choice(("random", "equal", "along", "parallel")), tuple(rng.randint(1, 5) for _ in range(d))
+        strength = [rng.randint(1, 4) for _ in range(n)]  # one strength for each agent, not for each coordinate
+        if mode == "random":
+            weights = {a: tuple(rng.randint(1, 5) for _ in range(d)) for a in range(n)}
+        elif mode == "equal":
+            weights = {a: base for a in range(n)}
+        else:
+            weights = {a: tuple(strength[a] * c for c in (price if mode == "along" else base)) for a in range(n)}
+        priced += 1
+        witness = standing.thaw_witness(price, weights)
+        if (witness is not None) != standing.can_thaw(price, weights):
+            problems.append("can_thaw and thaw_witness disagree about whether any goods can trade")
+        elif witness is not None:
+            witnessed += 1
+            delicate += witness.lam == Fraction(1, 2)  # weights parallel but unequal, none along the price
+            first, second = witness.agents
+            pair = {first: weights[first], second: weights[second]}
+            if standing.thaw_outcome(witness.endowment, witness.goods, price, pair, witness.lam) != {
+                    first: "y", second: "x"}:
+                problems.append("the witness for the weights does not trade at its setting")
+        else:
+            barren += 1
+            stretched += len(set(weights.values())) > 1  # unequal multiples of the price
+            goods = {f"g{k}": tuple(rng.randint(0, 6) for _ in range(d)) for k in range(n)}
+            held = list(goods)
+            rng.shuffle(held)
+            if any(piece.movers for piece in standing.thaw_pieces(dict(zip(range(n), held)), goods, price, weights)):
+                problems.append("goods traded though the weights are all equal or all along the price")
+        if len(problems) > before:
+            break
+
     expected = {"profiles": identity_markets, "ladders": identity_efficient,
                 "loops": identity_markets - identity_efficient, "wealth_starts": exhaustive_wealth,
                 "wealth_frozen": left_alone}
@@ -1460,6 +1496,12 @@ def _d32() -> Verdict:
                         f"of {sample['instances']} seeded instances with two or three coordinates {sample['trade']} "
                         f"trade at some setting, and in {sample['reverse']} of those trade opens and closes again as "
                         "the dial rises, so the dial is not a one-way door",
+                        f"{priced} prices with weights of four kinds (random, all equal, all along the price, parallel with "
+                        f"different strengths): {witnessed} have a witness, two goods and a setting at which two agents "
+                        f"swap ({delicate} of them parallel but unequal, with the setting at the middle of the dial), "
+                        f"and in the other {barren}, exactly those with weights all equal or all along the price "
+                        f"({stretched} of them unequal multiples of the price), no goods and no start trade at any "
+                        "setting",
                         "two goods of equal worth at the price (1, 1) are swapped at any divergence at all "
                         "(threshold 0, never attained); a gap of 1 in worth is closed exactly at 1/3, and the tie "
                         "there is broken by the order the goods are listed in; one instance trades on the stretch "
@@ -2202,9 +2244,10 @@ LEDGER: tuple[Decision, ...] = (
         "loop is a pecking order (each holds its favourite of what it and those after it hold), a ladder; and a "
         "start made by letting the wealthiest pick first is such a ladder, so abolishing money while keeping "
         "holdings freezes it wherever rankings agree. A dial from the rankings a common price induces to private "
-        "rankings, computed exactly in rational arithmetic, shows what unfreezes it: nothing at the price alone, "
-        "nothing with one coordinate, nothing when the weights lie along the price, and otherwise trade at exact "
-        "rational settings that can open and close again. The start is an input, whoever made it.",
+        "rankings, computed exactly in rational arithmetic, shows what unfreezes it: some goods and some start trade "
+        "exactly when the agents' weights are neither all equal nor all along the price (nothing at the price alone, "
+        "nothing with one coordinate), at exact rational settings that can open and close again. The start is an "
+        "input, whoever made it.",
         ("A uniformly random start, from which top trading cycles gives the lottery of random serial dictatorship: "
          "WITHDRAWN by the owner on 2026-10-11 (\"There is no possible uniform start\"): no neutral party exists to "
          "draw it, and the start is what money built.",
@@ -2223,7 +2266,8 @@ LEDGER: tuple[Decision, ...] = (
         "A market where trade is possible and envy has no loop, or the reverse; an efficient start with no pecking "
         "order; a start made by letting the wealthiest pick first that the exchange moves, or in which someone "
         "envies a poorer agent; or a dial in which agents rank apart at the price alone, with one coordinate or "
-        "with weights along the price, or in which a ranking changes inside a stretch between breakpoints.",
+        "with weights all equal or all along the price, or goods that trade though they are, or weights that are "
+        "not and no goods that trade, or in which a ranking changes inside a stretch between breakpoints.",
         "None: nothing real has been exchanged. The wealthiest-first start is a stylisation (a market is not a "
         "serial dictatorship); the dial's linear mix is one path among many from a common ranking to private ones; "
         "and real status is a taste that depends on what others hold, which this model does not have. It shows "

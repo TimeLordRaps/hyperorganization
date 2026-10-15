@@ -24,8 +24,18 @@ from test_deals import menu_counts
 from test_entangled import GHZ_TYPE_STATES
 from test_knowledge import split_counts
 from test_rival import LARGER_MARKETS, RECORD_MARKETS
+from test_standing import gap_instance, reversal_instance, swap_instance
 
-from hyperoptimization import comprehension, deals, decisions, entangled, family, rival, surprisal
+from hyperoptimization import (
+    comprehension,
+    deals,
+    decisions,
+    entangled,
+    family,
+    rival,
+    standing,
+    surprisal,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 DESIGN = (ROOT / "DESIGN.md").read_text(encoding="utf-8")
@@ -244,3 +254,82 @@ def test_the_quoted_agreement_with_the_exchange_reference_is_the_full_runs_count
     total = sizes["outcomes"] + sizes["allocations"] * 8 + sizes["cores"] + sizes["misreports"]
     quoted(f"agrees on {total:,} comparisons in the full run ({sizes['outcomes']:,} outcomes, three checkers on "
            f"{sizes['allocations'] * 8:,} allocations, {sizes['cores']} cores and {sizes['misreports']} sets of misreports)")
+
+
+# --- standing (14.6) ----------------------------------------------------------------------------------------------------
+
+
+def test_the_quoted_standing_counts_are_the_computed_ones():
+    counts = standing.survey(3)
+    quoted(f"Of the {counts['profiles']} profiles of three agents with the identity start, {counts['loops']} have a "
+           f"loop and {counts['ladders']} do not")
+    found = ledger_line("D32", r"^(\d+) markets of two and three agents .* and (\d+) seeded markets of four and five")
+    quoted(f"two and three agents ({int(found.group(1)):,} markets) and on {found.group(2)} seeded markets of four "
+           "and five in the ledger")
+    found = ledger_line("D32", r"; (\d+) wealth starts \(every wealth order of every profile of three agents")
+    seeded = int(found.group(1)) - counts["wealth_starts"]
+    quoted(f"{counts['wealth_frozen']:,} of {counts['wealth_starts']:,} wealth starts of three agents (every wealth "
+           f"order of every profile) and {seeded} seeded wealth starts of four to nine agents in the ledger")
+    quoted(f"and {math.factorial(4) ** 4 * math.factorial(4):,} of {math.factorial(4) ** 4 * math.factorial(4):,} in the long run "
+           "of four (every one of the 24 orders of every profile)")
+
+
+def test_the_quoted_long_run_counts_agree_with_the_exchange_long_run_and_with_each_other():
+    # neither is recomputed here (minutes of processor time): the two documents quote the same pair, and it adds up
+    trade, still = 255_120, 76_656
+    assert trade + still == math.factorial(4) ** 4
+    quoted(f"trade happened in {trade:,} of them and in none of the other {still:,}")
+    quoted(f"envy has a loop in {trade:,} and in none of the other {still:,}")
+
+
+def test_the_quoted_dial_numbers_are_the_computed_ones():
+    sample = standing.dial_survey()
+    quoted(f"of {sample['instances']} seeded instances with two or three coordinates, {sample['trade']} trade at some "
+           f"setting and in {sample['reverse']} of those trade opens and closes again")
+    sizes = {key: pair[1] for key, pair in __import__("importlib").import_module("test_oracles").runner.SIZES["standing"].items()}
+    quoted(f"agrees on every comparison in the full run ({sizes['markets']:,} markets and {sizes['dials']} dials)")
+
+
+def test_the_quoted_worked_dials_are_the_computed_ones():
+    endowment, goods, price, weights = swap_instance()
+    assert standing.thaw_threshold(endowment, goods, price, weights) == standing.Threshold(0, False)
+    quoted("are swapped at any divergence at all (threshold 0, never attained)")
+    endowment, goods, price, weights = gap_instance()
+    assert standing.thaw_breakpoints(goods, price, weights) == (Fraction(1, 3),)
+    assert standing.thaw_threshold(endowment, goods, price, weights) == standing.Threshold(Fraction(1, 3), False)
+    assert sum(sum(goods[g]) for g in ("G1",)) == 4 and sum(goods["G2"]) == 3  # worth 4 and 3 at the price (1, 1)
+    quoted("A gap of 1 in worth, between goods worth 4 and 3, is closed at exactly 1/3")
+    endowment, goods, price, weights = reversal_instance()
+    pieces = standing.thaw_pieces(endowment, goods, price, weights)
+    moving = [(p.low, p.high) for p in pieces if p.movers]
+    assert moving == [(Fraction(1, 3), Fraction(1, 2)), (Fraction(1, 2), Fraction(1, 2))]
+    quoted("so they trade on the stretch above 1/3 up to and including 1/2 and nowhere else")
+
+
+def test_a_changed_standing_number_in_the_document_is_noticed():
+    counts = standing.survey(3)
+    sentence = f"{counts['loops']} have a loop and {counts['ladders']} do not"
+    quoted(sentence)
+    for damage in (counts["loops"] + 1, counts["loops"] - 1):
+        broken = DESIGN.replace(f"{counts['loops']} have a loop", f"{damage} have a loop")
+        assert broken != DESIGN
+        with pytest.raises(AssertionError, match="does not say"):
+            quoted(sentence, broken)
+
+
+def test_the_quoted_witness_is_the_computed_one():
+    witness = standing.thaw_witness((1, 1), {"A": (3, 1), "B": (1, 3)})
+    assert witness.lam == 1 and witness.agents == ("A", "B")
+    quoted("For A with weights (3, 1) and B with weights (1, 3) at the price (1, 1), A holds a good worth "
+           f"{witness.goods['x']}, B one worth {witness.goods['y']}, and they swap at setting {witness.lam}")
+
+
+def test_the_ledger_check_of_the_characterisation_reaches_both_answers_and_both_delicate_kinds():
+    found = ledger_line("D32", r"^(\d+) prices with weights of four kinds .*?: (\d+) have a witness.*? \((\d+) of them "
+                               r"parallel but unequal.*? and in the other (\d+),.*? \((\d+) of them unequal multiples")
+    cases, witnessed, delicate, barren, stretched = map(int, found.groups())
+    assert witnessed + barren == cases and witnessed >= 20 and barren >= 20
+    # the kinds a check names must be kinds it reached: weights parallel with different strengths (the witness is at
+    # the middle of the dial) and unequal multiples of the price (no witness though the weights differ)
+    assert 5 <= delicate <= witnessed and 5 <= stretched <= barren
+

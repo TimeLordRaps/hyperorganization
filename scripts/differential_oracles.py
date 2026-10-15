@@ -1,19 +1,23 @@
-"""Compare the package with four independent reference oracles, instance by instance.
+"""Compare the package with five independent reference oracles, instance by instance.
 
-The oracles (`oracle_comprehension.py`, `oracle_quantum.py`, `oracle_price.py`, `oracle_ttc.py`) were written by a
-subagent from a written specification alone, without sight of the package. Each computes the same quantities
-by a different route: comprehension by enumerating every group of people; the quantum values from explicit
-projectors on state vectors in exact `sympy` arithmetic; the price test by Fourier-Motzkin elimination on
-fractions where the package enumerates the vertices of the polytope itself; top trading cycles by executing one
-cycle at a time where the package executes a round together, with the core, efficiency and misreport checks by
-their own enumerations. A disagreement is a slip in one of the two, found by running both on the same instances.
+The oracles (`oracle_comprehension.py`, `oracle_quantum.py`, `oracle_price.py`, `oracle_ttc.py`,
+`oracle_standing.py`) were written by a subagent from a written specification alone, without sight of the package.
+Each computes the same quantities by a different route: comprehension by enumerating every group of people; the
+quantum values from explicit projectors on state vectors in exact `sympy` arithmetic; the price test by
+Fourier-Motzkin elimination on fractions where the package enumerates the vertices of the polytope itself; top
+trading cycles by executing one cycle at a time where the package executes a round together, with the core,
+efficiency and misreport checks by their own enumerations; envy loops by trying every ordered selection of
+agents and pecking orders by trying every ordering, where the package searches depth-first and peels sinks, and
+the dial by evaluating rankings and outcomes at settings of its own choosing (the specification is kept in
+`validation/oracle-standing-specification.md`). A disagreement is a slip in one of the two, found by running both
+on the same instances.
 Agreement shows that implementation slips of that kind are caught. It does not show that the definitions are
 right: both were written from the same specification. Only the quantum stage needs `sympy`; the others use the
 standard library.
 
-    python scripts/differential_oracles.py                  # all four stages, the quick sample
+    python scripts/differential_oracles.py                  # all five stages, the quick sample
     python scripts/differential_oracles.py --full           # the sample sizes quoted in VALIDATION.md
-    python scripts/differential_oracles.py --stage quantum  # one stage: comprehension, quantum, price or rival
+    python scripts/differential_oracles.py --stage quantum  # one stage: comprehension, quantum, price, rival or standing
 
 Exit status 0: every instance agrees. 1: at least one disagreement (printed). 2: a stage could not be run
 (UNKNOWN: `sympy` missing, or the stage passed its deadline); no disagreement was found in what did run.
@@ -25,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import itertools
 import random
 import subprocess
 import sys
@@ -41,16 +46,17 @@ SRC = HERE.parent / "src"
 if SRC.is_dir() and str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from hyperoptimization import comprehension, deals, entangled, rival  # noqa: E402
+from hyperoptimization import comprehension, deals, entangled, rival, standing  # noqa: E402
 
 SIZES = {  # stage -> sample sizes (quick, full)
     "comprehension": {"instances": (1500, 1500), "graphs": (800, 800)},
     "quantum": {"ghz": (12, 12), "chsh": (8, 25)},
     "price": {"small": (120, 1000), "large": (12, 200)},
     "rival": {"outcomes": (1000, 3000), "allocations": (200, 700), "cores": (100, 300), "misreports": (40, 120)},
+    "standing": {"markets": (500, 1500), "dials": (200, 600), "weight_cases": (150, 500)},
 }
 DEADLINES = {"comprehension": (60, 120), "quantum": (120, 300), "price": (300, 900),
-             "rival": (120, 300)}  # seconds (quick, full)
+             "rival": (120, 300), "standing": (120, 300)}  # seconds (quick, full)
 Report = Callable[[str], None]
 
 # Option sets whose answers were derived by hand (the specification the oracle was written from).
@@ -331,8 +337,190 @@ def compare_rival(outcomes: int = 3000, allocations: int = 700, cores: int = 300
     return result
 
 
+# --- standing --------------------------------------------------------------------------------------------------------
+
+
+def random_dial(rng: random.Random, n: int, d: int) -> tuple[dict, dict, tuple, dict]:
+    """A start, goods with d coordinates (0 to 6), a price and each agent's weights (1 to 6)."""
+    names = [f"g{k}" for k in range(n)]
+    goods = {g: tuple(rng.randint(0, 6) for _ in range(d)) for g in names}
+    price = tuple(rng.randint(1, 6) for _ in range(d))
+    weights = {a: tuple(rng.randint(1, 6) for _ in range(d)) for a in range(n)}
+    held = names[:]
+    rng.shuffle(held)
+    return dict(zip(range(n), held)), goods, price, weights
+
+
+def stretch(pieces: list, lam: Fraction):
+    """The piece of the dial that holds the setting `lam`."""
+    return next(p for p in pieces if p.low < lam < p.high or p.low == p.high == lam)
+
+
+def worked_dials() -> list[tuple[str, tuple, list[bool]]]:
+    """The dials derived by hand (tests/test_standing.py): which pieces of each trade, from setting 0 up."""
+    vectors = {"G1": (3, 1), "G2": (1, 2)}
+    held = {"A": "G2", "B": "G1"}
+    return [
+        ("the swap at equal worth", ({"A": "y", "B": "x"}, {"y": (1, 5), "x": (5, 1)}, (1, 1),
+                                     {"A": (3, 1), "B": (1, 3)}), [False, True, True]),
+        ("a gap of 1 in worth", (held, vectors, (1, 1), {"A": (3, 1), "B": (1, 4)}),
+         [False, False, False, True, True]),
+        ("the same gap, the other good listed first", (held, {"G2": (1, 2), "G1": (3, 1)}, (1, 1),
+                                                       {"A": (3, 1), "B": (1, 4)}), [False, False, True, True, True]),
+        ("trade that opens and closes", (held, vectors, (1, 1), {"A": (1, 3), "B": (1, 4)}),
+         [False, False, False, True, True, False, False]),
+    ]
+
+
+def compare_standing(markets: int = 1500, dials: int = 150, weight_cases: int = 500, report: Report = print) -> Result:
+    """Envy, loops, pecking orders, serial dictatorship and wealth starts against the reference on random markets of up
+    to six agents, and the dial against the reference's own rankings and top trading cycles: at the representative
+    of every piece, on a grid of 63 settings (so a breakpoint the package missed shows as a piece that is not
+    constant), at nine settings through the rankings, and on four dials whose pieces were derived by hand. The
+    characterisation of the weights that can ever trade (`can_thaw`, `thaw_witness`): each witness is run through the
+    reference and must swap its two agents; for weights the package says cannot trade, the reference runs random
+    markets of those agents at nine settings and must move nobody."""
+    ref = reference("standing")
+    result = Result("standing")
+    start = time.perf_counter()
+    seen = {"loop": [0, 0], "ladder_orders": 0, "orders_tried": 0}
+    for seed in range(markets):
+        rng = random.Random(40_000 + seed)
+        n = rng.randint(1, 6)
+        endowment, prefs = housing_market(rng, n)
+        agents = list(endowment)
+        edges = {(i, j) for i, targets in standing.envy_graph(endowment, prefs).items() for j in targets}
+        theirs_orders = ref.pecking_orders(endowment, prefs)
+        loop = ref.has_envy_loop(endowment, prefs)
+        traded = bool(ref.movers(endowment, ref.top_trading_cycles(endowment, prefs)))
+        seen["loop"][loop] += 1
+        seen["ladder_orders"] += bool(theirs_orders)
+        mine = (edges, standing.envy_loop(endowment, prefs) is not None, standing.frozen(endowment, prefs),
+                standing.pecking_order(endowment, prefs))
+        theirs = (ref.envy_edges(endowment, prefs), loop, not traded, theirs_orders[0] if theirs_orders else None)
+        result.checked += 1
+        if mine != theirs:
+            result.mismatches.append(("market", seed, endowment, prefs, mine, theirs))
+        chosen = list(itertools.permutations(agents)) if n <= 4 else [tuple(rng.sample(agents, n)) for _ in range(6)]
+        valid = set(theirs_orders)
+        for order in chosen:
+            seen["orders_tried"] += 1
+            result.checked += 1
+            if standing.is_pecking_order(endowment, prefs, order) != (order in valid):
+                result.mismatches.append(("is_pecking_order", seed, endowment, prefs, order))
+        order = tuple(rng.sample(agents, n))
+        result.checked += 1
+        mine_picks = list(standing.serial_dictatorship(order, prefs).items())  # keys listed in the order of picking
+        if mine_picks != list(ref.serial_dictatorship(order, prefs).items()):
+            result.mismatches.append(("serial_dictatorship", seed, order, prefs))
+        wealth = dict(zip(agents, rng.sample(range(1, 10 * n + 1), n)))
+        if seed % 2:
+            wealth = {a: Fraction(w, 3) for a, w in wealth.items()}
+        result.checked += 1
+        if list(standing.wealth_start(wealth, prefs).items()) != list(ref.wealth_start(wealth, prefs).items()):
+            result.mismatches.append(("wealth_start", seed, wealth, prefs))
+    traded_dials = reversed_dials = pieces_compared = 0
+    for seed in range(dials):
+        rng = random.Random(50_000 + seed)
+        endowment, goods, price, weights = random_dial(rng, rng.randint(2, 5), rng.randint(1, 3))
+        pieces = standing.thaw_pieces(endowment, goods, price, weights)
+        pattern = []
+        for piece in pieces:
+            lam = piece.low if piece.low == piece.high else (piece.low + piece.high) / 2
+            theirs_allocation = ref.thaw_allocation(endowment, goods, price, weights, lam)
+            pattern.append(bool(ref.movers(endowment, theirs_allocation)))
+            pieces_compared += 1
+            result.checked += 1
+            if theirs_allocation != piece.allocation:
+                result.mismatches.append(("piece", seed, lam, piece.allocation, theirs_allocation))
+        for step in range(1, 64):
+            lam = Fraction(step, 64)
+            result.checked += 1
+            theirs_allocation = ref.thaw_allocation(endowment, goods, price, weights, lam)
+            if theirs_allocation != stretch(pieces, lam).allocation:
+                result.mismatches.append(("stretch", seed, lam, stretch(pieces, lam).allocation, theirs_allocation))
+        for step in range(9):
+            lam = Fraction(step, 8)
+            result.checked += 1
+            mine_rankings = standing.thaw_rankings(goods, price, weights, lam)
+            theirs_rankings = {a: ref.thaw_ranking(goods, price, w, lam) for a, w in weights.items()}
+            mine_outcome = standing.thaw_outcome(endowment, goods, price, weights, lam)
+            if mine_rankings != theirs_rankings or mine_outcome != ref.thaw_allocation(
+                    endowment, goods, price, weights, lam):
+                result.mismatches.append(("rankings", seed, lam, mine_rankings, theirs_rankings))
+        first = pattern.index(True) if True in pattern else None
+        expected = None if first is None else standing.Threshold(pieces[first].low,
+                                                                 pieces[first].low == pieces[first].high)
+        reverses = first is not None and not all(pattern[first:])
+        result.checked += 1
+        if (standing.thaw_threshold(endowment, goods, price, weights), standing.thaw_reverses(
+                endowment, goods, price, weights)) != (expected, reverses):
+            result.mismatches.append(("threshold", seed, expected, reverses))
+        traded_dials += first is not None
+        reversed_dials += reverses
+    witnessed = barren = delicate = stretched = 0
+    for seed in range(weight_cases):
+        rng = random.Random(60_000 + seed)
+        d, n = rng.randint(1, 3), rng.randint(2, 4)
+        price = tuple(rng.randint(1, 5) for _ in range(d))
+        base, mode = tuple(rng.randint(1, 5) for _ in range(d)), rng.choice(("random", "equal", "along", "parallel"))
+        strength = [rng.randint(1, 4) for _ in range(n)]
+        if mode == "random":
+            weights = {a: tuple(rng.randint(1, 5) for _ in range(d)) for a in range(n)}
+        elif mode == "equal":
+            weights = {a: base for a in range(n)}
+        else:
+            weights = {a: tuple(strength[a] * c for c in (price if mode == "along" else base)) for a in range(n)}
+        witness = standing.thaw_witness(price, weights)
+        result.checked += 1
+        if (witness is not None) != standing.can_thaw(price, weights):
+            result.mismatches.append(("characterisation", seed, price, weights, witness))
+        elif witness is not None:
+            witnessed += 1
+            delicate += witness.lam == Fraction(1, 2)  # weights parallel but unequal, none along the price
+            first, second = witness.agents
+            pair = {first: weights[first], second: weights[second]}
+            if ref.thaw_allocation(witness.endowment, witness.goods, price, pair, witness.lam) != {
+                    first: "y", second: "x"}:
+                result.mismatches.append(("witness", seed, price, weights, witness))
+        else:
+            barren += 1
+            stretched += len(set(weights.values())) > 1  # unequal multiples of the price
+            for _ in range(3):
+                goods = {f"g{k}": tuple(rng.randint(0, 6) for _ in range(d)) for k in range(n)}
+                held = list(goods)
+                rng.shuffle(held)
+                endowment = dict(zip(range(n), held))
+                for step in range(9):
+                    lam = Fraction(step, 8)
+                    if ref.movers(endowment, ref.thaw_allocation(endowment, goods, price, weights, lam)):
+                        result.mismatches.append(("barren", seed, price, weights, goods, endowment, lam))
+    for name, instance, moves in worked_dials():
+        result.checked += 1
+        mine_pieces = standing.thaw_pieces(*instance)
+        theirs_moves = [bool(ref.movers(instance[0], ref.thaw_allocation(
+            *instance, p.low if p.low == p.high else (p.low + p.high) / 2))) for p in mine_pieces]
+        if [bool(p.movers) for p in mine_pieces] != moves or theirs_moves != moves:
+            result.mismatches.append(("worked", name, [bool(p.movers) for p in mine_pieces], theirs_moves, moves))
+    result.seconds = time.perf_counter() - start
+    result.facts = {"markets": markets, "loop_no": seen["loop"][0], "loop_yes": seen["loop"][1],
+                    "with_a_pecking_order": seen["ladder_orders"], "orders_tried": seen["orders_tried"],
+                    "dials": dials, "dials_that_trade": traded_dials, "dials_that_reverse": reversed_dials,
+                    "pieces": pieces_compared, "worked": len(worked_dials()), "weight_cases": weight_cases,
+                    "witnessed": witnessed, "barren": barren, "delicate": delicate, "stretched": stretched}
+    result.note = (f"{markets} markets (loops {seen['loop'][1]} yes / {seen['loop'][0]} no; {seen['orders_tried']} "
+                   f"orders tried against the reference's list), {dials} dials with {pieces_compared} pieces, 63 grid "
+                   f"settings and 9 ranking settings each ({traded_dials} trade, {reversed_dials} reverse), "
+                   f"{len(worked_dials())} dials worked by hand, {weight_cases} weight cases ({witnessed} with a "
+                   f"witness that swaps in the reference, {delicate} of them with weights parallel but unequal; "
+                   f"{barren} that cannot trade and trade nowhere in it, {stretched} of them unequal multiples of "
+                   "the price)")
+    report(f"  standing: {result.checked} comparisons ({result.note}) in {result.seconds:.1f}s")
+    return result
+
+
 STAGES = {"comprehension": compare_comprehension, "quantum": compare_quantum, "price": compare_price,
-          "rival": compare_rival}
+          "rival": compare_rival, "standing": compare_standing}
 
 
 def run_stage(name: str, full: bool, report: Report = print) -> Result:

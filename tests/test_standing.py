@@ -24,6 +24,7 @@ doctored inputs the properties must reject. The theorems these meet are not cite
 from __future__ import annotations
 
 import itertools
+import math
 import os
 import random
 import subprocess
@@ -297,8 +298,8 @@ def test_wealth_must_belong_to_exactly_the_agents_who_rank():
 
 def test_serial_dictatorship_refuses_an_order_or_rankings_that_do_not_describe_a_market():
     prefs = {"A": ["g1", "g2"], "B": ["g1", "g2"]}
-    for order in (("A",), ("A", "A"), ("A", "B", "C"), ("A", "C")):
-        with pytest.raises(ValueError, match="order"):
+    for order in (("A",), ("A", "A"), ("A", "B", "C"), ("A", "C"), ("A", "A", "B"), ("B", "A", "B")):
+        with pytest.raises(ValueError, match="order"):  # the last two name every agent and one of them twice
             standing.serial_dictatorship(order, prefs)
     with pytest.raises(ValueError, match="rank"):
         standing.serial_dictatorship(("A", "B"), {"A": ["g1", "g2"], "B": ["g1", "g3"]})
@@ -306,13 +307,19 @@ def test_serial_dictatorship_refuses_an_order_or_rankings_that_do_not_describe_a
         standing.serial_dictatorship(("A", "B"), {"A": ["g1", "g2", "g3"], "B": ["g1", "g2", "g3"]})
     with pytest.raises(ValueError, match="rank"):
         standing.serial_dictatorship(("A", "B"), {"A": ["g1", "g1"], "B": ["g1", "g2"]})
+    with pytest.raises(ValueError, match="rank"):  # every good is ranked, one of them twice
+        standing.serial_dictatorship(("A", "B"), {"A": ["g1", "g2"], "B": ["g1", "g2", "g2"]})
 
 
 def test_is_pecking_order_refuses_an_order_that_is_not_a_rearrangement_of_the_agents():
     endowment, prefs = {"A": "g2", "B": "g1"}, {"A": ["g1", "g2"], "B": ["g1", "g2"]}
-    for order in (("B",), ("B", "B"), ("B", "A", "C"), ("B", "C")):
-        with pytest.raises(ValueError, match="order"):
+    for order in (("B",), ("B", "B"), ("B", "A", "C"), ("B", "C"), ("B", "A", "A"), ("A", "A", "B")):
+        with pytest.raises(ValueError, match="order"):  # the last two name every agent and one of them twice
             standing.is_pecking_order(endowment, prefs, order)
+    with pytest.raises(ValueError):  # and the market itself must be a strict one
+        standing.is_pecking_order({"A": "g1", "B": "g1"}, {"A": ["g1"], "B": ["g1"]}, ("A", "B"))
+    with pytest.raises(ValueError):
+        standing.is_pecking_order(endowment, {"A": ["g1", "g2"]}, ("B", "A"))
 
 
 def test_the_envy_functions_refuse_what_is_not_a_strict_market():
@@ -533,6 +540,14 @@ def test_listing_the_agents_in_another_order_moves_the_same_agents_at_every_sett
             (p.low, p.high, frozenset(p.movers)) for p in after]
 
 
+def test_breakpoints_are_exact_with_fractional_coordinates_and_weights_equal_to_the_price_never_cross():
+    goods = {"a": (Fraction(1, 2),), "b": (1,)}
+    assert standing.thaw_breakpoints(goods, (1,), {"A": (1,)}) == ()  # scores differ by 1/2 at every setting
+    assert standing.thaw_breakpoints(goods, (1,), {"A": (3,)}) == ()  # the crossing, if any, lies below 0
+    fractional = {"a": (Fraction(1, 2), 1), "b": (1, 0)}  # difference (-1/2, 1): worth 1/2 more at the price (1, 1)
+    assert standing.thaw_breakpoints(fractional, (1, 1), {"A": (3, 1)}) == (Fraction(1, 2),)
+
+
 def test_the_thaw_refuses_what_it_cannot_mean():
     endowment, goods, price, weights = swap_instance()
     with pytest.raises(TypeError):
@@ -545,18 +560,362 @@ def test_the_thaw_refuses_what_it_cannot_mean():
             standing.thaw_pieces(endowment, goods, bad_price, weights)
     with pytest.raises(TypeError):
         standing.thaw_pieces(endowment, goods, (1.0, 1), weights)
+    with pytest.raises(ValueError, match="at least one coordinate"):
+        standing.thaw_pieces({"A": "y"}, {"y": ()}, (), {"A": ()})  # a price with nothing to weigh
     with pytest.raises(ValueError):
         standing.thaw_pieces(endowment, goods, price, {"A": (3, 1), "B": (0, 3)})
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="weights are needed"):
         standing.thaw_pieces(endowment, goods, price, {"A": (3, 1)})
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="weights are needed"):
         standing.thaw_pieces(endowment, goods, price, {"A": (3, 1), "B": (1, 3), "C": (1, 1)})
+    with pytest.raises(ValueError, match="goods"):
+        standing.thaw_outcome({"A": "y", "B": "z"}, goods, price, weights, Fraction(1, 2))
+    with pytest.raises(ValueError, match="weights are needed"):
+        standing.thaw_outcome(endowment, goods, price, {"A": (3, 1)}, Fraction(1, 2))
     with pytest.raises(ValueError, match="goods"):
         standing.thaw_pieces({"A": "y", "B": "z"}, goods, price, weights)
     with pytest.raises(ValueError):
         standing.thaw_pieces(endowment, {"y": (1, 5), "x": (5,)}, price, weights)
     with pytest.raises(TypeError):
         standing.thaw_pieces(endowment, {"y": (1, 5), "x": (5, 1.5)}, price, weights)
+
+
+# --- exactly which weights can ever trade ----------------------------------------------------------------------
+
+
+def test_the_weights_that_can_ever_trade_are_exactly_those_neither_all_equal_nor_all_along_the_price():
+    price = (1, 2)
+    assert not standing.can_thaw(price, {"A": (3, 5), "B": (3, 5), "C": (3, 5)})  # all equal, not along the price
+    assert not standing.can_thaw(price, {"A": (1, 2), "B": (3, 6), "C": (Fraction(1, 2), 1)})  # all along it
+    assert not standing.can_thaw((5,), {"A": (1,), "B": (7,)})  # one coordinate: everything is along the price
+    assert not standing.can_thaw(price, {"A": (3, 5)}) and not standing.can_thaw(price, {})  # nobody to trade with
+    assert standing.can_thaw(price, {"A": (3, 5), "B": (3, 5), "C": (1, 2)})  # one along the price, two not
+    assert standing.can_thaw(price, {"A": (1, 1), "B": (3, 3)})  # parallel to each other, strength differs
+    assert standing.can_thaw(price, {"A": (3, 1), "B": (1, 3)})  # different directions
+
+
+def test_the_witness_for_the_swap_is_the_one_derived_by_hand():
+    # At setting 1 the effective weights are (3, 1) and (1, 3). With e.f = 6, f.f = 10 and e.e = 10 the interval for t is
+    # 3/5 to 5/3; its middle is 17/15; u = e - t f = (28/15, -12/5), which is (7, -9) in coprime integers: e.u = 12 > 0
+    # and f.u = -20 < 0. A holds the negative part (0, 9), B the positive part (7, 0), and each ranks the other's first.
+    weights = {"A": (3, 1), "B": (1, 3)}
+    witness = standing.thaw_witness((1, 1), weights)
+    assert witness == standing.Witness(Fraction(1), ("A", "B"), {"A": "x", "B": "y"}, {"x": (0, 9), "y": (7, 0)})
+    assert standing.thaw_outcome(witness.endowment, witness.goods, (1, 1), weights, witness.lam) == {"A": "y", "B": "x"}
+
+
+def test_weights_parallel_but_unequal_and_not_along_the_price_are_witnessed_at_the_middle_of_the_dial():
+    weights = {"A": (1, 1), "B": (3, 3)}
+    witness = standing.thaw_witness((1, 2), weights)
+    assert witness is not None and witness.lam == Fraction(1, 2) and witness.agents == ("A", "B")
+    outcome = standing.thaw_outcome(witness.endowment, witness.goods, (1, 2), weights, witness.lam)
+    assert outcome == {"A": "y", "B": "x"}
+    # and at neither end of the dial: there they rank alike
+    for lam in (0, 1):
+        assert standing.thaw_outcome(witness.endowment, witness.goods, (1, 2), weights, lam) == witness.endowment
+
+
+def weight_cases(seed, count):
+    """Prices and weights of every kind that matters: random, all equal, all along the price, parallel to each other
+    with different strengths, and one agent along the price among others."""
+    rng = random.Random(seed)
+    for _ in range(count):
+        d, n = rng.choice((1, 2, 3)), rng.choice((1, 2, 3, 4))
+        price = tuple(rng.randint(1, 5) for _ in range(d))
+        kind = rng.choice(("random", "equal", "along", "parallel", "mixed"))
+        base = tuple(rng.randint(1, 5) for _ in range(d))
+
+        def stretched(vector):
+            factor = Fraction(rng.randint(1, 6), rng.randint(1, 3))  # one strength for the whole vector
+            return tuple(factor * c for c in vector)
+
+        if kind == "random":
+            weights = {a: tuple(rng.randint(1, 5) for _ in range(d)) for a in range(n)}
+        elif kind == "equal":
+            weights = {a: base for a in range(n)}
+        elif kind == "along":
+            weights = {a: stretched(price) for a in range(n)}
+        elif kind == "parallel":
+            weights = {a: stretched(base) for a in range(n)}
+        else:
+            weights = {a: base for a in range(n)}
+            weights[rng.randrange(n)] = stretched(price)
+        yield kind, price, weights
+
+
+def test_a_witness_exists_exactly_when_the_weights_can_trade_and_it_trades_at_its_setting():
+    kinds = {}
+    for kind, price, weights in weight_cases(seed=5, count=600):
+        witness = standing.thaw_witness(price, weights)
+        assert (witness is not None) == standing.can_thaw(price, weights), (kind, price, weights)
+        kinds[kind, witness is not None] = kinds.get((kind, witness is not None), 0) + 1
+        if witness is None:
+            continue
+        first, second = witness.agents
+        pair = {first: weights[first], second: weights[second]}
+        outcome = standing.thaw_outcome(witness.endowment, witness.goods, price, pair, witness.lam)
+        assert outcome == {first: "y", second: "x"}, (kind, price, weights, witness)
+        vectors = list(witness.goods.values())
+        assert all(x >= 0 and type(x) is int for v in vectors for x in v)  # goods with whole non-negative coordinates
+        assert math.gcd(*(x for v in vectors for x in v)) == 1  # in lowest terms
+        e = standing.thaw_weights(price, weights[first], witness.lam)
+        f = standing.thaw_weights(price, weights[second], witness.lam)
+        score = lambda w, v: sum(a * b for a, b in zip(w, v))  # noqa: E731
+        held, wanted = witness.goods["x"], witness.goods["y"]  # the first holds x and the second holds y
+        assert score(e, wanted) > score(e, held) and score(f, held) > score(f, wanted)  # strictly: no tie decides it
+    assert kinds.get(("equal", True), 0) == 0 and kinds.get(("along", True), 0) == 0  # never for these kinds
+    assert kinds[("random", True)] > 50 and kinds[("random", False)] > 5  # both answers are reached by chance
+    assert kinds[("parallel", True)] > 10 and kinds[("mixed", True)] > 10  # and by the delicate kinds
+
+
+def test_where_the_weights_cannot_trade_no_goods_and_no_start_trade_at_any_setting():
+    rng = random.Random(6)
+    tried = 0
+    for _kind, price, weights in weight_cases(seed=7, count=500):
+        if standing.can_thaw(price, weights) or len(weights) < 2:
+            continue
+        agents = list(weights)
+        for _ in range(8):  # eight random markets of these agents, with any number of coordinates they have
+            goods = {f"g{k}": tuple(rng.randint(0, 6) for _ in price) for k in range(len(agents))}
+            held = list(goods)
+            rng.shuffle(held)
+            pieces = standing.thaw_pieces(dict(zip(agents, held)), goods, price, weights)
+            assert all(p.movers == () for p in pieces), (price, weights, goods)
+            tried += 1
+        for lam in (0, Fraction(1, 3), Fraction(1, 2), 1):  # everybody ranks alike at every setting
+            ranks = standing.thaw_rankings(goods, price, weights, lam)
+            assert len(set(ranks.values())) == 1
+    assert tried > 400
+
+
+def test_the_exact_characterisation_refuses_what_the_dial_refuses():
+    with pytest.raises(ValueError):
+        standing.can_thaw((0, 1), {"A": (1, 1)})
+    with pytest.raises(ValueError):
+        standing.thaw_witness((1, 1), {"A": (1, 1), "B": (0, 2)})
+    with pytest.raises(TypeError):
+        standing.can_thaw((1.5, 1), {"A": (1, 1)})
+    with pytest.raises(ValueError):
+        standing.thaw_witness((1, 1), {"A": (1, 1, 1), "B": (1, 1)})
+
+
+def test_the_cost_note_on_the_dial_quotes_the_counts_of_a_measured_instance():
+    # `thaw_pieces` says "20 agents with three coordinates, 117 breakpoints, 237 pieces". The instance is the one a
+    # scratch measurement used (goods, price, weights and the start drawn from one seeded generator); the counts are
+    # exact and must be pinned or the note drifts. The time quoted there ("about a second and a half") is a
+    # measurement on one machine and is not asserted.
+    n, rng = 20, random.Random(20)
+    names = [f"g{k}" for k in range(n)]
+    goods = {g: tuple(rng.randint(0, 6) for _ in range(3)) for g in names}
+    price = tuple(rng.randint(1, 6) for _ in range(3))
+    weights = {a: tuple(rng.randint(1, 6) for _ in range(3)) for a in range(n)}
+    held = names[:]
+    rng.shuffle(held)
+    start = dict(zip(range(n), held))
+    breakpoints = standing.thaw_breakpoints(goods, price, weights)
+    pieces = standing.thaw_pieces(start, goods, price, weights)
+    assert (len(breakpoints), len(pieces)) == (117, 237)
+    assert len(pieces) == 2 * len(breakpoints) + 3  # a point for 0, each breakpoint and 1, and a stretch between
+    assert len(breakpoints) <= n * n * (n - 1) // 2  # the bound the note gives
+    assert "117 breakpoints, 237 pieces" in " ".join((standing.thaw_pieces.__doc__ or "").split())
+
+
+# --- the refusal boundary, against a rule written from the requirements ------------------------------------------------
+
+DIAL_CALLS = {  # the dial's entry points, each called with one instance (a dict of its arguments)
+    "thaw_breakpoints": lambda s: standing.thaw_breakpoints(s["goods"], s["price"], s["weights"]),
+    "thaw_rankings": lambda s: standing.thaw_rankings(s["goods"], s["price"], s["weights"], s["lam"]),
+    "thaw_outcome": lambda s: standing.thaw_outcome(s["endowment"], s["goods"], s["price"], s["weights"], s["lam"]),
+    "thaw_pieces": lambda s: standing.thaw_pieces(s["endowment"], s["goods"], s["price"], s["weights"]),
+    "thaw_threshold": lambda s: standing.thaw_threshold(s["endowment"], s["goods"], s["price"], s["weights"]),
+    "thaw_reverses": lambda s: standing.thaw_reverses(s["endowment"], s["goods"], s["price"], s["weights"]),
+    "can_thaw": lambda s: standing.can_thaw(s["price"], s["weights"]),
+    "thaw_witness": lambda s: standing.thaw_witness(s["price"], s["weights"]),
+}
+
+# corruptions that each break exactly one requirement, and so name the error the requirement demands; "ok" ones
+# change an instance into another valid one (goods may have any sign and fractional coordinates, weights may be
+# fractions), so a boundary that is too tight is caught as well as one that is too loose
+CORRUPTIONS = ("price-float", "price-bool", "price-zero", "price-negative", "price-empty", "price-short",
+               "price-long", "weight-float", "weight-bool", "weight-zero", "weight-negative", "weight-short",
+               "good-float", "good-bool", "good-short", "lam-float", "lam-bool", "lam-low", "lam-high",
+               "endowment-unknown-good", "goods-extra", "goods-missing", "weights-extra", "weights-missing",
+               "endowment-duplicate", "weight-fraction-ok", "good-negative-ok", "good-fraction-ok", "valid")
+
+
+def corrupted(rng, kind, instance):
+    """`instance` with one requirement broken in the way `kind` names (a copy; the original is left alone)."""
+    new = {key: dict(value) if isinstance(value, dict) else value for key, value in instance.items()}
+    agent, good = rng.choice(list(new["weights"])), rng.choice(list(new["goods"]))
+    i, d = rng.randrange(len(new["price"])), len(new["price"])
+
+    def put(vector, value):
+        return vector[:i] + (value,) + vector[i + 1:]
+
+    if kind.startswith("price-"):
+        new["price"] = {"float": put(new["price"], 1.5), "bool": put(new["price"], True), "zero": put(new["price"], 0),
+                        "negative": put(new["price"], -2), "empty": (), "short": new["price"][:-1],
+                        "long": new["price"] + (1,)}[kind[6:]]
+    elif kind.startswith("weight-"):
+        old = new["weights"][agent]
+        new["weights"][agent] = {"float": put(old, 2.0), "bool": put(old, True), "zero": put(old, 0),
+                                 "negative": put(old, -1), "short": old[:-1], "fraction-ok": put(old, Fraction(7, 3))
+                                 }[kind[7:]]
+    elif kind.startswith("good-"):
+        old = new["goods"][good]
+        new["goods"][good] = {"float": put(old, 0.5), "bool": put(old, False), "short": old[:-1],
+                              "negative-ok": put(old, -9), "fraction-ok": put(old, Fraction(-1, 3))}[kind[5:]]
+    elif kind.startswith("lam-"):
+        new["lam"] = {"float": 0.5, "bool": True, "low": Fraction(-1, 7), "high": Fraction(8, 7)}[kind[4:]]
+    elif kind == "endowment-unknown-good":
+        new["endowment"][rng.choice(list(new["endowment"]))] = "nowhere"
+    elif kind == "goods-extra":
+        new["goods"]["extra"] = (1,) * d
+    elif kind == "goods-missing":
+        del new["goods"][good]
+    elif kind == "weights-extra":
+        new["weights"]["extra"] = (1,) * d
+    elif kind == "weights-missing":
+        del new["weights"][agent]
+    elif kind == "endowment-duplicate":
+        first, second = rng.sample(list(new["endowment"]), 2)
+        new["endowment"][first] = new["endowment"][second]
+    return new
+
+
+def demanded(name, s):
+    """The error the requirements demand of dial function `name` on instance `s`, or None when it must answer.
+    Requirements: coordinates are whole numbers or fractions (no floats, no bools); the price has a coordinate and
+    all are positive; each agent's weights are positive and as long as the price; each good's vector is as long as
+    the price; the dial lies in [0, 1]; the goods are exactly those the endowment gives out, to distinct holders,
+    and weights exist for exactly the agents who hold them (the last two where the function takes a start)."""
+    price, weights, goods, lam = s["price"], s["weights"], s["goods"], s["lam"]
+    whole = (int, Fraction)
+
+    def shape(vector):
+        if any(type(c) not in whole for c in vector):
+            return "TypeError"
+        return "ValueError" if len(vector) != len(price) else None
+
+    if name in ("thaw_rankings", "thaw_outcome"):
+        if type(lam) not in whole:
+            return "TypeError"
+        if not 0 <= lam <= 1:
+            return "ValueError"
+    if len(price) < 1:
+        return "ValueError"
+    if any(type(c) not in whole for c in price):
+        return "TypeError"
+    if any(c <= 0 for c in price):
+        return "ValueError"
+    for vector in weights.values():
+        if shape(vector):
+            return shape(vector)
+        if any(c <= 0 for c in vector):
+            return "ValueError"
+    if name in ("can_thaw", "thaw_witness"):
+        return None
+    for vector in goods.values():
+        if shape(vector):
+            return shape(vector)
+    if name in ("thaw_breakpoints", "thaw_rankings"):
+        return None
+    held = list(s["endowment"].values())
+    if set(goods) != set(held) or len(set(held)) != len(held) or set(weights) != set(s["endowment"]):
+        return "ValueError"
+    return None
+
+
+def boundary_disagreements(seed, count):
+    """Run every dial function on `count` seeded corruptions of valid instances and compare each verdict with the
+    requirements; returns (disagreements, how often each function accepted and refused, how often each corruption
+    was drawn)."""
+    rng = random.Random(seed)
+    found, reached, drawn = [], {}, {}
+    for _ in range(count):
+        n, d = rng.choice((2, 3, 4)), rng.choice((1, 2, 3))
+        names = [f"g{k}" for k in range(n)]
+        held = names[:]
+        rng.shuffle(held)
+        instance = {"endowment": dict(zip(range(n), held)),
+                    "goods": {g: tuple(rng.randint(-3, 6) for _ in range(d)) for g in names},
+                    "price": tuple(rng.randint(1, 5) for _ in range(d)),
+                    "weights": {a: tuple(rng.randint(1, 5) for _ in range(d)) for a in range(n)},
+                    "lam": Fraction(rng.randint(0, 6), 6)}
+        kind = rng.choice(CORRUPTIONS)
+        drawn[kind] = drawn.get(kind, 0) + 1
+        bad = corrupted(rng, kind, instance)
+        for name, call in DIAL_CALLS.items():
+            want = demanded(name, bad)
+            try:
+                call(bad)
+                got = None
+            except Exception as error:  # noqa: BLE001  any other error is a disagreement too, and is reported as one
+                got = type(error).__name__
+            reached[name, got is None] = reached.get((name, got is None), 0) + 1
+            if got != want:
+                found.append((kind, name, want, got))
+    return found, reached, drawn
+
+
+def test_every_dial_function_refuses_exactly_what_the_requirements_refuse_and_nothing_else():
+    found, reached, drawn = boundary_disagreements(seed=2026, count=700)
+    assert found == [], found[:3]
+    assert set(drawn) == set(CORRUPTIONS)  # every way of breaking a requirement was drawn
+    for name in DIAL_CALLS:  # and every function was made to refuse and to answer, many times
+        assert reached[name, True] > 30 and reached[name, False] > 30, (name, reached)
+
+
+def test_the_boundary_check_notices_a_dial_that_is_too_lax_or_too_tight(monkeypatch):
+    # a coordinate check that lets floats, bools and a wrong length through, as an oracle with no guard would
+    monkeypatch.setattr(standing, "_fractions", lambda label, values, dimension: tuple(Fraction(v) for v in values))
+    lax, _, _ = boundary_disagreements(seed=2026, count=300)
+    assert any(kind in ("price-float", "weight-bool", "good-short") for kind, *_ in lax)
+    monkeypatch.undo()
+    # a dial check that refuses every setting but 0 and 1
+    real = standing._setting
+    monkeypatch.setattr(standing, "_setting", lambda lam: real(lam) if lam in (0, 1) else (_ for _ in ()).throw(
+        ValueError("only the ends")))
+    tight, _, _ = boundary_disagreements(seed=2026, count=300)
+    assert any(kind in ("valid", "price-short", "weight-fraction-ok") for kind, *_ in tight)
+
+
+def test_a_non_mapping_where_a_mapping_goes_fails_loudly_and_never_answers():
+    # The module docstring says containers are not type-checked but never give a wrong answer: put something that
+    # is not a mapping into each mapping slot of each function, one slot at a time, and require an exception.
+    env, prefs = {"A": "x", "B": "y"}, {"A": ("y", "x"), "B": ("x", "y")}
+    goods, price, weights = {"x": (1, 2), "y": (2, 1)}, (1, 1), {"A": (1, 3), "B": (3, 1)}
+    calls = [  # (function, arguments, the slots that take a mapping)
+        (standing.envy_graph, (env, prefs), (0, 1)), (standing.envy_loop, (env, prefs), (0, 1)),
+        (standing.frozen, (env, prefs), (0, 1)), (standing.pecking_order, (env, prefs), (0, 1)),
+        (standing.is_pecking_order, (env, prefs, ("A", "B")), (0, 1)),
+        (standing.serial_dictatorship, (("A", "B"), prefs), (1,)),
+        (standing.wealth_start, ({"A": 2, "B": 1}, prefs), (0, 1)),
+        (standing.thaw_breakpoints, (goods, price, weights), (0, 2)),
+        (standing.thaw_rankings, (goods, price, weights, Fraction(1, 2)), (0, 2)),
+        (standing.thaw_outcome, (env, goods, price, weights, Fraction(1, 2)), (0, 1, 3)),
+        (standing.thaw_pieces, (env, goods, price, weights), (0, 1, 3)),
+        (standing.thaw_threshold, (env, goods, price, weights), (0, 1, 3)),
+        (standing.thaw_reverses, (env, goods, price, weights), (0, 1, 3)),
+        (standing.can_thaw, (price, weights), (1,)), (standing.thaw_witness, (price, weights), (1,)),
+    ]
+
+    class Bare:
+        pass
+
+    notmaps = [None, 0, 2.5, True, "xy", b"xy", [], [("A", "x")], (), ("A", "x"), set(), {"A"}, range(3), iter([]),
+               Bare(), Fraction(1, 2), 10 ** 30]
+    tried = 0
+    for function, arguments, slots in calls:
+        function(*arguments)  # the honest call answers
+        for slot in slots:
+            for notmap in notmaps:
+                broken = list(arguments)
+                broken[slot] = notmap
+                with pytest.raises(Exception):  # noqa: B017  loud: the kind of error is not promised, an answer is not allowed
+                    function(*broken)
+                tried += 1
+    assert tried == 17 * sum(len(slots) for _f, _a, slots in calls)
 
 
 # --- the counts ------------------------------------------------------------------------------------------------

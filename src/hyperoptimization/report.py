@@ -24,6 +24,7 @@ from . import (
     quorum,
     renewal,
     rival,
+    standing,
     surprisal,
     viability,
 )
@@ -240,7 +241,7 @@ def _section_exchange() -> list[str]:
     ghz, magic, chsh = entangled.ghz_game(), entangled.magic_square_game(), entangled.chsh_game()
     rational = entangled.chsh_strategy((1, 0), (0, 1), (Fraction(119, 169), Fraction(120, 169)),
                                        (Fraction(119, 169), Fraction(-120, 169)))
-    counts = rival.survey(3)
+    counts, ladders, dial = rival.survey(3), standing.survey(3), standing.dial_survey()
     return [
         "== exchange  (no money: what is exchanged, who may decide, how a deal is valued, what a shared "
         "entangled state buys)",
@@ -274,6 +275,14 @@ def _section_exchange() -> list[str]:
         f"not Pareto efficient; nobody ends below where they began, no agent gains by misreporting "
         f"({counts['gameable_ttc']} do) and the Boston mechanism, a common rule, can be gamed in "
         f"{counts['gameable_boston']}; with identical rankings nothing moves, so the starting allocation decides",
+        f"   standing (a start, whoever made it): of the same {ladders['profiles']} rankings envy has a loop in "
+        f"{ladders['loops']}, exactly where trade happens, and the other {ladders['ladders']} are ladders (each holds "
+        f"its favourite of what those before it left); a start made by letting the wealthiest pick first is a ladder "
+        f"the exchange leaves where it is ({ladders['wealth_frozen']} of {ladders['wealth_starts']} such starts), so "
+        "abolishing money while keeping holdings freezes it; on a dial from the rankings a common price induces to "
+        "private ones some goods and some start trade exactly when the agents' weights are neither all equal nor all "
+        f"along the price (nothing at the price alone or with one coordinate), and of {dial['instances']} seeded "
+        f"instances {dial['trade']} trade at some setting and in {dial['reverse']} of those trade opens and closes again",
     ]
 
 
@@ -308,8 +317,10 @@ def _section_open() -> list[str]:
         "derived and not given; D31)",
         "   OPEN             an instrument for understanding (D29); NOT_ESTABLISHED that institutional decisions "
         "can be entangled (D28)",
-        "   UNKNOWN          CI on Windows and Python 3.10 in the hosted matrix has not run on this "
-        "repository (3.10 and 3.13 pass locally)",
+        "   UNKNOWN          macOS and Python 3.11 are not in the hosted matrix (the hosted run of 2026-10-11 "
+        "passed on Linux and Windows under 3.10 and 3.13; 3.11 passes locally)",
+        "   OPEN             how to unfreeze a ladder by anything but a change in what agents value, and what "
+        "status is when tastes depend on what others hold (D32, HO-030)",
     ]
 
 

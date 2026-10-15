@@ -1,84 +1,143 @@
 # Validation
 
-The receipt for `hyperoptimization` 0.1.0.dev0, 2026-10-11. Everything below was observed in one session by one author. Nothing here has been run by anyone else. No hosted workflow had run on this repository when the receipt was written; the update below records the one that ran after the push. Part of the checking was done by reference implementations that subagents wrote from a specification; they are untrusted model output and are described as such where they appear.
-
-## Update, 2026-10-11, after the push
-
-The repository was pushed to `TimeLordRaps/hyperorganization` as `8190793`, a merge of the owner's Initial commit (`a58c56a`, an Apache-2.0 LICENSE) and `dbd2bf2`. Two statements in this receipt were true of `dbd2bf2` and are superseded: that the repository has no remote, and that no hosted workflow had run.
-
-* **What changed in the bytes.** `git diff dbd2bf2 8190793` shows `LICENSE` only: the owner's text keeps the template's appendix placeholder where mine had filled it in. The commit after it changes `PROVENANCE.md` (the owner's two later messages, verbatim, and the repository's history), `DESIGN.md` (section 13, items 12 and 13: the random-start candidate is withdrawn), `TECHNICAL_DEBT.md` (HO-005 and HO-009 resolved, HO-027 rewritten, HO-029 and HO-030 added) and `tests/test_spec.py` (one test extended and two added: the quoted messages are the six the owner sent and nothing else; the statement is exact wherever it changed something; nothing still proposes the withdrawn candidate; each was run against doctored copies and fails on them). No source module, script or data file changed. The manifest was regenerated for the four bound files that changed (70 files, digest in the coordinates below), and the full suite was rerun on the tree as it now stands: **911 passed, zero skips**, CPython 3.11, `PYTHONHASHSEED=0`, 148 seconds, slowest test 9.4 seconds; `ruff check .` clean, run last. The other interpreters and hash seeds were not rerun for this documents-only change (no source file differs from `dbd2bf2`).
-* **Hosted run (OBSERVED, through the hosting API, 2026-10-11).** Workflow `conformance`, run 38174725004, event push, head `8190793`: the jobs `discover`, `documents`, `python` on ubuntu-latest and windows-latest with CPython 3.10 and 3.13, and `conformance-gate` all concluded `success`. The step "Run the test suite" took 69 to 199 seconds on the four legs, against 116 to 174 seconds in the local runs, so it ran the suite and did not pass vacuously.
-* **What the hosted run does not settle.** The pytest summary line of each leg was not read: the log host is refused by the session's network policy, so the per-leg test count is UNKNOWN. macOS and CPython 3.11 are not in the hosted matrix (3.11 ran locally). The hosted run is the workflow's own reading of the pushed bytes; it was not run by anyone but the platform.
+The receipt for `hyperoptimization` 0.1.0.dev0, 2026-10-11, for the bytes of the commit that closes out decision D32 (`standing`). Everything below was observed by one author in one working session series, on one container. Nothing here has been run by anyone else. Part of the checking was done by reference implementations that subagents wrote from a specification; they are untrusted model output and are described as such where they appear. The hosted workflow's result for this commit is recorded under "Hosted run" below, and the history of earlier hosted runs under "History".
 
 ## Coordinates
 
-* Repository `hyperoptimization`, local when the receipt was written and pushed after it as `TimeLordRaps/hyperorganization` (see the update below, [PROVENANCE.md](PROVENANCE.md) and `TECHNICAL_DEBT.md` HO-009), branch `main`, parent commit `a1a154b`. That parent closed out the exchange layer (the modules `knowledge`, `comprehension`, `deals` and `entangled`, the decisions D24 to D30, the specification `L1_exchange.hm`, three reference implementations and the runner). The commit carrying this receipt adds rival freedoms: the module `rival` (top trading cycles for indivisible goods), the decision D31, a fourth reference implementation, an exhaustive check over every four-party ranking profile, the specification's fifth axiom, four derives and an open item for the starting allocation, DESIGN section 14.5 and block B16. The manifest binds the bytes.
-* The implementation, tests, scripts, data, specifications and the three generated or load-bearing documents are byte-bound in [`validation/source-manifest.json`](validation/source-manifest.json): 70 files, digest of its canonical `files` mapping `b059f12526b21c3f3bfd610b38ec208eb8032a072bc7c42fae4f19383a3154fd` (it was `ff224d6832ef3cf1a65df789e856a03731b3e2a9aa93ee8cc15b6373d560a6e7` at `dbd2bf2`; the differences are listed in the update). The manifest identifies tested bytes. It does not sign or certify them.
-* CPython 3.11.15 for the main run, and the same suite under CPython 3.10.20 and 3.13.14, on Linux 6.18.44. pytest 9.1.1, pytest-timeout 2.4.0, sympy 1.14.0 (needed only by the quantum reference implementation and its tests), ruff 0.16.10, coverage 7.16.2, uv 0.8.17 (used to build). `pyproject.toml` supplies `-vv -s --durations=10 --timeout=60`; the runs below used `--timeout=120` (coverage 400, unpacked sdist 240) because several ran at once.
+* Repository `hyperoptimization`, branch `main`. The module commit `f27dfc5` (D32, `standing`, its tests and its first checks) sits on `0db8b99`, the owner's correction. The commit that carries this receipt closes D32: the mutation rounds and their fixes, the refusal boundary, the reference runs at their final sizes, the audit row and the packaging checks. Its hash is the head of `main` when this file is read; the manifest binds the bytes the tests ran on.
+* The implementation, tests, scripts, data, specifications and the load-bearing documents are byte-bound in [`validation/source-manifest.json`](validation/source-manifest.json): 75 files, digest `98e4d8904ecdbe2ac37301c80d6987a4915d58ee76519ec6bad869c2149fc25c`. `scripts/regenerate_manifest.py --check` reports it current on these bytes. The manifest identifies tested bytes. It does not sign or certify them.
+* Interpreters: CPython 3.11.15 for the main runs, under hash seeds 0, 1, 3 and 4242; CPython 3.10.20 and 3.13.14 under hash seed 0. Linux 6.18.44. pytest 9.1.1, pytest-timeout 2.4.0, sympy 1.14.0 (needed only by the quantum reference and its tests), ruff 0.16.10, coverage 7.16.2, uv 0.8.17 (to build). `pyproject.toml` supplies `-vv -s --durations=10 --timeout=60`; the runs below used `--timeout=180` (the cross-version runs), `240` (coverage and the unpacked source distribution).
 * **No runtime dependencies.** The package imports only the standard library, and none of the packages whose records it holds.
-* **What ran on which bytes.** Everything listed below ran on the final bytes of this commit except the mutants of files this commit did not change (`knowledge`, `comprehension`, `deals`, `entangled`, and the older modules), which were judged on the parent commit's tree: their files are byte-identical here and the tests only grew.
-* Records of other packages, each a snapshot with the commit it was read at: hyperethics `a13770716f57` (gate costs), hyperlogic `09231650d419` (Gödel–Löb prover verdicts), hyperstratum `87aadc390fea` (the static family graph, digest `b56f1a3c61d9…`, and the live scan). Checked against, in this session: hyperethics `a515d89` (cross-verification) and hypermath `a340179` (specification lint).
+* Records of other packages, each a snapshot with the commit it was read at: hyperethics `a13770716f57` (gate costs, the committed golden), hyperlogic `09231650d419` (the Gödel–Löb loop verdicts, the committed golden), hyperstratum `87aadc390fea` (the family graph and the live scan, digest `b56f1a3c61d9`, the committed goldens). Checked against at closeout, in the sibling checkouts: hyperethics `a515d89`, hyperlogic `0923165`, hyperstratum `0f054e7`, hypermath `a340179`. Regenerated at closeout, the goldens differ from the committed ones only in the recorded commit fields (see the audit 6 row of `TECHNICAL_DEBT.md`); the committed goldens are unchanged.
 
-## Observed checks
+## Observed checks at closeout
 
 ```console
-python -m pytest
-python -m ruff check src tests scripts
-python -m coverage run --branch --source=src/hyperoptimization -m pytest tests
-python -m hyperoptimization
-python -m hyperoptimization decisions
+PYTHONHASHSEED=0|1|3|4242 PYTHONPATH=src python -m pytest tests --timeout=180   # CPython 3.11, and 3.10 and 3.13 with seed 0
+python -m coverage run --branch --source=src/hyperoptimization -m pytest tests --timeout=240
+python -m coverage report -m
 python scripts/differential_oracles.py --full
-python scripts/check_rival_exhaustive.py
 PYTHONPATH=<hyperethics>/src:<hyperethics>/tests python scripts/verify_against_hyperethics.py
 PYTHONPATH=<hypermath>/src python -m hypermath_foundations translate L0_viability.hm --lint
 PYTHONPATH=<hypermath>/src python -m hypermath_foundations translate L1_exchange.hm --lint
+python scripts/regenerate_manifest.py --check
 python scripts/check_sdist.py
+python -m ruff check .
 ```
 
-* **909 passed, zero skips**, under CPython 3.11 with `PYTHONHASHSEED` 0, 1, 3 and 4242 (142 to 144 s each, four runs at a time), under 3.10 (174 s) and under 3.13 (116 s), and from the unpacked source distribution under 3.13 (117 s). By file: clauses 93, comprehension 25, deals 23, decisions 93, design numbers 15, documents 3, entangled 25, entrenchment 13, family 23, ground 11, knowledge 22, loop 70, maintenance 10, manifest 4, oracles 21, ordinal 28, phases 19, poly 18, quorum 57, renewal 43, report 13, rival 51, spec 97, surprisal 77, viability 55. The longest single test is about 8 s. Ruff passes with no findings.
-* **Coverage, line and branch: 99%** (3605 statements, 2 missed; 1576 branches, 1 partial). Every module is at 100% (`rival` 230 statements and 106 branches included) except `__main__.py`, whose two missed lines are the body of `if __name__ == "__main__":`. They run only in a subprocess, which this measurement does not follow; the subprocess tests exercise that path. (The coverage run takes 454 s: it is the slowest way to run the suite.)
-* **Mutation testing.** Of the module added here, **48 hand-written mutants of `rival.py`: 47 killed and 1 equivalent**. The first run killed 38 and left 10, which were read one by one: six were real test gaps (a ranking with the right goods and a repeat; an allocation keyed by the wrong agents; a cycle entered from outside, which a walk lists from the wrong member; the order of cycles within a round; whether the honest record is among the enumerated records; an agent listed twice inside one cycle), each now tested; two were redundant code, removed (skipping the truthful report, which never gains; a count check implied by another); one (`audit`'s occurrence count) was replaced by three live mutants of the simplified code, which are killed; and one is equivalent: the best place an agent can reach over all starting allocations is always its first choice, since an agent that holds its favourite keeps it, so the initial value of the running minimum in `endowment_spread` cannot matter (`test_the_best_place_an_agent_can_reach_over_all_starting_allocations_is_always_its_first_choice` checks the property). Four mutants of the report's new rival line and its reworded open obligation are killed, and the 17 older mutants of `decisions.py` and `report.py`, the files this commit changed, were re-run on this tree and are all killed. The 147 mutants of the exchange layer and the 131 earlier ones (130 killed, 1 proved equivalent) were judged on the parent tree; their files are unchanged. Each mutant is judged first by its module's own tests and, if it survives those, by the whole suite. The mutants are a hand-picked sample of small changes. Killing them shows the tests notice those changes; it does not show the code correct.
-* **Every failure clause of every check can fire.** `tests/test_clauses.py` reads the failure clauses out of the source of `decisions.py` (every `problems.append(...)`), breaks one function for each, and requires the witness to say what the clause says; a clause no breakage reaches fails the suite (negative control: an unreachable clause is reported by decision and line).
-* **The numbers the design quotes are the numbers the models compute.** `tests/test_design_numbers.py` (15 tests) recomputes every count and value that DESIGN.md sections 14.1 to 14.5 and the README quote (717, 126 and 249 of 1,092 splits; 9 of 14 territorial games; 236, 3 and 0 menus; 13, 2, 2 and 4 footprints; 6.3 and 2.7 bits; 577/676 and its distance from the Tsirelson value; 118 and 98 of the 216 three-party profiles; the 36 in which the Boston mechanism can be gamed; the swap from 8 to 16; the 9,020 comparisons of the exchange reference) and requires the document to contain the sentence built from them. Run against a copy of the document with fourteen numbers altered, 13 of its 15 tests fail and each says which number changed and what the document says instead; the two that pass test the guard's own handling of a missing sentence and of whitespace. Two counts the suite does not recompute (trade in 255,120 of the four-party profiles and none in 76,656) come from the long run below and are labelled so.
-* **Reference implementations.** `scripts/oracle_comprehension.py`, `oracle_quantum.py`, `oracle_price.py` and `oracle_ttc.py` were written by subagents from a written specification alone (they never saw this package) and are run against it by `scripts/differential_oracles.py`. `python scripts/differential_oracles.py --full` (37 s, exit 0): 3,473 comparisons for the footprint and quorum (1,500 instances, 1,173 of them makeable, 800 graphs), 1,206 for the price test (6 hand-derived cases, 1,000 small and 200 larger option sets, 3,389 efficient options, 492 of them price-invisible), 38 for the quantum values (12 GHZ-type states, 25 random CHSH strategies, the magic square), and 9,020 for top trading cycles (3,000 outcomes of markets of up to eight agents, three checkers on 5,600 allocations with both verdicts well represented, 300 cores, 120 sets of misreports); no disagreement. Each stage runs in its own process under a deadline and reports UNKNOWN, never agreement, if it is killed or lacks `sympy` (the quantum stage only). `tests/test_oracles.py` (21 tests) plants a slip in the package and in each oracle and requires disagreement. Agreement shows that implementation slips of these kinds are caught; both sides were written from the same text, so it does not show the definitions right (HO-024). A first price oracle built on sympy's simplex was dropped: it does not finish for some hash seeds on a six-option set and returns points that violate its own constraints (HO-025; `scripts/probe_sympy_lpmax.py` reproduces both).
-* **Rival freedoms, every profile.** The properties of top trading cycles (individually rational, Pareto efficient, in the strict core and the only allocation there, no profitable misreport) are checked from their definitions, not from the theorems: in the suite on all 4 profiles of two parties and all 216 of three, on 151 seeded markets of four to six, and in the ledger (D31) on 35 more; and by `scripts/check_rival_exhaustive.py` on all 331,776 strict ranking profiles of four parties (the identity endowment stands for every endowment up to renaming the goods), 2 minutes 40 seconds on four cores on 2026-10-11: every profile met every definition, trade happened in 255,120 and in none of the other 76,656. The Boston mechanism is the negative control: the same misreport checker finds a profitable lie in 36 of the 216 three-party profiles. This closes HO-021 for the model as stated; what the model leaves out is HO-028 and the starting allocation is HO-027.
-* **Cross-check against hyperethics' own code** at `a515d89`: gate cost is at most gate size times the dearest price on 1,178 of its random gates; the smallest system that obeys its rule and costs at least a stake has an amendment gate of `max(k+1, m*)` on 120 instances, by exhaustive search that builds each candidate as a hyperethics `Governance`.
-* **Specification lint** with the family's translator (hypermath `a340179`): exit 0 for both `L0_viability.hm` and `L1_exchange.hm`, 0 statements outside the translatable fragment. The axioms are prose in comments; the translator does not translate derives or non-derives, so nothing mechanical ties the specifications to the code except `tests/test_spec.py` (97 tests: every declared name has a row, every row names code, a test and a decision that exist, and the owner's messages are in the specifications and in PROVENANCE exactly as sent, including the doubled space in the third).
-* **Packaging.** An sdist and a wheel were built with `uv build` from a clean copy of the tree. `scripts/check_sdist.py` finds all 70 listed files in the sdist, byte for byte (83 files in it). The wheel, installed into a clean CPython 3.13 environment, imports the new modules, and `python -m hyperoptimization decisions` is byte-identical to `DECISIONS.md` (31 decisions, 25 with checks, all 25 holding). The unpacked sdist's own suite passes (909) under 3.13.
-* **Defects found and repaired while building and closing this out**, each reproduced first. In this commit: six test gaps and two redundant lines in `rival.py` found by its mutants (above); a count in my own prose ("2,740 comparisons", the quick sample's, where the sentence said the full run's 9,020) caught by the pin test before it was committed; two expectations of mine in the new tests that were wrong and were corrected after working them by hand (the audit is sound but not complete over orderings of rounds; a tie order); and guessed constants in my first drafts (replaced by measured counts). In the parent commit (register rows HO-025, HO-026 and audit 5): a price reference that hung for some hash seeds, two commutation caches with no bound, three import-order lint failures introduced after a lint run I had reported clean, and a test gap in the output merging of `table`.
+### Tests
+
+* **1,038 passed and zero skipped in every run**: CPython 3.11 under the four hash seeds (287 to 292 s each, four at a time on four cores), CPython 3.10 (337 s) and CPython 3.13 (224 s). The same 1,038 tests are collected each time. By file: clauses 113, comprehension 25, deals 23, decisions 96, design numbers 22, documents 5, entangled 25, entrenchment 13, family 23, ground 11, knowledge 22, loop 70, maintenance 10, manifest 4, oracles 41, ordinal 28, phases 19, poly 18, quorum 57, renewal 43, report 13, rival 51, spec 109, standing 65, surprisal 77, viability 55. The longest single tests take about 5 to 6 seconds.
+* Ruff passes on the whole tree, run last (below).
+
+### Coverage
+
+Line and branch coverage with `--branch`: 4,043 statements and 1,762 branches. Two statements and one partial branch are missed, all in the `if __name__ == "__main__":` block of `__main__.py` (lines 37 and 38), which runs only in a subprocess that this measurement does not follow. Every other module has no missed statement and no partial branch, `standing.py` included. The coverage run took about fourteen minutes on this container.
+
+### Mutation testing
+
+Two rounds of hand-written mutants, each read one survivor at a time.
+
+* **Round 1, the module (`standing.py`): 100 mutants, 88 killed by the first run.** Of the 12 survivors, 8 were test gaps and are closed by tests (among them duplicate agents in an order, a non-market refusal, a ranking with a repeated good, an empty price, the messages of the refusals, and fractional breakpoints). Four are equivalent by argument: a `<=` where `<` is written for distinct goods; a `j != i` removed where it cannot matter; skipped finished roots; and the orientation of the wealth order in a count.
+* **Round 2, the characterisation, its clauses and the oracle stage: 35 mutants, 31 killed by the first run.** Of the four survivors, two are equivalent: `al-first`, which restricts `_along` to the pairs that involve the first coordinate, and `al-range`, which adds the pairs with equal indices. On strictly positive vectors the first restriction forces proportionality, and the second adds only trivially equal pairs. Both were checked over 149,882 pairs of positive vectors; the equivalence is argued, not mechanically proved. The other two were real gaps, each now closed and each mutant now failing the new test on a copy of the tree: `d32-strength` (the ledger check did not count the delicate kinds, weights parallel but unequal and unequal multiples of the price; it now asserts reach floors for both) and `rn-barren` (the oracle runner's check of the weight cases that cannot trade had no test; a new test requires a reference that passes goods on whenever every agent scores alike to be reported).
+* **Total: 135 mutants, 119 killed by the first run, 10 real gaps closed with tests, 6 equivalent by argument.**
+
+### Differential oracles (`--full`, about 55 s, exit 0)
+
+Every stage agrees with the package.
+
+* Footprint and quorum: 3,473 comparisons (1,500 instances, 1,173 of them makeable; 800 graphs).
+* The price test: 1,206 (six hand-derived cases; 1,000 small and 200 larger option sets; 3,389 efficient options, 492 of them price-invisible).
+* Quantum values: 38 (12 GHZ-type states, 25 CHSH strategies, the magic square).
+* Top trading cycles: 9,020 (3,000 outcomes; three checkers on 5,600 allocations; 300 cores; 120 sets of misreports).
+* `standing`: 63,611 (1,500 markets of up to six agents, 878 with a loop of envy and 622 without, with 11,503 orderings tried against the reference's list; 600 dials with 3,304 pieces, 63 grid settings and 9 ranking settings each, of which 126 trade and 44 of those reverse; 4 dials worked by hand; and 500 weight cases, 159 with a witness that swaps in the reference, 74 of them with weights parallel but unequal, and 341 that cannot trade, 197 of them unequal multiples of the price).
+* Total: 77,348 comparisons. The debt file had quoted 63,111 for the `standing` stage; that was the stage before the weight cases were added, and it is corrected there.
+
+Each stage can fail. `tests/test_oracles.py` plants a slip in the package and in each oracle and requires disagreement, and a stage killed at its deadline reports UNKNOWN, never agreement. Agreement shows that slips of the kinds sampled are caught. Both sides were written from the same text, so it does not show the definitions right (HO-024).
+
+### The long run: every four-agent profile of `standing`
+
+`scripts/check_standing_exhaustive.py`, 2026-10-11, 1 min 58 s wall and 7 min 39 s of CPU on four cores (the log is kept in the working scratch area, not in the repository): 331,776 of 331,776 strict profiles, with the identity start (every start is that one up to renaming the goods). Envy has a loop in 255,120 of them, so someone trades, and none in 76,656, a ladder; these are the two counts `rival`'s long run found for trade and for none. Every one of 7,962,624 wealth starts (every order of every profile) is a rearrangement of the goods, is left where it is by top trading cycles, has the wealth order as a pecking order, and has envy pointing only toward the wealthier. 0 failures.
+
+### Other reference checks
+
+* **Hyperethics cross-check** at `a515d89`: gate cost is at most gate size times the dearest price on 1,178 of its random gates; the smallest rule-obeying gate of cost at least a stake has amendment gate `max(k+1, m*)` on 120 instances. Unchanged from the earlier receipt.
+* **Specification lint**, with the family's translator at hypermath `a340179`: exit 0 for `L0_viability.hm` and for `L1_exchange.hm`, with 0 statements outside the translatable fragment. The axioms are prose in comments, and the translator does not translate derives or non-derives; `tests/test_spec.py` (109 tests) ties the names in the specifications to the rows, the code, the tests and the decisions.
+
+### Packaging
+
+* `scripts/check_sdist.py` on a fresh copy of the final tree: the source distribution (88 files) carries each of the 75 manifest-listed files byte for byte.
+* `uv build` on the same copy builds the source distribution and the wheel. The wheel's contents and its install are checked below.
+* The wheel installs into a clean CPython 3.13 environment with 30 members, and the unpacked source distribution's own suite passes under CPython 3.13: 1,038 passed in 214 s, exit 0. That sdist was built before this file's last edit; it differs from the commit only in `VALIDATION.md` and `TECHNICAL_DEBT.md`, which `tests/test_documents.py` reads, so the suite was run again on the committed bytes as well (below).
+
+### Lint
+
+`python -m ruff check .` on the final tree, run last: all checks passed. The repository's gate is the linter; the formatter was not run, and 59 files would change under it, which this closeout does not do.
+
+### Hosted run
+
+[FILLED AFTER THE PUSH].
+
+## Scratch checks, not kept in the repository
+
+These were run in the working scratch area. They are reported for what they show, and where a check was worth keeping it is a native test.
+
+* **An independent refusal-boundary fuzz** of the dial functions: 54,000 calls over 6,000 random corruptions of valid instances, each compared with a validity rule written from the requirements. No disagreement. The seeded native version in `tests/test_standing.py` runs 700 corruptions through eight functions.
+* **A non-mapping in every mapping slot** of 15 functions, one slot at a time: 682 calls in the scratch check and 527 in the native test; no call answered. The exceptions raised are AttributeError (259), TypeError (112) and ValueError (156) in the scratch run, which is why the docstring now names all three.
+* **Scale.** A single cycle of envy through 3,000 agents: `envy_loop` returns the whole cycle in about 6 s with no recursion limit reached; a ladder of 3,000 agents is checked in about 3 s.
+* **Two first-run "findings" that are not defects.** The non-mapping containers raise an exception, as the module now documents. And `dial_survey` with a count of 10^100 runs as long as it is asked: the count is a loop bound with no cap, and the caller chooses it.
+* **A subagent fuzz** of `standing`, written by a subagent at the smallest model tier as the standing rule requires, stopped twice at its output limit without writing a file, and was stopped. Its report was never received, and no finding came from it.
+
+## Defects found and repaired in this window
+
+Each was reproduced first, then repaired.
+
+1. A random factor drawn once per coordinate instead of once per agent, in three places (`tests/test_standing.py`, `_d32` in `decisions.py`, and the weight-case generator). The slip made "parallel" weights unequal in some coordinates. Each place now draws one strength per agent or vector.
+2. Round 1 of the mutation run: eight test gaps (listed above).
+3. Round 2 of the mutation run: two real gaps (the ledger's reach of the delicate kinds; the oracle runner's check of the weight cases that cannot trade).
+4. The `standing` docstring said that a non-mapping raises AttributeError. The exceptions observed are AttributeError, TypeError and ValueError. Corrected, and the boundary is now a test.
+5. Two debt rows quoted 63,111 for the `standing` oracle stage, which predates the weight cases. Corrected to 63,611.
+6. The sniff audit's draw printed two numbers and the wrong one was read first, so the hosted workflow was examined before the drawn area. The drawn area was then run, and the record says so (`TECHNICAL_DEBT.md`, audit 6).
+7. The hosted workflow runs `python -m pytest -q`. Observed to still print one line per test, because `pyproject.toml` adds `-vv`. Recorded as HO-031 and not changed, because the workflow is shared with the other repositories.
 
 ## What the results are evidence of
 
-* `[FORM]` results (the greatest sustaining law and its uniqueness, rank certificates, exemption is fatal, quorum duality and the single critical point, the dual-variable identity of the loops, closed forms for the renewal chain, prices as surprisal brackets, protection as the weakest link, the phase of a dependency graph, self-maintenance as a greatest fixed point, Goodstein descent; and in the exchange layer, soundness and exactness of a partial view, the cover and robust quorum against every group of people, dominance and the price certificates, the exact quantum values) were checked exactly in rationals or exhaustively on every finite structure of a stated size, against definitions that share no code with the implementation, or against a reference written by someone who had not seen it.
-* `[FRAME]` results hold inside stated assumptions (independent seats, mean-field loops, a birth–death chain with repair only while the body holds, surprisal as price, full support as free will, the Löb ring as the logic of proof-checked approval, a recorded snapshot of the family; in the exchange layer, ignorance as pessimism, understanding as a set, a deal as a vector with four yes-or-no coherence dimensions, an entangled decision as measurements on a shared state). Each assumption is a decision in `DECISIONS.md` with what would refute it.
-* `[HYPER]` and `[OPEN]` items carry no check on purpose: that physical reality adheres to such a structure (D17), why persistence is the right thing to optimize (D16), that hyperoptimization closes the family's open items (D18; the first passes do not support it), that institutional decisions can be entangled (D28), that understanding can be measured (D29), and that win-win survives rival freedoms without an exchange rule (D30).
+* `[FORM]` results, checked exactly or exhaustively against definitions that share no code with the implementation, or against a reference written by someone who had not seen it. For `standing`: from a start, envy has a loop exactly when top trading cycles moves someone and exactly when the start is not Pareto efficient; a pecking order exists exactly when the start is Pareto efficient; a wealth start is a ladder that top trading cycles leaves where it is; and, for the dial, some goods and some start trade at some setting exactly when the weights are neither all equal nor all positive multiples of the price, with a constructive witness from strict Cauchy–Schwarz (`thaw_witness`), agreed with `can_thaw` on every case. The first two are checked on every profile of two, three and four agents (the four by the long run); the dial on sampled instances against an independent reference.
+* `[FRAME]` results, which hold inside stated assumptions: strict private rankings, one indivisible good to each agent, and no prices in the exchange itself. The dial's straight mix (1 - t) price + t own is one path among many from a common ranking to private ones, and the wealthiest-first start is a stylisation, not a model of any market.
+* `[HYPER]` and `[OPEN]` items carry no check on purpose: that the present world's start is a wealth start or any particular start; that tastes which depend on what others hold thaw a ladder by the same mechanism; that a transfer from the top of a ladder is lawful (D16, the owner's; HO-030).
 
 ## Not observed
 
-* **No hosted workflow has run on this repository.** The conformance workflow was copied unchanged. Its install step falls back from the declared extras to fewer when an install fails, so a missing `sympy` would fail the oracle tests (they do not skip), not hide. The one Windows failure that could be reproduced here (a cp1252 pipe) is fixed and tested; Windows, macOS and the hosted 3.10 and 3.13 legs are unrun (HO-005). The oracle runner's deadline uses `subprocess` and is portable in design, but it was only run on Linux; `scripts/probe_sympy_lpmax.py` needs `SIGALRM` for half of what it does.
-* No independent reviewer and no external reproduction. Hash-seed independence was checked by subprocess runs, not by a second machine.
-* **The reference implementations are model-written from the design's own text** (HO-024). A mistake in a definition would be in both.
-* Nothing quantum has been run on a physical system; the Tsirelson value is cited, not proved; the quantum engine is exact and dense and out of reach beyond about six qubits (HO-022, HO-023). The state-dependence formula covers one family of states and one set of measurements.
-* Understanding has no instrument (D29, HO-020); institutional entanglement has no witness (D28); win-win holds by construction for the permissions modelled, which are not rival (D30), and for rival freedoms only in the weak form that nobody ends below where they began, for indivisible goods held one to a party under strict rankings (D31). **No real market has been exchanged.** Ties, several units, tastes that depend on others, groups who misreport together and a publisher who lies are outside the model (HO-028), and the starting allocation is given, not derived (HO-027, B16).
-* The goldens are snapshots (HO-004). If hyperethics, hyperlogic or hyperstratum change what they record, the tests keep passing against the old numbers until the goldens are regenerated deliberately.
+* **macOS, and CPython 3.11 on the hosted runner,** are not in the hosted matrix. CPython 3.11 ran locally under four hash seeds.
+* **No independent reviewer, and no second machine.** Hash-seed independence was checked by running the suite under four seeds on one machine, not on a second.
+* **Shared definitions.** The reference implementations and the package were written from the same text (HO-024).
+* **No real market, start or status measure has been analysed.** Nothing physical was run. The wealth start is a stylisation (HO-030).
+* **Snapshots.** The goldens record what their sources said at their commits (HO-004). If hyperethics, hyperlogic or hyperstratum change what they record, the tests keep passing against the old numbers until the goldens are regenerated deliberately.
 * The loop thresholds are mean-field and the repair model is a chain; no real institution was measured (D03, D09, HO-001, HO-002, HO-003).
-* The family findings (D22, D23) are about one snapshot of two records. A citation is evidence of mention, not of need; the keyword table misses synonyms and counts a word in any sense; the reading of which four open items this package touches was by hand and cannot be rerun (HO-017, HO-018). The family footprints quoted in section 14.2 are loads in that model of the record.
-* The repository's name on the hosting platform (`hyperorganization`) is not the field's name (`hyperoptimization`); the owner's reply is awaited and nothing is registered in hyperstratum until then (HO-029).
+* Understanding has no instrument (D29, HO-020); institutional entanglement has no witness (D28); win-win holds for the permissions modelled, which are not rival (D30), and for rival freedoms only in the weak form that nobody ends below where they began, for indivisible goods held one to a party under strict rankings (D31). Ties, several units, tastes that depend on others, groups who misreport together and a publisher who lies are outside the model (HO-028), and the starting allocation is given, not derived (HO-027, B16).
+* The family findings (D22, D23) are about one snapshot of two records. A citation is evidence of mention, not of need; the keyword table misses synonyms; the reading of which four open items this package touches was by hand and cannot be rerun (HO-017, HO-018).
+* The repository's name on the hosting platform (`hyperorganization`) is not the field's name (`hyperoptimization`). The owner's answer is awaited, and nothing is registered in hyperstratum until then (HO-029).
 
 ## What would invalidate it
 
-Any change to a listed file (`tests/test_manifest.py` fails until the manifest is regenerated, which is the moment to rerun the checks above, the linter last); a regenerated golden; a change to hyperethics, hyperlogic, hyperstratum or hypermath that the records or cross-checks read; a new CPython minor version; a new sympy release (the quantum reference uses it for exact linear algebra).
+Any change to a file listed in the manifest (`tests/test_manifest.py` fails until the manifest is regenerated, which is the moment to rerun the checks above, the linter last); a regenerated golden; a change to hyperethics, hyperlogic, hyperstratum or hypermath that the records or the cross-checks read; a new CPython minor version; a new sympy release (the quantum reference uses it for exact linear algebra).
+
+## History
+
+* **2026-10-11, after the push.** The repository was pushed to `TimeLordRaps/hyperorganization` as `8190793`, a merge of the owner's Initial commit (`a58c56a`, an Apache-2.0 `LICENSE`) and `dbd2bf2`. The hosted workflow `conformance`, run 38174725004 on `8190793`, concluded `success` on `discover`, `documents`, `python` (ubuntu and windows, CPython 3.10 and 3.13) and `conformance-gate`. The step "Run the test suite" took 69 to 199 seconds on its four legs, so it ran the suite. The per-leg pytest summary lines were not read: the log host is refused by the session's network policy, so the per-leg test count is UNKNOWN.
+* **Earlier.** `dbd2bf2` (rival freedoms, D31) and `a1a154b` (the exchange layer) were checked as described in their own receipts in the history of this file.
 
 ## Reproduce
 
 ```console
 pip install -e ".[dev]"
-python -m pytest                            # 909 tests, verbose, per-test timeout, slowest ten listed
-python -m ruff check src tests scripts
-python -m hyperoptimization                 # the report: computed numbers, then what is not established
+python -m pytest                              # 1,038 tests, verbose, per-test timeout, slowest ten listed
+python -m ruff check .
+python -m hyperoptimization                   # the report: computed numbers, then what is not established
 python -m hyperoptimization decisions | diff - DECISIONS.md
-python scripts/differential_oracles.py      # add --full for the sizes quoted above
-python scripts/check_rival_exhaustive.py    # all 331,776 four-party ranking profiles, minutes
+python scripts/differential_oracles.py        # add --full for the sizes quoted above
+python scripts/check_standing_exhaustive.py   # all 331,776 four-agent profiles, about two minutes on four cores
+python scripts/check_rival_exhaustive.py      # all 331,776 four-party ranking profiles, minutes
 python scripts/regenerate_manifest.py --check
-python scripts/check_sdist.py               # needs `build` or `uv`
+python scripts/check_sdist.py                 # needs `build` or `uv`
 ```

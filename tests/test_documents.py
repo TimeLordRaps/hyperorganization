@@ -51,3 +51,35 @@ def test_the_repository_has_documents_and_none_is_empty():
 def test_every_relative_link_in_every_document_resolves():
     problems = {p.name: dangling(p.read_text(encoding="utf-8")) for p in documents()}
     assert {name: found for name, found in problems.items() if found} == {}
+
+
+# --- the trackers name only what exists --------------------------------------------------------------------------------
+
+
+def unresolved(text: str, tests: str | None = None) -> list[str]:
+    """Every test, script or path a tracker names between backticks that does not exist, and every file a
+    decision names under **Where.** that is nowhere in the repository."""
+    if tests is None:
+        tests = "\n".join(p.read_text(encoding="utf-8") for p in (ROOT / "tests").glob("*.py"))
+    missing = [name for name in sorted(set(re.findall(r"`(test_\w+)`", text))) if f"def {name}(" not in tests]
+    paths = set(re.findall(r"`((?:scripts|tests|src/hyperoptimization|validation)/[\w./-]+)`", text))
+    missing += [path for path in sorted(paths) if not (ROOT / path).exists()]
+    for line in re.findall(r"\*\*Where\.\*\* (.+)", text):
+        for part in re.split(r"[;,]", line):
+            name = part.strip().strip("`.")
+            if name.endswith((".py", ".md", ".hm")) and not (ROOT / name).exists() and not any(ROOT.glob(f"**/{name}")):
+                missing.append(name)
+    return missing
+
+
+def test_the_trackers_name_only_tests_scripts_and_files_that_exist():
+    for name in ("TECHNICAL_DEBT.md", "DECISIONS.md", "VALIDATION.md"):
+        assert unresolved((ROOT / name).read_text(encoding="utf-8")) == [], name
+
+
+def test_a_tracker_that_names_something_missing_is_noticed():
+    assert unresolved("see `test_no_such_test_exists_anywhere` and `scripts/no_such_script.py`") == [
+        "test_no_such_test_exists_anywhere", "scripts/no_such_script.py"]
+    assert unresolved("**Where.** no_such_module.py; tests/test_standing.py") == ["no_such_module.py"]
+    assert unresolved("see `scripts/check_standing_exhaustive.py` and `tests/test_standing.py`") == []
+

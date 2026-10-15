@@ -310,6 +310,15 @@ CLAUSES = [
      "the survey of three agents differs from the counts made here"),
     ("D32", standing, "wealth_start", lambda wealth, prefs: {agent: "g0" for agent in prefs},
      "the survey of three agents failed"),
+    ("D32", standing, "can_thaw", lambda price, weights: True,
+     "can_thaw and thaw_witness disagree about whether any goods can trade"),
+    ("D32", standing, "thaw_outcome", lambda endowment, goods, price, weights, lam: dict(endowment),
+     "does not trade at its setting"),
+    ("D32", standing, "thaw_pieces", lambda endowment, goods, price, weights: [  # trade at every setting of the dial
+        standing.Piece(Fraction(0), Fraction(0), dict(endowment), tuple(endowment)),
+        standing.Piece(Fraction(0), Fraction(1), dict(endowment), tuple(endowment)),
+        standing.Piece(Fraction(1), Fraction(1), dict(endowment), tuple(endowment))],
+     "goods traded though the weights are all equal or all along the price"),
 ]
 
 _results: dict[object, tuple[Status, tuple[str, ...]]] = {}

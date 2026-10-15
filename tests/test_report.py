@@ -156,6 +156,10 @@ def test_the_exchange_section_shows_the_numbers_the_models_compute():
     assert "of the 216 rankings of three agents trade happens in 118, exactly where the start is not Pareto efficient" in text
     assert "no agent gains by misreporting (0 do) and the Boston mechanism, a common rule, can be gamed in 36" in text
     assert "with identical rankings nothing moves, so the starting allocation decides" in text
+    # standing: ladders and loops of the same 216 rankings, the wealth starts, and the dial
+    assert "of the same 216 rankings envy has a loop in 118, exactly where trade happens, and the other 98 are ladders" in text
+    assert "(1296 of 1296 such starts), so abolishing money while keeping holdings freezes it" in text
+    assert "of 300 seeded instances 95 trade at some setting and in 26 of those trade opens and closes again" in text
 
 
 def test_the_open_obligations_name_what_the_exchange_layer_does_not_establish():
@@ -163,4 +167,6 @@ def test_the_open_obligations_name_what_the_exchange_layer_does_not_establish():
     assert "rival freedoms beyond one indivisible good each and strict rankings (ties, several units, tastes that" in text
     assert "a starting allocation that is derived and not given; D31)" in text
     assert "exchange of them without money" not in text  # no longer unbuilt: D31
+    assert "macOS and Python 3.11 are not in the hosted matrix" in text and "has not run on this" not in text
+    assert "how to unfreeze a ladder by anything but a change in what agents value" in text
     assert "an instrument for understanding (D29)" in text and "institutional decisions can be entangled (D28)" in text
