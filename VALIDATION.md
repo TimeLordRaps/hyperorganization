@@ -68,7 +68,7 @@ Each stage can fail. `tests/test_oracles.py` plants a slip in the package and in
 
 * `scripts/check_sdist.py` on a fresh copy of the final tree: the source distribution (88 files) carries each of the 75 manifest-listed files byte for byte.
 * `uv build` on the same copy builds the source distribution and the wheel. The wheel's contents and its install are checked below.
-* The wheel installs into a clean CPython 3.13 environment with 30 members, and the unpacked source distribution's own suite passes under CPython 3.13: 1,038 passed in 214 s, exit 0. That sdist was built before this file's last edit; it differs from the commit only in `VALIDATION.md` and `TECHNICAL_DEBT.md`, which `tests/test_documents.py` reads, so the suite was run again on the committed bytes as well (below).
+* The wheel has 30 members, listed with `zipfile` from a clean CPython 3.13 environment (it was not installed and imported there). The unpacked source distribution's own suite passes under CPython 3.13: 1,038 passed in 214 s, exit 0. That sdist was built before this file's last edit; it differs from the commit only in `VALIDATION.md` and `TECHNICAL_DEBT.md`, which `tests/test_documents.py` reads, so the suite was run again on the committed bytes as well (below).
 
 ### Lint
 
@@ -76,7 +76,7 @@ Each stage can fail. `tests/test_oracles.py` plants a slip in the package and in
 
 ### Hosted run
 
-[FILLED AFTER THE PUSH].
+The workflow `conformance`, run 38713844989 on `d60aa31` (a push to `main`, 2026-10-15), concluded `success`: `discover`, `documents`, the four `python` legs (ubuntu-latest and windows-latest, each under CPython 3.10 and 3.13) and `conformance-gate`. Each leg's "Run the test suite" step reported **1,038 passed**: ubuntu 3.13 in 223 s, windows 3.13 in 252 s, windows 3.10 in 259 s, ubuntu 3.10 in 375 s. The job logs were readable once the jobs had finished, so these per-leg counts are read, not inferred. The hosted matrix has no CPython 3.11 leg (3.11 ran locally under four hash seeds) and no macOS leg.
 
 ## Scratch checks, not kept in the repository
 
