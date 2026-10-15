@@ -1,6 +1,6 @@
 # Validation
 
-The receipt for `hyperoptimization` 0.1.0.dev0, 2026-10-11, for the bytes of the commit that closes out decision D32 (`standing`). Everything below was observed by one author in one working session series, on one container. Nothing here has been run by anyone else. Part of the checking was done by reference implementations that subagents wrote from a specification; they are untrusted model output and are described as such where they appear. The hosted workflow's result for this commit is recorded under "Hosted run" below, and the history of earlier hosted runs under "History".
+The receipt for `hyperoptimization` 0.1.0.dev0, for the bytes of the commit that closes out decision D32 (`standing`). Its mutation rounds and long run were made on 2026-10-11; its closeout checks, packaging and hosted run on 2026-10-15. Everything below was observed by one author in one working session series, on one container. Nothing here has been run by anyone else. Part of the checking was done by reference implementations that subagents wrote from a specification; they are untrusted model output and are described as such where they appear. The hosted workflow's result for this commit is recorded under "Hosted run" below, and the history of earlier hosted runs under "History".
 
 ## Coordinates
 
